@@ -85,6 +85,8 @@ This module helps designers prepare for a job search, from reviewing their appli
 
 Each skill can be used on its own.
 
+Job Finder, Job Matcher and Personal Job Board are in beta. They were built and tested in Claude first, and the board needs Claude on a paid plan. In other assistants you get the same list and reports in the chat. [How they work, what was tested and the known limits](modules/career-job-search/README.md#how-job-finder-works).
+
 ### Planned skills
 
 Resume Matcher, for tailoring a CV to a vacancy with an ATS-friendly PDF, and Mock Interview are planned for this module. They are not available in this repository yet.
@@ -181,6 +183,8 @@ This is an early public version.
 The four Professional Growth skills are developed enough to be tested with real users, but I expect them to evolve as more people try them in different roles and contexts.
 
 I would rather change them based on repeated real-world feedback than keep polishing them in theory.
+
+Job Finder, Job Matcher and Personal Job Board are a beta. I've tested them in Claude with a fictional CV and real vacancies, and now I'd like to see how they work for real job searches. I'm especially interested in whether the vacancies on your board were relevant and still open, and whether the match reports were useful.
 
 ## Feedback
 
