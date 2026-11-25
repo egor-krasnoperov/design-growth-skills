@@ -32,7 +32,7 @@ All documents live in the user's private area of the board's database. Unknown v
 
 | Document | Written by | Content |
 | --- | --- | --- |
-| `profile` | Job Finder | Display name for the greeting, target roles and levels, locations, work modes, minimum salary if given, a label for the CV version used. No CV text. |
+| `profile` | Job Finder | Display name for the greeting, target roles and levels, locations, work modes, minimum salary if given, a short label for the CV version, such as `Design Lead CV 2025`. Never use the file name or the person's full name, because the label is shown on the board and goes into downloaded files. No CV text. |
 | `search` | Job Finder | When the search ran, which sources were searched, limited or unavailable, and the search limitations. |
 | `job-<id>` | Job Finder | One vacancy, fields below. |
 | `report-<id>` | Job Matcher | One match report, fields below. |
@@ -46,9 +46,9 @@ All documents live in the user's private area of the board's database. Unknown v
 | `title`, `company` | As in the posting | required |
 | `roleFamily` | `product-designer`, `ux-ui-designer`, `design-engineer`, `design-manager`, `head-of-design`, `head-of-product-design`, `design-director` | `other` |
 | `level` | `middle`, `senior` or `leadership`. A lead role that manages people counts as `leadership`; a lead role without reports counts as `senior`. | `not_stated` |
-| `location` | Location text | `not_stated` |
+| `location` | The place only, short and in English, as the posting states it, for example `London` or `Remote, worldwide`. Never repeat the work format here, it lives in `workMode`. Put details such as allowed countries, travel or the base office into `constraints`. | `not_stated` |
 | `workMode` | `remote`, `hybrid`, `onsite` | `unknown` |
-| `salary` | `{min, max, currency, period}`; ISO currency code; `period` is `year`, `month` or `hour`. The board shows only yearly ranges; other periods stay in the description. | `null` |
+| `salary` | `{min, max, currency, period}`; ISO currency code; `period` is `year`, `month` or `hour`. Take `min` and `max` from one stated range with one currency and one period. If the posting gives several ranges (by location, level or currency), do not combine them: use the range that clearly applies to the user, or leave `salary` empty and list the ranges in `constraints`. Never convert currencies. | `null` |
 | `publishedAt` | Publication date, only when explicitly stated | `null` |
 | `checkedAt` | When the listing was checked | required |
 | `foundAt` | Which search found it | required |

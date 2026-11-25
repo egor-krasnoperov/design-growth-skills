@@ -67,7 +67,7 @@ Use the user's language and provide a manageable number of relevant opportunitie
 - job title, employer, location and working arrangement;
 - source link and original employer link when different and available;
 - publication date, or `not stated`, and when the listing was checked;
-- disclosed salary and its currency and period, or `not stated`;
+- disclosed salary and its currency and period, or `not stated`. Never combine separate ranges, levels or currencies into one range;
 - concise relevance grounded in the candidate's stated goals and CV, without claiming that an unmentioned skill is absent;
 - important constraints, ambiguous conditions, and whether the full description and current status could be checked.
 
