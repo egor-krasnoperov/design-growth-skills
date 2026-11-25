@@ -54,8 +54,8 @@ All documents live in the user's private area of the board's database. Unknown v
 | `foundAt` | Which search found it | required |
 | `sourceName`, `sourceUrl` | Where it was found; links must start with `https://` | required |
 | `employerUrl` | The employer's original posting, `https://` only | `null` |
-| `listingStatus` | `open_confirmed`, `unverified`, `closed` | `unverified` |
-| `description` | Full accessible description text | empty |
+| `listingStatus` | `open_confirmed` only when the posting page opened in this search and showed the posting. Vacancies that are closed or could not be opened do not go on the board. When Refresh finds a board vacancy closed, set `closed`. | required |
+| `description` | The full description copied from the original page in its original language. No summary, translation or added notes. | empty |
 | `descriptionStatus` | `full`, `partial`, `unavailable` | `unavailable` |
 | `relevance` | Why it was included, in the user's language | required |
 | `constraints` | Important constraints or ambiguities | `[]` |

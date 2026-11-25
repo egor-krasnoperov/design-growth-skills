@@ -19,7 +19,7 @@
       --ease-out: cubic-bezier(.23,1,.32,1);
       --ease-soft: cubic-bezier(.22,1,.36,1);
       /* Desktop columns, shared by the header and the page so their edges line up */
-      --layout-cols: 224px minmax(0,1000px);
+      --layout-cols: 224px minmax(0,1fr);
       --layout-gap: 48px;
       --layout-left: 24px;
       --layout-right: 48px;
@@ -87,7 +87,8 @@
     .filter-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 
     /* Job cards */
-    .grid { grid-column: 2; grid-row: 3; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+    /* Cards widen with the window; a new column appears once a card can be 288 px again, at most 5 in a row */
+    .grid { grid-column: 2; grid-row: 3; display: grid; grid-template-columns: repeat(auto-fill,minmax(max(288px,calc((100% - 32px) / 5)),1fr)); gap: 8px; }
     .job { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 190px; padding: 24px;
       border-radius: 20px; background: var(--card); transition: background-color 200ms ease; }
     .job-header { position: relative; display: flex; align-items: flex-start; gap: 8px; min-height: 24px; }
@@ -136,11 +137,6 @@
     .card-bottom { display: flex; align-items: end; justify-content: space-between; gap: 8px; min-height: 44px; margin-top: auto; padding-top: 12px;
       font-size: 14px; line-height: 20px; }
     .match-status { color: var(--muted); }
-    /* Match: the Figma target icon before the word, no underline; the same on the card and in the dialog */
-    .card-match { position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 8px; flex: none; min-height: 44px;
-      margin: -8px auto -8px -8px; padding: 8px; font-size: 14px; line-height: 20px; }
-    .card-match svg { flex: none; width: 18px; height: 18px; fill: currentColor; }
-    .card-match:disabled { color: var(--muted); cursor: default; }
 
     /* Empty state, footer links and toast */
     .empty { grid-column: 2; grid-row: 3; max-width: 420px; padding: 48px 0; }
@@ -195,6 +191,8 @@
     .close-anchor { position: sticky; top: 24px; z-index: 5; height: 0; }
     .dialog-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; }
     #close-detail { position: absolute; top: 0; right: 24px; z-index: 4; }
+    /* Once the dialog is scrolled, the cross gets the card actions' white panel, so text passing under it stays out of the way */
+    .details-dialog[data-scrolled="true"] #close-detail { background: #fff; box-shadow: 0 0 0 .5px rgb(0 0 0 / .08), 0 2px 8px rgb(0 0 0 / .08); }
     .dialog-shell { display: grid; grid-template-columns: 180px minmax(0,720px); justify-content: start; align-items: start; gap: 56px 48px;
       width: 100%; margin: 0 auto; padding: 40px 32px 56px; }
     .dialog-rail { position: sticky; top: 32px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
@@ -248,14 +246,13 @@
       .job:is(:hover, :has(:focus-visible), :has(.card-more[aria-expanded="true"])) :is(.card-more, .bookmark) { opacity: 1; }
       .card-actions button:hover { background: var(--card); }
       .toast-action:hover { background: rgb(255 255 255 / .14); }
-      .card-match:not(:disabled) { opacity: 0; }
-      .job:hover .card-match, .job:focus-within .card-match { opacity: 1; }
       .control:hover, .filter-clear:hover { color: var(--ink); }
       .filter-clear:hover { background: var(--hover); }
       .control:hover .icon { opacity: 1; }
       .side-link:hover, .refresh:hover { color: #666; }
       .filter-option:hover { background: #f6f6f6; }
       .dialog-icon:hover { background: var(--card); }
+      .details-dialog[data-scrolled="true"] #close-detail:hover { background: var(--card); }
       .dialog-rail button:not(.rail-match):hover { color: var(--ink); }
       .egor-face:hover { opacity: 1; }
     }
@@ -267,7 +264,7 @@
 
     /* Wide screens */
     @media (min-width:1700px) {
-      :root { --layout-cols: 224px minmax(0,1100px); --layout-left: 48px; }
+      :root { --layout-left: 48px; }
     }
     /* Desktop: fixed brand and sidebar, sticky toolbar */
     @media (min-width:761px) {
@@ -331,6 +328,9 @@
       .utilities span { flex-basis: 100%; }
       /* On phones the portrait sits at the end of the page instead of covering the cards */
       .egor { position: relative; left: auto; bottom: auto; order: 6; margin-top: 24px; }
+      /* The bubble opens to the right of the portrait, so it never covers Download HTML above it */
+      .egor-bubble { left: calc(100% + 10px); bottom: auto; top: 50%; translate: 0 -50%; }
+      .egor-bubble::after { left: auto; right: 100%; top: 50%; margin-top: -6px; border: 6px solid transparent; border-right-color: #2c2c2c; border-left: 0; }
       .job { min-height: 176px; }
       .close-anchor { top: 12px; }
       #close-detail { right: 12px; }
@@ -363,6 +363,7 @@
     @media (prefers-reduced-motion:no-preference) {
       .details-dialog[open]:not([data-instant="true"]) { animation: detail-enter 260ms var(--ease-soft) both; }
       .details-dialog[open]:not([data-instant="true"])::backdrop { animation: backdrop-enter 260ms ease-out both; }
+      #close-detail { transition: background-color 160ms ease, box-shadow 160ms ease; }
       @keyframes detail-enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes backdrop-enter { from { background: rgb(0 0 0 / 0); } to { background: rgb(0 0 0 / .22); } }
     }
@@ -427,7 +428,7 @@
       <p id="empty-copy">Try a different format or grade.</p>
       <button class="text-button" id="empty-action" type="button">Clear filters</button>
     </section>
-    <footer class="utilities"><span>Design examples · Demo data</span><button id="download" type="button">Download HTML</button></footer>
+    <footer class="utilities"><span id="demo-footer">Design examples · Demo data</span><button id="download" type="button">Download HTML</button></footer>
     <div class="egor" id="egor"><div class="egor-bubble" id="egor-bubble" role="status" aria-live="polite" hidden></div><button class="egor-face" id="egor-face" type="button" aria-label="Egor" aria-controls="egor-bubble" aria-expanded="false"><svg viewBox="2 9 48 47" aria-hidden="true"><path d="M27 9h9v1h-9zM25 10h14v1h-14zM23 11h18v1h-18zM20 12h23v1h-23zM19 13h3v1h-3zM24 13h1v1h-1zM26 13h18v1h-18zM18 14h3v1h-3zM23 14h11v1h-11zM35 14h9v1h-9zM12 15h1v1h-1zM14 15h15v1h-15zM30 15h2v1h-2zM33 15h4v1h-4zM38 15h8v1h-8zM7 16h20v1h-20zM28 16h18v1h-18zM5 17h29v1h-29zM35 17h12v1h-12zM3 18h36v1h-36zM40 18h7v1h-7zM2 19h46v1h-46zM2 20h17v1h-17zM20 20h1v1h-1zM27 20h1v1h-1zM29 20h1v1h-1zM31 20h18v1h-18zM2 21h15v1h-15zM34 21h14v1h-14zM2 22h14v1h-14zM36 22h5v1h-5zM42 22h7v1h-7zM4 23h11v1h-11zM36 23h1v1h-1zM38 23h11v1h-11zM6 24h9v1h-9zM35 24h1v1h-1zM37 24h13v1h-13zM9 25h6v1h-6zM37 25h2v1h-2zM40 25h1v1h-1zM42 25h7v1h-7zM10 26h5v1h-5zM37 26h13v1h-13zM13 27h1v1h-1zM24 27h4v1h-4zM30 27h1v1h-1zM32 27h1v1h-1zM39 27h1v1h-1zM41 27h1v1h-1zM43 27h6v1h-6zM22 28h8v1h-8zM38 28h12v1h-12zM11 29h7v1h-7zM22 29h2v1h-2zM29 29h16v1h-16zM47 29h2v1h-2zM10 30h5v1h-5zM16 30h8v1h-8zM25 30h2v1h-2zM28 30h1v1h-1zM30 30h13v1h-13zM46 30h1v1h-1zM48 30h1v1h-1zM10 31h1v1h-1zM12 31h2v1h-2zM17 31h6v1h-6zM25 31h2v1h-2zM29 31h2v1h-2zM32 31h5v1h-5zM40 31h2v1h-2zM45 31h2v1h-2zM48 31h1v1h-1zM9 32h5v1h-5zM15 32h1v1h-1zM17 32h2v1h-2zM21 32h2v1h-2zM30 32h1v1h-1zM32 32h1v1h-1zM38 32h4v1h-4zM44 32h1v1h-1zM48 32h1v1h-1zM9 33h5v1h-5zM15 33h1v1h-1zM18 33h1v1h-1zM21 33h3v1h-3zM30 33h1v1h-1zM32 33h1v1h-1zM40 33h3v1h-3zM48 33h1v1h-1zM9 34h1v1h-1zM11 34h1v1h-1zM13 34h1v1h-1zM18 34h1v1h-1zM22 34h1v1h-1zM30 34h1v1h-1zM36 34h1v1h-1zM38 34h1v1h-1zM40 34h2v1h-2zM43 34h2v1h-2zM47 34h1v1h-1zM11 35h2v1h-2zM23 35h1v1h-1zM31 35h1v1h-1zM34 35h1v1h-1zM38 35h1v1h-1zM40 35h2v1h-2zM48 35h1v1h-1zM10 36h3v1h-3zM17 36h1v1h-1zM19 36h1v1h-1zM23 36h1v1h-1zM29 36h2v1h-2zM36 36h1v1h-1zM38 36h1v1h-1zM40 36h2v1h-2zM43 36h1v1h-1zM47 36h1v1h-1zM12 37h1v1h-1zM20 37h1v1h-1zM22 37h1v1h-1zM24 37h5v1h-5zM34 37h1v1h-1zM37 37h1v1h-1zM39 37h1v1h-1zM41 37h1v1h-1zM43 37h1v1h-1zM45 37h1v1h-1zM47 37h1v1h-1zM11 38h2v1h-2zM14 38h1v1h-1zM16 38h1v1h-1zM23 38h1v1h-1zM36 38h1v1h-1zM38 38h1v1h-1zM40 38h2v1h-2zM45 38h1v1h-1zM47 38h1v1h-1zM12 39h1v1h-1zM19 39h3v1h-3zM23 39h1v1h-1zM35 39h1v1h-1zM37 39h1v1h-1zM41 39h1v1h-1zM18 40h1v1h-1zM32 40h1v1h-1zM36 40h1v1h-1zM39 40h3v1h-3zM45 40h1v1h-1zM12 41h1v1h-1zM18 41h1v1h-1zM20 41h2v1h-2zM23 41h1v1h-1zM35 41h1v1h-1zM38 41h1v1h-1zM41 41h2v1h-2zM44 41h1v1h-1zM13 42h1v1h-1zM16 42h3v1h-3zM20 42h3v1h-3zM24 42h2v1h-2zM31 42h1v1h-1zM35 42h1v1h-1zM39 42h1v1h-1zM41 42h3v1h-3zM16 43h3v1h-3zM20 43h1v1h-1zM23 43h1v1h-1zM25 43h2v1h-2zM28 43h1v1h-1zM37 43h1v1h-1zM40 43h4v1h-4zM14 44h1v1h-1zM16 44h1v1h-1zM26 44h2v1h-2zM33 44h1v1h-1zM35 44h1v1h-1zM37 44h1v1h-1zM39 44h1v1h-1zM41 44h3v1h-3zM14 45h1v1h-1zM17 45h2v1h-2zM20 45h7v1h-7zM28 45h2v1h-2zM37 45h1v1h-1zM40 45h3v1h-3zM17 46h1v1h-1zM24 46h1v1h-1zM35 46h2v1h-2zM39 46h4v1h-4zM15 47h1v1h-1zM19 47h1v1h-1zM32 47h1v1h-1zM36 47h1v1h-1zM38 47h1v1h-1zM40 47h2v1h-2zM20 48h1v1h-1zM35 48h1v1h-1zM37 48h1v1h-1zM15 49h1v1h-1zM18 49h1v1h-1zM20 49h2v1h-2zM36 49h2v1h-2zM16 50h1v1h-1zM27 50h1v1h-1zM34 50h2v1h-2zM29 51h1v1h-1zM32 51h1v1h-1zM34 51h1v1h-1zM17 52h1v1h-1zM24 52h1v1h-1zM28 52h1v1h-1zM31 52h1v1h-1zM18 53h1v1h-1zM26 53h1v1h-1zM28 53h1v1h-1zM30 53h1v1h-1zM20 54h1v1h-1zM22 54h1v1h-1zM24 54h1v1h-1zM26 54h1v1h-1zM28 54h1v1h-1zM21 55h1v1h-1zM23 55h1v1h-1z" fill="currentColor"/></svg></button></div>
   </main>
   </div>
@@ -441,7 +442,7 @@
     <h2 id="detail-title"></h2><p class="dialog-meta" id="detail-meta"></p><p class="published-line" id="published-line"></p>
     <section id="description-panel"></section><p class="source-line"><span id="source-facts"></span><a id="job-source" target="_blank" rel="noopener noreferrer" hidden>View original job ↗</a><span id="source-missing" hidden>Original job link unavailable</span></p>
     <section id="match-panel"></section>
-    <p class="dialog-note">Demo vacancies and example results</p>
+    <p class="dialog-note" id="demo-note">Demo vacancies and example results</p>
     <textarea class="agent-request" id="agent-request" aria-label="Request for your agent" hidden readonly></textarea></div></div>
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
@@ -535,7 +536,6 @@
     var bookmarkIcon = '<span class="bm" aria-hidden="true"><svg viewBox="3 3 18 18"><path d="M7 19V6.5C7 6.0875 7.14687 5.73438 7.44062 5.44063C7.73437 5.14688 8.0875 5 8.5 5H15.5C15.9125 5 16.2656 5.14688 16.5594 5.44063C16.8531 5.73438 17 6.0875 17 6.5V19L12 17L7 19ZM8.5 16.7708L12 15.375L15.5 16.7708V6.5H8.5V16.7708Z"/></svg>' +
       '<svg class="bm-ink" viewBox="3 3 18 18"><path d="' + pileIcons.saved + '"/></svg></span>';
     // Match icon from Figma (Material Symbols target), drawn at its Figma size.
-    var matchIcon = '<svg viewBox="3 3 18 18" aria-hidden="true"><path d="M8.89583 19.375C7.92361 18.9583 7.07292 18.3854 6.34375 17.6562C5.61458 16.9271 5.04167 16.0764 4.625 15.1042C4.20833 14.1319 4 13.0938 4 11.9896C4 10.8854 4.20833 9.85069 4.625 8.88542C5.04167 7.92014 5.61458 7.07292 6.34375 6.34375C7.07292 5.61458 7.92361 5.04167 8.89583 4.625C9.86806 4.20833 10.9062 4 12.0104 4C13.1146 4 14.1493 4.20833 15.1146 4.625C16.0799 5.04167 16.9271 5.61458 17.6562 6.34375C18.3854 7.07292 18.9583 7.92014 19.375 8.88542C19.7917 9.85069 20 10.8854 20 11.9896C20 13.0938 19.7917 14.1319 19.375 15.1042C18.9583 16.0764 18.3854 16.9271 17.6562 17.6562C16.9271 18.3854 16.0799 18.9583 15.1146 19.375C14.1493 19.7917 13.1146 20 12.0104 20C10.9062 20 9.86806 19.7917 8.89583 19.375ZM16.6042 16.6042C17.8681 15.3403 18.5 13.8056 18.5 12C18.5 10.1944 17.8681 8.65972 16.6042 7.39583C15.3403 6.13194 13.8056 5.5 12 5.5C10.1944 5.5 8.65972 6.13194 7.39583 7.39583C6.13194 8.65972 5.5 10.1944 5.5 12C5.5 13.8056 6.13194 15.3403 7.39583 16.6042C8.65972 17.8681 10.1944 18.5 12 18.5C13.8056 18.5 15.3403 17.8681 16.6042 16.6042ZM8.45833 15.5417C7.48611 14.5694 7 13.3889 7 12C7 10.6111 7.48611 9.43056 8.45833 8.45833C9.43056 7.48611 10.6111 7 12 7C13.3889 7 14.5694 7.48611 15.5417 8.45833C16.5139 9.43056 17 10.6111 17 12C17 13.3889 16.5139 14.5694 15.5417 15.5417C14.5694 16.5139 13.3889 17 12 17C10.6111 17 9.43056 16.5139 8.45833 15.5417ZM14.4792 14.4792C15.1597 13.7986 15.5 12.9722 15.5 12C15.5 11.0278 15.1597 10.2014 14.4792 9.52083C13.7986 8.84028 12.9722 8.5 12 8.5C11.0278 8.5 10.2014 8.84028 9.52083 9.52083C8.84028 10.2014 8.5 11.0278 8.5 12C8.5 12.9722 8.84028 13.7986 9.52083 14.4792C10.2014 15.1597 11.0278 15.5 12 15.5C12.9722 15.5 13.7986 15.1597 14.4792 14.4792ZM10.9375 13.0625C10.6458 12.7708 10.5 12.4167 10.5 12C10.5 11.5833 10.6458 11.2292 10.9375 10.9375C11.2292 10.6458 11.5833 10.5 12 10.5C12.4167 10.5 12.7708 10.6458 13.0625 10.9375C13.3542 11.2292 13.5 11.5833 13.5 12C13.5 12.4167 13.3542 12.7708 13.0625 13.0625C12.7708 13.3542 12.4167 13.5 12 13.5C11.5833 13.5 11.2292 13.3542 10.9375 13.0625Z"/></svg>';
     // Card menu icons: three dots, and a light eye (1.8 line) for Hide (with a slash) and Show again (open).
     var moreIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>';
     function eyeIcon(off) {
@@ -574,6 +574,14 @@
     // Older saved states could put a job in several piles: a status wins, then Hidden, then Saved.
     state.hidden = state.hidden.filter(function (id) { return !state.statuses[id]; });
     state.saved = state.saved.filter(function (id) { return !state.hidden.includes(id) && !state.statuses[id]; });
+    // Keeps one- and two-letter words (в, на, и, a, of), short prepositions and a dash on the same line as the next word.
+    // Repeats until nothing changes, so a run of short words ("и в") is glued too; no lookbehind, so older Safari can read it.
+    function glue(value) {
+      var text = String(value == null ? '' : value), before;
+      var short = /(^|[\s(«“"„])([a-zа-яё]{1,2}|для|без|под|над|при|про|или|the|and|for) +(?=\S)/giu;
+      do { before = text; text = text.replace(short,'$1$2 '); } while (text !== before);
+      return text.replace(/ +(?=[—–] )/g,' ');
+    }
     function escapeHTML(value) {
       return String(value == null ? '' : value).replace(/[&<>"']/g,function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
     }
@@ -716,12 +724,9 @@
           escapeHTML(bookmarkLabel(j,saved)) + '" aria-pressed="' + saved + '" data-tip="' + (saved ? 'Remove from saved' : 'Save') + '">' + bookmarkIcon + '</button>') +
           '</div></div>' +
           '<div class="job-main"><h2 class="job-title"><button type="button" class="title-button" data-open="' + escapeHTML(j.id) +
-          '">' + escapeHTML(j.title) + '</button></h2><p class="job-meta">' + escapeHTML(metaLine(j)) +
+          '">' + escapeHTML(glue(j.title)) + '</button></h2><p class="job-meta">' + escapeHTML(glue(metaLine(j))) +
           '</p></div><div class="card-bottom">' +
-          (!report && !j.match && !demoShown(j.id) ? '<button class="card-match" type="button" data-run-match="' + escapeHTML(j.id) + '" aria-label="' +
-          escapeHTML((matching.has(j.id) ? 'Matching… ' : 'Match: ') + jobName(j)) + '"' + (matching.has(j.id) ? ' disabled' : '') + '>' +
-          matchIcon + '<span>' + (matching.has(j.id) ? 'Matching…' : 'Match') + '</span></button>' : '') +
-          '<span class="match-status">' + (report ? escapeHTML(reportLabel(report)) : j.match ? 'Match ' + escapeHTML(j.match) + '%' :
+          '<span class="match-status">' + (report ? escapeHTML(reportLabel(report)) : matching.has(j.id) ? 'Matching…' : j.match ? 'Match ' + escapeHTML(j.match) + '%' :
           demoShown(j.id) ? 'Demo match' : '') + '</span></div></article>';
       }).join('');
       $('result-count').textContent = jobs.length + (jobs.length === 1 ? ' job' : ' jobs');
@@ -756,7 +761,12 @@
       $('sort-trigger').setAttribute('aria-label','Sort: ' + selected[1]);
       $('sort-trigger').dataset.filtered = String(sort !== defaults.sort + '-desc');
     }
-    function render() { renderControls(); renderJobs(); persist(); }
+    // The demo notes show only with the built-in demo data: every company is marked "(demo)". Real vacancies never carry them.
+    function renderDemoNotes() {
+      var demo = !hostData && data.jobs.length > 0 && data.jobs.every(function (j) { return /\(demo\)\s*$/.test(j.company || ''); });
+      $('demo-footer').hidden = !demo; $('demo-note').hidden = !demo;
+    }
+    function render() { renderControls(); renderJobs(); renderDemoNotes(); persist(); }
     function toggleSaved(id) {
       var job = data.jobs.find(function (j) { return j.id === id; });
       if (!job) return;
@@ -870,20 +880,22 @@
         if (dot) { dot.nextElementSibling.remove(); dot.remove(); }
       }
       $('detail-company').textContent = active.company || '';
-      $('detail-title').textContent = active.title || '';
-      $('detail-meta').textContent = metaLine(active);
-      $('published-line').textContent = publishedLabel(active.publishedAt) ? 'Published ' + publishedLabel(active.publishedAt) : 'Publication date unavailable';
+      $('detail-title').textContent = glue(active.title || '');
+      $('detail-meta').textContent = glue(metaLine(active));
+      // An unknown publication date is left out, like other unknown parts.
+      $('published-line').textContent = publishedLabel(active.publishedAt) ? 'Published ' + publishedLabel(active.publishedAt) : '';
+      $('published-line').hidden = !publishedLabel(active.publishedAt);
       var source = ''; try { var parsed = new URL(active.employerUrl || active.url || active.sourceUrl || ''); if (['http:','https:'].includes(parsed.protocol)) source = parsed.href; } catch (_) {}
       $('job-source').hidden = !source; $('source-missing').hidden = !!source; if (source) $('job-source').href = source; else $('job-source').removeAttribute('href');
       // Where the vacancy was found, when the listing was checked and whether it is still open.
       var listing = {open_confirmed:'Open', unverified:'Not verified', closed:'Closed'}[active.listingStatus];
       var facts = [active.sourceName ? 'Found on ' + active.sourceName : '', dayOf(active.checkedAt) ? 'checked ' + new Date(dayOf(active.checkedAt) + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '', listing || ''].filter(Boolean);
       $('source-facts').textContent = facts.length ? facts.join(' · ') + ' · ' : '';
-      $('description-panel').innerHTML = '<h3>Job description</h3><p>' + (active.description ? escapeHTML(active.description).replace(/\n/g,'<br>') : 'Full job description is not available in this demo.') + '</p>';
+      $('description-panel').innerHTML = '<h3>Job description</h3><p>' + (active.description ? escapeHTML(glue(active.description)).replace(/\n/g,'<br>') : 'Full job description is not available.') + '</p>';
       renderMatchPanel();
       updateDetailStatus();
       $('agent-request').hidden = true; $('copy-feedback').textContent = '';
-      if (!dialog.open) dialog.showModal();
+      if (!dialog.open) { dialog.dataset.scrolled = 'false'; dialog.showModal(); }
     }
     function positionFilter() {
       if (!$('filter-dialog').open || !filterTrigger) return;
@@ -943,7 +955,7 @@
       }
     }
     $('jobs').addEventListener('click',function (event) {
-      if (event.target.closest('[data-save], [data-run-match], [data-more]')) return;
+      if (event.target.closest('[data-save], [data-more]')) return;
       var card = event.target.closest('.job');
       if (card) openDetails(card.dataset.id,event.detail === 0);
     });
@@ -952,7 +964,6 @@
       if (!button) return;
       if (button.dataset.save) return toggleSaved(button.dataset.save);
       if (button.dataset.more) return openFilter('card',event.detail === 0,false,button,button.dataset.more);
-      if (button.dataset.runMatch) return requestMatch(button.dataset.runMatch);
       if (button.dataset.filter) return openFilter(button.dataset.filter,event.detail === 0,false);
       if (button.dataset.option) {
         if (filterKey === 'status' || filterKey === 'card') return chooseStatusOption(button.dataset.option,event);
@@ -1086,6 +1097,7 @@
     }
     $('details').addEventListener('cancel',function (event) { event.preventDefault(); closeDetails(true); });
     $('close-detail').onclick = function (event) { closeDetails(event.detail === 0); };
+    $('details').addEventListener('scroll',function () { var d = $('details'), scrolled = String(d.scrollTop > 4); if (d.dataset.scrolled !== scrolled) d.dataset.scrolled = scrolled; },{passive:true});
     function renderMatchPanel() {
       if (!active) return;
       var report = reportOf(active.id), result = report || active.match || demoShown(active.id);
@@ -1101,7 +1113,7 @@
     // The report in the dialog: level and percentage, the AI note, which CV and when, the summary,
     // then requirements with their status and CV evidence, strengths, gaps, questions, CV improvements and coverage.
     function reportHTML(r) {
-      var esc = escapeHTML, list = function (items) { return Array.isArray(items) ? items.filter(Boolean) : []; };
+      var esc = function (value) { return escapeHTML(glue(value)); }, list = function (items) { return Array.isArray(items) ? items.filter(Boolean) : []; };
       var html = '<h3>' + esc(reportLabel(r)) + '</h3>' +
         '<p class="report-note">AI estimate of how well your CV fits this job description. A guide, not a prediction of an interview invitation.</p>' +
         (reportMeta(r) ? '<p class="report-note">' + esc(reportMeta(r)) + '</p>' : '') + (r.summary ? '<p>' + esc(r.summary) + '</p>' : '');
@@ -1197,7 +1209,7 @@
         '**Published:** ' + (active.publishedAt || 'Not provided'), '**Source:** ' + (source ? '[View original job](<' + source + '>)' : 'Not provided'), ''];
       lines = lines.concat(report ? reportMarkdown(report) : ['## Match report', '', '**' + label + '**', '', 'Demo only — no CV analysis has been performed.', '',
         '- Matches: not assessed.', '- Gaps: not assessed.', '- To clarify: CV and full vacancy description are needed.', '']);
-      lines.push('## Job description', '', active.description || 'Full job description is not available in this demo.', '');
+      lines.push('## Job description', '', active.description || 'Full job description is not available.', '');
       saveTextFile('job-match-report.md', lines.join('\n'), 'text/markdown;charset=utf-8');
     };
     $('copy-request').onclick = async function () {
