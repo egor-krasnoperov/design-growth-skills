@@ -599,7 +599,7 @@
     function scheduleToast(ms) { clearTimeout(toastTimer); toastTimer = setTimeout(hideToast,ms); }
     function notify(message, action) {
       // The open vacancy dialog covers the toast, so there a plain message goes to the dialog's own line under its actions.
-      if (!action && $('details').open) { $('copy-feedback').textContent = message; return; }
+      if (!action && $('details').open) { $('copy-feedback').textContent = message; $('copy-feedback').dataset.host = 'true'; return; }
       var toast = $('toast');
       clearTimeout(toastTimer); toast.textContent = message;
       if (action) {
@@ -896,7 +896,7 @@
       $('description-panel').innerHTML = '<h3>Job description</h3><p>' + (active.description ? escapeHTML(glue(active.description)).replace(/\n/g,'<br>') : 'Full job description is not available.') + '</p>';
       renderMatchPanel();
       updateDetailStatus();
-      $('agent-request').hidden = true; $('copy-feedback').textContent = '';
+      $('agent-request').hidden = true; $('copy-feedback').textContent = ''; delete $('copy-feedback').dataset.host;
       if (!dialog.open) { dialog.dataset.scrolled = 'false'; dialog.showModal(); }
     }
     function positionFilter() {
@@ -1111,6 +1111,8 @@
       $('rail-result').hidden = !result; $('rail-result').textContent = report ? reportLabel(report) : active.match ? 'Match ' + active.match + '%' : 'Demo match';
       $('download-report').hidden = !result;
       $('copy-request').hidden = !result || !features.tailor;
+      // Once the report has arrived, the note about the request sent to the chat has done its job.
+      if (result && $('copy-feedback').dataset.host === 'true') { $('copy-feedback').textContent = ''; delete $('copy-feedback').dataset.host; }
     }
     // The report in the dialog: level and percentage, the AI note, which CV and when, the summary,
     // then requirements with their status and CV evidence, strengths, gaps, questions, CV improvements and coverage.
@@ -1502,8 +1504,9 @@
       var result = action.type === 'refresh' ? 'new vacancies will appear here.' : 'the report will appear here.';
       // Called synchronously inside the click: nothing is awaited before it.
       room.sendToClaudeSession(payload, { deliver: deliver }).then(function () {
+        // A send waits for the person's answer in Claude's own "send a message?" window, so the message says what to press.
         say(deliver === 'send'
-          ? name + ' request sent to your chat with Claude. ' + result.charAt(0).toUpperCase() + result.slice(1)
+          ? 'Press Send in Claude\'s window to start ' + name + '. ' + result.charAt(0).toUpperCase() + result.slice(1)
           : 'The ' + name + ' request is in your chat. Press Send there, ' + result);
       }, function (error) {
         if (deliver === 'send' && error && error.code === 'claude_unavailable') sendRefused = true;

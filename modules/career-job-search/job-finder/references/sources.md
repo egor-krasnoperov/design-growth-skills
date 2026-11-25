@@ -51,13 +51,15 @@ Find the platform from the posting link (or from the employer's "Apply" link on 
 | Workable | `apply.workable.com/{account}/j/{shortcode}` | `https://apply.workable.com/api/v1/widget/accounts/{account}` | `https://apply.workable.com/api/v2/accounts/{account}/jobs/{shortcode}` |
 | Ashby | `jobs.ashbyhq.com/{org}/{id}` | `https://api.ashbyhq.com/posting-api/job-board/{org}?includeCompensation=true` (full texts of all postings; a large employer comes in several parts) | No public address for one posting, and the posting page shows no text without JavaScript. Use the list: a posting in it is open. |
 | Recruitee | `{company}.recruitee.com/o/{slug}` or a career site on Recruitee | `https://{company}.recruitee.com/api/offers/` | Open the posting page itself |
+| SmartRecruiters | `jobs.smartrecruiters.com/{company}/{id}` | `https://api.smartrecruiters.com/v1/companies/{company}/postings` (large employers come in parts with `limit` and `offset`) | `https://api.smartrecruiters.com/v1/companies/{company}/postings/{id}` |
 
 How to read the answer:
 
 - **The posting is in the employer's live list, or comes back on its own.** The vacancy is open. Take the title, location, work mode, an explicit publication date and a disclosed salary from it.
 - **An error comes back for one posting** (the reading tool may show only `client_error`, or 404, 410), **a page redirects to the general list** (Greenhouse adds `?error=true`), **or the posting is missing from the employer's live list.** The vacancy is closed or removed. Drop it. Do not treat this as "blocked" or "not verified".
 - **The whole platform address fails** (for example the company name is wrong, or the employer has moved to another platform and its list is empty). Open the posting page itself, with a check string, and judge it by its content.
-- **Rate limited.** Platforms limit fast reading. Read one address of a site at a time; if a read is limited, go on with another employer and come back later.
+- **Rate limited.** Platforms limit fast reading, Greenhouse most of all. Read one address of a site at a time. For Greenhouse read one list per employer (with `content=true` it has the texts of all postings) instead of single postings. If the list address is limited, try the employer's board page `https://job-boards.greenhouse.io/{board}?check=…`, which shows the same open postings. If a read is still limited, go on with other employers and come back to it at the end of the search, before you decide what goes on the board.
+- **A very long list.** Large employers on Ashby or Lever have lists too long to read in full. On Lever read the single posting instead. On Ashby open the posting page with a check string: a 404 means closed, and the page title shows the posting when it is open. Then read the list in parts only until you reach that posting's text.
 
 Where the fields are:
 
@@ -67,5 +69,6 @@ Where the fields are:
 | Lever | `descriptionPlain`, then each of `lists` (heading and items), then `additionalPlain` | not stated (`createdAt` is not a publication date) | `salaryRange` when present | `categories.location`, `workplaceType` |
 | Workable | `description`, `requirements`, `benefits` (HTML) | `published` | `salary_from`, `salary_to`, `salary_currency_iso_code`, `salary_frequency` | `location`, `locations`, `workplace`, `remote` |
 | Ashby | `descriptionPlain` | `publishedAt` | `compensation`: use one tier only; a summary such as "Multiple Ranges" or several tiers are separate ranges | `location`, `secondaryLocations`, `workplaceType`, `isRemote` |
+| SmartRecruiters | `jobAd.sections` (`jobDescription`, `qualifications`, `additionalInformation`) | `releasedDate` | rarely given | `location.city`, `location.remote`, `location.hybrid`; `active: true` means open |
 
 To find more vacancies on these platforms, search the platform domains directly with the role and region, for example `site:job-boards.greenhouse.io "Product Designer" remote Europe`, `site:jobs.lever.co`, `site:jobs.ashbyhq.com`, `site:apply.workable.com`. Search results are leads only; check each one as above. Once an employer's list is open, look there for other postings that fit the user's roles too.

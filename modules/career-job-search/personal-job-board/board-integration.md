@@ -47,7 +47,7 @@ All documents live in the user's private area of the board's database. Unknown v
 | `title`, `company` | As in the posting | required |
 | `roleFamily` | `product-designer`, `ux-ui-designer`, `design-engineer`, `design-manager`, `head-of-design`, `head-of-product-design`, `design-director` | `other` |
 | `level` | `middle`, `senior` or `leadership`. A lead role that manages people counts as `leadership`; a lead role without reports counts as `senior`. | `not_stated` |
-| `location` | The place only, short and in English, as the posting states it, for example `London` or `Remote, worldwide`. Never repeat the work format here, it lives in `workMode`. Put details such as allowed countries, travel or the base office into `constraints`. | `not_stated` |
+| `location` | The place only, short and in English, as the posting states it, for example `London`, `Portugal`, `Europe` or `Worldwide`. Never write the work format here (`Remote`, `Hybrid`, `On-site`), it lives in `workMode`. For a remote role use the country or region where it can be done; if the posting names none, use `not_stated`. Put details such as allowed countries, travel or the base office into `constraints`. | `not_stated` |
 | `workMode` | `remote`, `hybrid`, `onsite` | `unknown` |
 | `salary` | `{min, max, currency, period}`; ISO currency code; `period` is `year`, `month` or `hour`. Take `min` and `max` from one stated range with one currency and one period. If the posting gives several ranges (by location, level or currency), do not combine them: use the range that clearly applies to the user, or leave `salary` empty and list the ranges in `constraints`. Never convert currencies. | `null` |
 | `publishedAt` | Publication date, only when explicitly stated | `null` |
