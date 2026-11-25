@@ -34,7 +34,7 @@ The source list below was compiled on 2026-11-19 from design job boards collecte
 
 Additional channels: employer career pages and the public job platform addresses below, for identified employers, not global searches. Use each source only within its current access and usage conditions.
 
-At the last check in November 2026 DesignX returned an empty accessible view and Work in Startups required a human check. Remote geography, individual vacancy freshness and the original employer posting still need verification.
+At the last check in November 2026 DesignX returned an empty accessible view, Work in Startups required a human check, and Woody Jobs and Personio career pages refused the reading tool in claude.ai. Remote geography, individual vacancy freshness and the original employer posting still need verification.
 
 ## Checking a posting on its job platform
 
@@ -51,7 +51,7 @@ Find the platform from the posting link (or from the employer's "Apply" link on 
 | Workable | `apply.workable.com/{account}/j/{shortcode}` | `https://apply.workable.com/api/v1/widget/accounts/{account}` | `https://apply.workable.com/api/v2/accounts/{account}/jobs/{shortcode}` |
 | Ashby | `jobs.ashbyhq.com/{org}/{id}` | `https://api.ashbyhq.com/posting-api/job-board/{org}?includeCompensation=true` (full texts of all postings; a large employer comes in several parts) | No public address for one posting, and the posting page shows no text without JavaScript. Use the list: a posting in it is open. |
 | Recruitee | `{company}.recruitee.com/o/{slug}` or a career site on Recruitee | `https://{company}.recruitee.com/api/offers/` | Open the posting page itself |
-| SmartRecruiters | `jobs.smartrecruiters.com/{company}/{id}` | `https://api.smartrecruiters.com/v1/companies/{company}/postings` (large employers come in parts with `limit` and `offset`) | `https://api.smartrecruiters.com/v1/companies/{company}/postings/{id}` |
+| SmartRecruiters | `jobs.smartrecruiters.com/{company}/{id}` | `https://api.smartrecruiters.com/v1/companies/{company}/postings` (large employers come in parts with `limit` and `offset`). In November 2026 these addresses refused the reading tool in claude.ai, so there the posting page itself may be the only way. | `https://api.smartrecruiters.com/v1/companies/{company}/postings/{id}` |
 
 How to read the answer:
 
