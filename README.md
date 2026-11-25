@@ -80,12 +80,14 @@ This module helps designers prepare for a job search, from reviewing their appli
 
 - [Resume Checker](modules/career-job-search/resume-checker/SKILL.md) reviews a designer's resume as a hiring artifact and provides structured feedback.
 - [Portfolio Checker](modules/career-job-search/portfolio-checker/SKILL.md) reviews how a designer's portfolio may come across to a hiring manager for a target role.
+- [Job Finder](modules/career-job-search/job-finder/SKILL.md) *(beta)* finds current design vacancies that fit what you're looking for and collects them on your own [Personal Job Board](modules/career-job-search/personal-job-board/README.md).
+- [Job Matcher](modules/career-job-search/job-matcher/SKILL.md) *(beta)* compares your CV with a specific vacancy and shows what is supported, what is missing and what to clarify.
 
 Each skill can be used on its own.
 
 ### Planned skills
 
-Job Matcher and Mock Interview are planned for this module. They are not available in this repository yet.
+Resume Matcher, for tailoring a CV to a vacancy with an ATS-friendly PDF, and Mock Interview are planned for this module. They are not available in this repository yet.
 
 ## How the skills work together
 

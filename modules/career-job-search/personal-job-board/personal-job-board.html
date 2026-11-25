@@ -1,0 +1,1479 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="color-scheme" content="light">
+  <title>Your personal job board — Design Growth Skills</title>
+  <link rel="icon" href="data:,">
+  <style>
+    /* Personal Job Board. One layer: tokens, base, components, then screen sizes. */
+    :root {
+      --ink: #222222;
+      --muted: #696969;
+      --card: #f5f5f5;
+      --hover: #ebebeb;
+      --selected: #f0f0f0;
+      --line: #e8e8e8;
+      --ease-out: cubic-bezier(.23,1,.32,1);
+      --ease-soft: cubic-bezier(.22,1,.36,1);
+      /* Desktop columns, shared by the header and the page so their edges line up */
+      --layout-cols: 224px minmax(0,1000px);
+      --layout-gap: 48px;
+      --layout-left: 24px;
+      --layout-right: 48px;
+    }
+
+    /* Base */
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; }
+    html:has(dialog[open]) { overflow: hidden; }
+    body { margin: 0; background: white; color: var(--ink); font: 400 16px/24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    button, textarea { font: inherit; color: inherit; }
+    button { border: 0; background: none; padding: 0; cursor: pointer; text-align: left;
+      touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+    button:focus-visible, a:focus-visible, textarea:focus-visible { outline: 2px solid #777; outline-offset: 4px; }
+    button { transition: transform 160ms var(--ease-out), background-color 160ms ease, color 160ms ease, opacity 160ms ease; }
+    button:active { transform: scale(.97); }
+    ::selection { color: var(--ink); background: #dedede; }
+    .icon { width: 20px; height: 20px; display: block; flex: 0 0 auto; }
+
+    /* Header */
+    .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding: 28px 28px 0; }
+    .brand-name { margin: 0; font-size: 18px; line-height: 19px; font-weight: 600; }
+    .byline { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: var(--muted); }
+    .refresh { display: inline-flex; align-items: flex-start; gap: 7px; min-height: 44px; padding: 0 0 10px 12px; border-radius: 12px;
+      color: var(--ink); background: transparent; font-size: 18px; line-height: 19px; font-weight: 600; }
+
+    /* Page layout and navigation */
+    .app-layout { display: grid; grid-template-columns: var(--layout-cols); column-gap: var(--layout-gap); margin: 0 var(--layout-right) 64px var(--layout-left); }
+    .workspace { display: contents; }
+    .side-nav { grid-column: 1; grid-row: 3; align-self: start; display: grid; gap: 0; }
+    .side-link { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 24px; padding: 2px 16px 2px 0;
+      border-radius: 12px; color: var(--muted); font-size: 14px; line-height: 20px; font-weight: 400; }
+    .side-link[aria-current="page"] { color: var(--ink); font-weight: 600; }
+    .side-link[aria-current="page"] .nav-count { color: var(--ink); }
+    .nav-count { min-width: 18px; text-align: right; font-variant-numeric: tabular-nums; }
+    .cv-link { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 4px; width: 100%;
+      min-height: 44px; margin-top: 20px; padding: 6px 0; font-size: 14px; line-height: 20px; }
+    .cv-link strong { font-weight: 600; }
+    .cv-link span { color: var(--muted); text-align: left; }
+    .hero { grid-column: 2; grid-row: 1; display: block; }
+    .greeting { margin: 0; font-size: 18px; line-height: 19px; font-weight: 600; overflow-wrap: anywhere; text-wrap: balance; }
+
+    /* Toolbar: counts, filters and sort */
+    .toolbar { grid-column: 2; grid-row: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      min-height: 44px; margin: 24px 0 16px; }
+    .collection-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 16px; }
+    .result-count { margin: 0; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 14px; line-height: 20px; }
+    .last-updated { display: flex; gap: 4px; margin: 0; color: var(--muted); font-size: 14px; line-height: 20px; }
+    .controls { display: flex; align-items: center; gap: 4px; }
+    .control { display: inline-flex; align-items: center; justify-content: flex-start; gap: 4px; min-height: 44px; padding: 10px 12px;
+      min-width: 0; border-radius: 999px; color: var(--muted); font-size: 14px; line-height: 20px; white-space: nowrap; }
+    /* Filters show state by colour only: grey at rest, black when hovered, open or set */
+    .control .icon { opacity: .55; transition: opacity 160ms ease; }
+    .filter-trigger[aria-expanded="true"], .filter-trigger[data-filtered="true"] { color: var(--ink); }
+    .filter-trigger[aria-expanded="true"] .icon, .filter-trigger[data-filtered="true"] .icon { opacity: 1; }
+    /* A set work format or grade shows a small cross instead of the arrow; the cross clears only that filter */
+    .clearable[data-filtered="true"] .icon { display: none; }
+    .clearable[data-filtered="true"] { padding-right: 4px; }
+    .filter-clear { display: inline-grid; place-items: center; width: 28px; height: 28px; margin-left: -4px; border-radius: 50%; color: var(--muted); }
+    .filter-clear svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+    .filter-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Job cards */
+    .grid { grid-column: 2; grid-row: 3; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+    .job { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 190px; padding: 24px;
+      border-radius: 20px; background: var(--card); transition: background-color 200ms ease; }
+    .job-header { position: relative; display: flex; align-items: flex-start; gap: 8px; min-height: 24px; }
+    /* Room for the card actions: none at rest, one slot for the job's pile icon (saved or a status), two while the panel is open */
+    .job-header { padding-right: var(--actions-rest,0px); }
+    .job:has(.bookmark[aria-pressed="true"]), .job:has(.card-status) { --actions-rest: 36px; }
+    /* "New": found in the latest search and not opened yet */
+    .new-dot { display: inline-block; width: 8px; height: 8px; margin: 0 6px 1px 0; border-radius: 50%; background: var(--ink); vertical-align: middle; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .company { flex: 1; min-width: 0; font-size: 14px; line-height: 20px; font-weight: 600; overflow-wrap: anywhere; }
+    .card-date { flex: 0 0 auto; margin-left: auto; color: var(--muted); font-size: 14px; line-height: 20px; text-align: right; white-space: nowrap; }
+    /* Saved jobs and jobs with a status show no date, which leaves the company name more room */
+    .job:has(.bookmark[aria-pressed="true"]) .card-date, .job:has(.card-status) .card-date { display: none; }
+    .card-date { transition: opacity 160ms ease; }
+    /* Card actions: 28 px slots on the company line, more and then the job's pile icon (its status, or the bookmark) at the right edge.
+       A white panel shows behind them on hover, on keyboard focus and while the menu is open. */
+    .card-actions { position: absolute; top: -6px; right: -7px; z-index: 2; display: flex; padding: 2px; border-radius: 10px; }
+    .card-actions::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #fff;
+      box-shadow: 0 0 0 .5px rgb(0 0 0 / .08), 0 2px 8px rgb(0 0 0 / .08); opacity: 0; transition: opacity 160ms ease; }
+    .job:has(.card-more[aria-expanded="true"]) .card-actions::before { opacity: 1; }
+    .card-actions button, .card-status { position: relative; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; }
+    .card-actions svg { width: 18px; height: 18px; fill: currentColor; }
+    .card-more[aria-expanded="true"] { background: var(--card); }
+    .card-status[data-status="rejected"] { color: var(--muted); }
+    /* Bookmark: an outline and an ink layer of the same shape; the ink shows when the job is saved */
+    .bm { position: relative; display: grid; width: 18px; height: 18px; pointer-events: none; }
+    .bm svg { grid-area: 1 / 1; width: 100%; height: 100%; fill: currentColor; }
+    .bm-ink { opacity: 0; }
+    [aria-pressed="true"] .bm-ink { opacity: 1; }
+    .spark { position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px; background: var(--ink); opacity: 0; pointer-events: none; }
+    /* One shared tooltip for the card icons: centred under the icon, kept inside the window, fades in without moving */
+    .tip { position: fixed; z-index: 20; padding: 2px 8px; border-radius: 6px; background: #2c2c2c; color: #fff; font-size: 14px; line-height: 20px;
+      white-space: nowrap; pointer-events: none; }
+    .tip:not([hidden]) { animation: tip-in 150ms ease both; }
+    @keyframes tip-in { from { opacity: 0; } }
+    .rail-icon { width: 20px; height: 20px; flex: none; fill: currentColor; }
+    .dialog-rail .rail-action { display: inline-flex; align-items: center; gap: 8px; }
+    .job-main { margin-top: 20px; }
+    .title-button { display: block; width: 100%; }
+    .title-button:active { transform: none; }
+    .title-button::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+    .title-button:focus-visible { outline: none; }
+    .title-button:focus-visible::after { outline: 2px solid var(--ink); outline-offset: -3px; }
+    .job-title { margin: 0; font-size: 18px; line-height: 22px; font-weight: 600; overflow-wrap: anywhere; }
+    .job-meta { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+    .card-bottom { display: flex; align-items: end; justify-content: space-between; gap: 8px; min-height: 44px; margin-top: auto; padding-top: 12px;
+      font-size: 14px; line-height: 20px; }
+    .match-status { color: var(--muted); }
+    /* Match: the Figma target icon before the word, no underline; the same on the card and in the dialog */
+    .card-match { position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 8px; flex: none; min-height: 44px;
+      margin: -8px auto -8px -8px; padding: 8px; font-size: 14px; line-height: 20px; }
+    .card-match svg { flex: none; width: 18px; height: 18px; fill: currentColor; }
+    .card-match:disabled { color: var(--muted); cursor: default; }
+
+    /* Empty state, footer links and toast */
+    .empty { grid-column: 2; grid-row: 3; max-width: 420px; padding: 48px 0; }
+    .empty h2 { margin: 0 0 8px; font-size: 18px; line-height: 22px; font-weight: 600; }
+    .empty p { margin: 0 0 20px; color: var(--muted); }
+    .text-button { min-height: 44px; text-decoration: underline; text-underline-offset: 4px; }
+    .utilities { grid-column: 2; grid-row: 4; display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin-top: 24px;
+      color: var(--muted); font-size: 14px; line-height: 20px; }
+    .utilities button { min-height: 44px; text-decoration: underline; text-underline-offset: 4px; }
+    .toast { position: fixed; bottom: max(24px,env(safe-area-inset-bottom)); left: 50%; z-index: 5; transform: translateX(-50%);
+      width: max-content; max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 12px; background: #2c2c2c; color: white;
+      font-size: 14px; line-height: 20px; }
+    .toast:has(.toast-action) { display: flex; align-items: center; gap: 12px; padding-top: 6px; padding-bottom: 6px; }
+    .toast-action { min-height: 32px; margin-right: -10px; padding: 6px 12px; border-radius: 999px; color: #fff; font-weight: 600; }
+
+    /* Egor's portrait in the bottom-left corner: 48 square pixels wide, so each one is exactly 1 px.
+       A small speech bubble shows a greeting on hover and a new line on each click; 12 px is used only here. */
+    .egor { position: fixed; left: 28px; bottom: 28px; z-index: 3; width: 48px; }
+    /* Grey at rest so it does not draw attention; full ink on hover, keyboard focus and while its bubble is open */
+    .egor-face { display: block; width: 48px; border-radius: 6px; color: var(--ink); opacity: .4; transform-origin: 50% 100%; }
+    .egor-face:focus-visible, .egor-face[aria-expanded="true"] { opacity: 1; }
+    .egor-face svg { display: block; width: 100%; height: auto; shape-rendering: crispEdges; }
+    .egor-bubble { position: absolute; left: 0; bottom: calc(100% + 10px); width: max-content; max-width: 200px; margin: 0; padding: 6px 10px;
+      border-radius: 10px; background: #2c2c2c; color: #fff; font-size: 12px; line-height: 16px; }
+    .egor-bubble::after { content: ""; position: absolute; left: 18px; top: 100%; border: 6px solid transparent; border-top-color: #2c2c2c; border-bottom: 0; }
+    .egor-bubble a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
+
+    /* Filter popover; becomes a bottom sheet on small screens */
+    .filter-dialog { position: fixed; inset: auto; width: 240px; max-width: calc(100vw - 24px); max-height: min(420px,calc(100dvh - 24px));
+      margin: 0; padding: 8px; overflow-y: auto; overscroll-behavior: contain; border: 0; border-radius: 16px;
+      background: #fff; color: var(--ink); box-shadow: 0 8px 32px rgb(0 0 0 / .14); }
+    .filter-dialog::backdrop { background: transparent; }
+    .filter-heading { display: none; }
+    .option-list { display: grid; gap: 2px; }
+    .filter-option { display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; min-height: 44px;
+      padding: 10px 12px; border-radius: 10px; font-size: 14px; line-height: 20px; }
+    .filter-option .icon { margin-left: auto; visibility: hidden; }
+    .filter-option:is([aria-selected="true"], [aria-checked="true"]) { background: #f3f3f3; font-weight: 600; }
+    .filter-option:is([aria-selected="true"], [aria-checked="true"]) .icon { visibility: visible; }
+    /* Status lists and the card menu: an icon before the label; Rejected is grey; Hide is a light eye */
+    .filter-option .mi { flex: none; width: 18px; height: 18px; fill: currentColor; }
+    .mi[data-status="rejected"] { color: var(--muted); }
+    .mi.eye { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .option-list hr { height: 1px; margin: 6px 4px; border: 0; background: var(--line); }
+    .filter-option:focus-visible { outline-offset: -3px; background: #f3f3f3; }
+
+    /* Vacancy details */
+    .details-dialog { width: min(1320px,calc(100% - 40px)); max-width: none; height: min(900px,calc(100dvh - 40px)); max-height: calc(100dvh - 40px);
+      padding: 0; overflow-y: auto; overscroll-behavior: contain; border: 0; border-radius: 24px;
+      color: var(--ink); background: white; box-shadow: 0 16px 64px rgb(0 0 0 / .12); }
+    .details-dialog::backdrop { background: rgb(0 0 0 / .22); }
+    .close-anchor { position: sticky; top: 24px; z-index: 5; height: 0; }
+    .dialog-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; }
+    #close-detail { position: absolute; top: 0; right: 24px; z-index: 4; }
+    .dialog-shell { display: grid; grid-template-columns: 180px minmax(0,720px); justify-content: start; align-items: start; gap: 56px 48px;
+      width: 100%; margin: 0 auto; padding: 40px 32px 56px; }
+    .dialog-rail { position: sticky; top: 32px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+    .dialog-rail button { min-height: 40px; margin-left: -10px; padding: 8px 10px; border-radius: 999px; color: var(--muted);
+      font-size: 14px; line-height: 20px; text-align: left; text-decoration: none; }
+    /* Match looks the same as on the card: the target icon and the word, black, no button shape */
+    .dialog-rail .rail-match { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 4px; color: var(--ink); }
+    .dialog-rail .rail-match:disabled { color: var(--muted); cursor: default; }
+    .dialog-rail .rail-status { display: inline-flex; align-items: center; gap: 8px; }
+    .dialog-rail .rail-status[data-set="true"] { color: var(--ink); }
+    .rail-result { margin: 0 0 12px; color: var(--ink); font-size: 14px; line-height: 20px; font-weight: 600; }
+    .copy-feedback { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 20px; }
+    .dialog-main { position: relative; width: 100%; min-width: 0; }
+    .dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 24px;
+      color: var(--muted); font-size: 14px; line-height: 20px; }
+    .details-dialog h2, .details-dialog h3 { font-size: 16px; line-height: 24px; font-weight: 600; }
+    .details-dialog h2 { margin: 16px 0 6px; font-size: 18px; line-height: 22px; overflow-wrap: anywhere; }
+    .details-dialog h3 { margin: 0 0 8px; }
+    .dialog-meta { margin: 0; color: var(--muted); font-size: 14px; line-height: 20px; }
+    .published-line { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 20px; }
+    .details-dialog section { margin-top: 32px; }
+    .details-dialog section p { max-width: 34em; margin: 0 0 12px; font-size: 16px; line-height: 24px; white-space: normal; overflow-wrap: anywhere; }
+    .source-line { margin: 12px 0 0; color: var(--muted); font-size: 14px; line-height: 22px; }
+    .source-line a { color: var(--ink); text-underline-offset: 3px; }
+    /* Match report in the dialog: monochrome, the same three type sizes, spacing instead of lines */
+    #match-panel h4 { margin: 24px 0 8px; font-size: 14px; line-height: 20px; font-weight: 600; }
+    #match-panel .report-note { margin: 0 0 4px; color: var(--muted); font-size: 14px; line-height: 20px; }
+    #match-panel .report-note + p:not(.report-note) { margin-top: 16px; }
+    .report-reqs, .report-list { max-width: 34em; margin: 0; padding: 0; list-style: none; }
+    .report-reqs li { display: grid; grid-template-columns: 104px minmax(0,1fr); gap: 12px; padding: 6px 0; }
+    .req-status { color: var(--muted); font-size: 14px; line-height: 24px; }
+    #match-panel .report-reqs p { margin: 0; }
+    .req-priority { color: var(--muted); font-size: 14px; }
+    #match-panel .req-detail { margin-top: 2px; color: var(--muted); font-size: 14px; line-height: 20px; }
+    .report-list li { position: relative; padding-left: 16px; font-size: 16px; line-height: 24px; }
+    .report-list li::before { content: "–"; position: absolute; left: 0; color: var(--muted); }
+    .report-list li + li { margin-top: 4px; }
+    .dialog-note { margin-top: 24px; color: var(--muted); font-size: 14px; line-height: 20px; }
+    .agent-request { width: 100%; min-height: 120px; margin-top: 20px; padding: 12px; border: 1px solid var(--line); border-radius: 12px;
+      font-size: 16px; line-height: 24px; resize: vertical; caret-color: var(--ink); }
+
+    /* Mouse hover */
+    @media (hover:hover) and (pointer:fine) {
+      .job:hover, .job:has(.card-more[aria-expanded="true"]) { background: var(--hover); }
+      /* The actions panel opens on hover, on keyboard focus inside the card and while its menu is open */
+      .job:is(:hover, :has(:focus-visible), :has(.card-more[aria-expanded="true"])) .job-header { padding-right: var(--actions-open,64px); }
+      .job:is(:hover, :has(:focus-visible), :has(.card-more[aria-expanded="true"])) .card-date { opacity: 0; }
+      .job:is(:hover, :has(:focus-visible)) .card-actions::before { opacity: 1; }
+      /* Transparent rather than hidden, so keyboard users can still reach them */
+      .card-more, .bookmark[aria-pressed="false"] { opacity: 0; }
+      .job:is(:hover, :has(:focus-visible), :has(.card-more[aria-expanded="true"])) :is(.card-more, .bookmark) { opacity: 1; }
+      .card-actions button:hover { background: var(--card); }
+      .toast-action:hover { background: rgb(255 255 255 / .14); }
+      .card-match:not(:disabled) { opacity: 0; }
+      .job:hover .card-match, .job:focus-within .card-match { opacity: 1; }
+      .control:hover, .filter-clear:hover { color: var(--ink); }
+      .filter-clear:hover { background: var(--hover); }
+      .control:hover .icon { opacity: 1; }
+      .side-link:hover, .refresh:hover { color: #666; }
+      .filter-option:hover { background: #f6f6f6; }
+      .dialog-icon:hover { background: var(--card); }
+      .dialog-rail button:not(.rail-match):hover { color: var(--ink); }
+      .egor-face:hover { opacity: 1; }
+    }
+    /* Touch screens */
+    @media (hover:none), (pointer:coarse) {
+      .job-header { padding-right: var(--actions-open,64px); }
+      .job .card-date { margin-left: 4px; margin-right: auto; }
+    }
+
+    /* Wide screens */
+    @media (min-width:1700px) {
+      :root { --layout-cols: 224px minmax(0,1100px); --layout-left: 48px; }
+    }
+    /* Desktop: fixed brand and sidebar, sticky toolbar */
+    @media (min-width:761px) {
+      .topbar { position: absolute; top: 0; left: 0; right: 0; width: 100%; display: grid; grid-template-columns: var(--layout-cols);
+        justify-content: start; column-gap: var(--layout-gap); padding: 28px var(--layout-right) 0 var(--layout-left); }
+      .topbar .brand { position: fixed; top: 28px; left: 28px; z-index: 3; }
+      .topbar > .refresh { grid-column: 2; justify-self: end; }
+      .app-layout { padding-top: 28px; }
+      .side-nav { position: fixed; top: min(var(--jobs-top,153px),max(88px,calc(100dvh - 220px))); left: 28px; z-index: 3; width: 220px; }
+      .toolbar { position: sticky; top: 0; z-index: 4; margin-top: 12px; margin-bottom: 4px; padding: 12px 0; isolation: isolate; }
+      .toolbar::before { content: ""; position: absolute; inset: 0 -12px; z-index: -1; background: rgba(255,255,255,.68);
+        backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 8px 18px rgba(255,255,255,.46); }
+      .toolbar .controls { margin-left: auto; }
+      .toolbar .refresh { flex: none; align-items: center; min-height: 44px; padding: 10px 0 10px 10px; font-size: 14px; line-height: 20px; }
+    }
+    @media (min-width:1700px) {
+      .topbar .brand { left: 48px; }
+      .egor { left: 48px; }
+      .side-nav { left: 48px; width: 224px; }
+    }
+    @media (min-width:901px) and (max-width:1230px) {
+      .side-nav { width: 188px; }
+    }
+    @media (min-width:761px) and (max-width:900px) {
+      .side-nav { width: 172px; }
+    }
+    /* Laptop and tablet */
+    @media (max-width:1230px) {
+      :root { --layout-cols: 192px minmax(0,1fr); --layout-gap: 40px; --layout-right: 32px; }
+      .toolbar { flex-wrap: wrap; }
+      .last-updated { flex-wrap: wrap; }
+      .grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width:900px) {
+      :root { --layout-cols: 184px minmax(0,1fr); --layout-gap: 32px; --layout-left: 16px; --layout-right: 24px; }
+      .controls { gap: 0; }
+      .control { padding-left: 10px; padding-right: 10px; }
+      .job { padding: 20px; }
+      .dialog-shell { grid-template-columns: 160px minmax(0,720px); column-gap: 32px; padding: 32px 24px 48px; }
+    }
+    /* Phone and small tablet: one column of content */
+    @media (max-width:760px) {
+      .topbar { gap: 16px; padding: calc(20px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) 0 max(20px,env(safe-area-inset-left,0px)); }
+      .brand-name { line-height: 20px; }
+      .app-layout { display: flex; flex-direction: column; margin: 24px 20px 0; padding-bottom: calc(36px + env(safe-area-inset-bottom,0px)); }
+      .hero { order: 1; }
+      .greeting { line-height: 22px; }
+      .side-nav { order: 2; display: flex; flex-wrap: wrap; column-gap: 16px; margin: 20px 0 0; }
+      .side-link { position: relative; justify-content: flex-start; gap: 6px; min-height: 44px; padding: 10px 0; }
+      .side-link[aria-current="page"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--ink); }
+      .nav-count { min-width: 0; }
+      .cv-link { flex-basis: 100%; gap: 2px; min-height: 0; margin: 12px 0 0; padding: 0; }
+      /* Count, date and filters share a line when it fits; filters move to the next line only when it does not */
+      .toolbar { order: 3; flex-wrap: wrap; gap: 8px 16px; min-height: 0; margin: 20px 0 16px; }
+      .collection-meta { gap: 4px 12px; }
+      .controls { flex-wrap: wrap; gap: 0 8px; margin-left: -8px; }
+      .control { flex: 0 0 auto; padding: 10px 8px; border: 1px solid transparent; }
+      .grid { order: 4; }
+      .empty { order: 4; }
+      .utilities { order: 5; gap: 4px 20px; margin-top: 16px; }
+      .utilities span { flex-basis: 100%; }
+      /* On phones the portrait sits at the end of the page instead of covering the cards */
+      .egor { position: relative; left: auto; bottom: auto; order: 6; margin-top: 24px; }
+      .job { min-height: 176px; }
+      .close-anchor { top: 12px; }
+      #close-detail { right: 12px; }
+    }
+    @media (max-width:640px) {
+      .grid { grid-template-columns: minmax(0,1fr); }
+      .filter-dialog { inset: auto 0 0; width: 100%; max-width: none; max-height: min(520px,calc(100dvh - 24px));
+        padding: 8px 16px calc(16px + env(safe-area-inset-bottom,0px)); border-radius: 24px 24px 0 0; box-shadow: 0 -8px 40px rgb(0 0 0 / .1); }
+      .filter-dialog::backdrop { background: rgb(0 0 0 / .22); }
+      .filter-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 4px 12px; }
+      .filter-heading h2 { margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; }
+      .filter-heading button { min-height: 44px; padding: 8px 0 8px 12px; color: var(--muted); font-size: 14px; }
+      .filter-option { min-height: 52px; padding: 14px 16px; border-radius: 12px; font-size: 16px; }
+      .details-dialog { width: 100%; height: auto; max-height: calc(100dvh - 16px); margin: auto 0 0; border-radius: 24px 24px 0 0; }
+      .report-reqs li { grid-template-columns: minmax(0,1fr); gap: 2px; }
+      .req-status { line-height: 20px; }
+      .dialog-shell { display: flex; flex-direction: column; gap: 16px; padding: 24px 24px 48px; }
+      .dialog-rail { position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 52px; }
+      .dialog-rail .rail-match { margin: 0; }
+      .dialog-rail .rail-result { flex-basis: 100%; margin: 0; }
+      .copy-feedback { flex-basis: 100%; }
+    }
+    @media (max-width:360px) {
+      .controls { gap: 0; margin-left: -4px; }
+      .control { gap: 2px; padding-left: 4px; padding-right: 4px; }
+      .filter-trigger .icon { width: 16px; height: 16px; }
+    }
+
+    /* Motion */
+    @media (prefers-reduced-motion:no-preference) {
+      .details-dialog[open]:not([data-instant="true"]) { animation: detail-enter 260ms var(--ease-soft) both; }
+      .details-dialog[open]:not([data-instant="true"])::backdrop { animation: backdrop-enter 260ms ease-out both; }
+      @keyframes detail-enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes backdrop-enter { from { background: rgb(0 0 0 / 0); } to { background: rgb(0 0 0 / .22); } }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      button, .job, .card-date, .card-actions::before, .control .icon { transition: none; }
+      .tip:not([hidden]) { animation: none; }
+      button:active { transform: none; }
+    }
+
+    /* Print: only the open vacancy report */
+    @media print {
+      @page { margin: 18mm; }
+      body > :not(#details) { display: none !important; }
+      html, body { overflow: visible !important; height: auto !important; }
+      #details[open] { display: block; position: static; width: 100%; height: auto; max-width: none; max-height: none; margin: 0; padding: 0;
+        overflow: visible; border: 0; border-radius: 0; box-shadow: none; animation: none; }
+      #details::backdrop { display: none; }
+      .dialog-shell { margin: 0; }
+      .close-anchor, .rail-status, .agent-request { display: none !important; }
+      #job-source:not([hidden])::after { content: " (" attr(href) ")"; overflow-wrap: anywhere; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <header class="brand"><p class="brand-name">Design Growth<br>Skills Beta</p><p class="byline">by Egor Krasnoperov</p></header>
+    <button class="refresh" id="refresh" type="button">Refresh</button>
+  </div>
+  <div class="app-layout">
+  <nav class="side-nav" aria-label="Vacancies">
+    <button class="side-link" id="all-jobs" type="button" aria-current="page"><span>All jobs</span><span class="nav-count" id="all-count">9</span></button>
+    <button class="side-link" id="saved-jobs" type="button"><span>Saved</span><span class="nav-count" id="saved-count">3</span></button>
+    <button class="side-link" id="applied-jobs" type="button"><span>Applied</span><span class="nav-count" id="applied-count">0</span></button>
+    <button class="side-link" id="progress-jobs" type="button"><span>In progress</span><span class="nav-count" id="progress-count">0</span></button>
+    <button class="side-link" id="rejected-jobs" type="button"><span>Rejected</span><span class="nav-count" id="rejected-count">0</span></button>
+    <button class="side-link" id="hidden-jobs" type="button"><span>Hidden</span><span class="nav-count" id="hidden-count">0</span></button>
+    <div class="cv-link" id="cv-status"><strong>My current CV</strong><span id="cv-status-label">Add your CV in the agent chat</span></div>
+  </nav>
+  <main class="workspace">
+    <section class="hero">
+      <h1 class="greeting" id="greeting">Your personal job board</h1>
+
+    </section>
+    <section class="toolbar" aria-label="Filter and sort">
+      <div class="collection-meta"><p class="result-count" id="result-count" role="status" aria-live="polite">9 jobs</p><p class="last-updated" id="last-updated">Updated <span id="updated-date">Mon 23 Nov, 2026</span></p></div>
+      <div class="controls">
+        <button class="control filter-trigger clearable" id="format-trigger" type="button" data-filter="format" aria-label="Work format: All formats" aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-dialog">
+          <span class="filter-label" id="format-label">All formats</span><img class="icon" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJrZXlib2FyZF9hcnJvd19kb3duIj4KPG1hc2sgaWQ9Im1hc2swXzBfMzUiIHN0eWxlPSJtYXNrLXR5cGU6YWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IGlkPSJCb3VuZGluZyBib3giIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI0Q5RDlEOSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfMF8zNSkiPgo8cGF0aCBpZD0ia2V5Ym9hcmRfYXJyb3dfZG93bl8yIiBkPSJNMTAgMTMuMDYyNUw1IDguMDYyNUw2LjA2MjUgN0wxMCAxMC45Mzc1TDEzLjkzNzUgN0wxNSA4LjA2MjVMMTAgMTMuMDYyNVoiIGZpbGw9IiMxQzFCMUYiLz4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt="">
+        </button>
+        <button class="filter-clear" id="format-clear" type="button" data-clear="format" aria-label="Clear work format" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8l8 8M16 8l-8 8"/></svg></button>
+        <button class="control filter-trigger clearable" id="grade-trigger" type="button" data-filter="grade" aria-label="Grade: All grades" aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-dialog">
+          <span class="filter-label" id="grade-label">All grades</span><img class="icon" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJrZXlib2FyZF9hcnJvd19kb3duIj4KPG1hc2sgaWQ9Im1hc2swXzBfMzUiIHN0eWxlPSJtYXNrLXR5cGU6YWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IGlkPSJCb3VuZGluZyBib3giIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI0Q5RDlEOSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfMF8zNSkiPgo8cGF0aCBpZD0ia2V5Ym9hcmRfYXJyb3dfZG93bl8yIiBkPSJNMTAgMTMuMDYyNUw1IDguMDYyNUw2LjA2MjUgN0wxMCAxMC45Mzc1TDEzLjkzNzUgN0wxNSA4LjA2MjVMMTAgMTMuMDYyNVoiIGZpbGw9IiMxQzFCMUYiLz4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt="">
+        </button>
+        <button class="filter-clear" id="grade-clear" type="button" data-clear="grade" aria-label="Clear grade" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8l8 8M16 8l-8 8"/></svg></button>
+        <button class="control filter-trigger" id="sort-trigger" type="button" data-filter="sort" aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-dialog"><span class="filter-label" id="sort-label">Sort</span><img class="icon" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJrZXlib2FyZF9hcnJvd19kb3duIj4KPG1hc2sgaWQ9Im1hc2swXzBfMzUiIHN0eWxlPSJtYXNrLXR5cGU6YWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IGlkPSJCb3VuZGluZyBib3giIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI0Q5RDlEOSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfMF8zNSkiPgo8cGF0aCBpZD0ia2V5Ym9hcmRfYXJyb3dfZG93bl8yIiBkPSJNMTAgMTMuMDYyNUw1IDguMDYyNUw2LjA2MjUgN0wxMCAxMC45Mzc1TDEzLjkzNzUgN0wxNSA4LjA2MjVMMTAgMTMuMDYyNVoiIGZpbGw9IiMxQzFCMUYiLz4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt=""></button>
+      </div>
+      <button class="refresh" id="sticky-refresh" type="button" hidden>Refresh</button>
+    </section>
+    <section class="grid" id="jobs" aria-label="Job results"></section>
+    <section class="empty" id="empty" hidden>
+      <h2 id="empty-title">No jobs match these filters</h2>
+      <p id="empty-copy">Try a different format or grade.</p>
+      <button class="text-button" id="empty-action" type="button">Clear filters</button>
+    </section>
+    <footer class="utilities"><span>Design examples · Demo data</span><button id="download" type="button">Download HTML</button></footer>
+    <div class="egor" id="egor"><div class="egor-bubble" id="egor-bubble" role="status" aria-live="polite" hidden></div><button class="egor-face" id="egor-face" type="button" aria-label="Egor" aria-controls="egor-bubble" aria-expanded="false"><svg viewBox="2 9 48 47" aria-hidden="true"><path d="M27 9h9v1h-9zM25 10h14v1h-14zM23 11h18v1h-18zM20 12h23v1h-23zM19 13h3v1h-3zM24 13h1v1h-1zM26 13h18v1h-18zM18 14h3v1h-3zM23 14h11v1h-11zM35 14h9v1h-9zM12 15h1v1h-1zM14 15h15v1h-15zM30 15h2v1h-2zM33 15h4v1h-4zM38 15h8v1h-8zM7 16h20v1h-20zM28 16h18v1h-18zM5 17h29v1h-29zM35 17h12v1h-12zM3 18h36v1h-36zM40 18h7v1h-7zM2 19h46v1h-46zM2 20h17v1h-17zM20 20h1v1h-1zM27 20h1v1h-1zM29 20h1v1h-1zM31 20h18v1h-18zM2 21h15v1h-15zM34 21h14v1h-14zM2 22h14v1h-14zM36 22h5v1h-5zM42 22h7v1h-7zM4 23h11v1h-11zM36 23h1v1h-1zM38 23h11v1h-11zM6 24h9v1h-9zM35 24h1v1h-1zM37 24h13v1h-13zM9 25h6v1h-6zM37 25h2v1h-2zM40 25h1v1h-1zM42 25h7v1h-7zM10 26h5v1h-5zM37 26h13v1h-13zM13 27h1v1h-1zM24 27h4v1h-4zM30 27h1v1h-1zM32 27h1v1h-1zM39 27h1v1h-1zM41 27h1v1h-1zM43 27h6v1h-6zM22 28h8v1h-8zM38 28h12v1h-12zM11 29h7v1h-7zM22 29h2v1h-2zM29 29h16v1h-16zM47 29h2v1h-2zM10 30h5v1h-5zM16 30h8v1h-8zM25 30h2v1h-2zM28 30h1v1h-1zM30 30h13v1h-13zM46 30h1v1h-1zM48 30h1v1h-1zM10 31h1v1h-1zM12 31h2v1h-2zM17 31h6v1h-6zM25 31h2v1h-2zM29 31h2v1h-2zM32 31h5v1h-5zM40 31h2v1h-2zM45 31h2v1h-2zM48 31h1v1h-1zM9 32h5v1h-5zM15 32h1v1h-1zM17 32h2v1h-2zM21 32h2v1h-2zM30 32h1v1h-1zM32 32h1v1h-1zM38 32h4v1h-4zM44 32h1v1h-1zM48 32h1v1h-1zM9 33h5v1h-5zM15 33h1v1h-1zM18 33h1v1h-1zM21 33h3v1h-3zM30 33h1v1h-1zM32 33h1v1h-1zM40 33h3v1h-3zM48 33h1v1h-1zM9 34h1v1h-1zM11 34h1v1h-1zM13 34h1v1h-1zM18 34h1v1h-1zM22 34h1v1h-1zM30 34h1v1h-1zM36 34h1v1h-1zM38 34h1v1h-1zM40 34h2v1h-2zM43 34h2v1h-2zM47 34h1v1h-1zM11 35h2v1h-2zM23 35h1v1h-1zM31 35h1v1h-1zM34 35h1v1h-1zM38 35h1v1h-1zM40 35h2v1h-2zM48 35h1v1h-1zM10 36h3v1h-3zM17 36h1v1h-1zM19 36h1v1h-1zM23 36h1v1h-1zM29 36h2v1h-2zM36 36h1v1h-1zM38 36h1v1h-1zM40 36h2v1h-2zM43 36h1v1h-1zM47 36h1v1h-1zM12 37h1v1h-1zM20 37h1v1h-1zM22 37h1v1h-1zM24 37h5v1h-5zM34 37h1v1h-1zM37 37h1v1h-1zM39 37h1v1h-1zM41 37h1v1h-1zM43 37h1v1h-1zM45 37h1v1h-1zM47 37h1v1h-1zM11 38h2v1h-2zM14 38h1v1h-1zM16 38h1v1h-1zM23 38h1v1h-1zM36 38h1v1h-1zM38 38h1v1h-1zM40 38h2v1h-2zM45 38h1v1h-1zM47 38h1v1h-1zM12 39h1v1h-1zM19 39h3v1h-3zM23 39h1v1h-1zM35 39h1v1h-1zM37 39h1v1h-1zM41 39h1v1h-1zM18 40h1v1h-1zM32 40h1v1h-1zM36 40h1v1h-1zM39 40h3v1h-3zM45 40h1v1h-1zM12 41h1v1h-1zM18 41h1v1h-1zM20 41h2v1h-2zM23 41h1v1h-1zM35 41h1v1h-1zM38 41h1v1h-1zM41 41h2v1h-2zM44 41h1v1h-1zM13 42h1v1h-1zM16 42h3v1h-3zM20 42h3v1h-3zM24 42h2v1h-2zM31 42h1v1h-1zM35 42h1v1h-1zM39 42h1v1h-1zM41 42h3v1h-3zM16 43h3v1h-3zM20 43h1v1h-1zM23 43h1v1h-1zM25 43h2v1h-2zM28 43h1v1h-1zM37 43h1v1h-1zM40 43h4v1h-4zM14 44h1v1h-1zM16 44h1v1h-1zM26 44h2v1h-2zM33 44h1v1h-1zM35 44h1v1h-1zM37 44h1v1h-1zM39 44h1v1h-1zM41 44h3v1h-3zM14 45h1v1h-1zM17 45h2v1h-2zM20 45h7v1h-7zM28 45h2v1h-2zM37 45h1v1h-1zM40 45h3v1h-3zM17 46h1v1h-1zM24 46h1v1h-1zM35 46h2v1h-2zM39 46h4v1h-4zM15 47h1v1h-1zM19 47h1v1h-1zM32 47h1v1h-1zM36 47h1v1h-1zM38 47h1v1h-1zM40 47h2v1h-2zM20 48h1v1h-1zM35 48h1v1h-1zM37 48h1v1h-1zM15 49h1v1h-1zM18 49h1v1h-1zM20 49h2v1h-2zM36 49h2v1h-2zM16 50h1v1h-1zM27 50h1v1h-1zM34 50h2v1h-2zM29 51h1v1h-1zM32 51h1v1h-1zM34 51h1v1h-1zM17 52h1v1h-1zM24 52h1v1h-1zM28 52h1v1h-1zM31 52h1v1h-1zM18 53h1v1h-1zM26 53h1v1h-1zM28 53h1v1h-1zM30 53h1v1h-1zM20 54h1v1h-1zM22 54h1v1h-1zM24 54h1v1h-1zM26 54h1v1h-1zM28 54h1v1h-1zM21 55h1v1h-1zM23 55h1v1h-1z" fill="currentColor"/></svg></button></div>
+  </main>
+  </div>
+  <dialog class="filter-dialog" id="filter-dialog" aria-label="Work format">
+    <header class="filter-heading"><h2 id="filter-title">Work format</h2><button id="close-filter" type="button">Close</button></header>
+    <div class="option-list" id="filter-options" role="listbox" aria-label="Work format"></div>
+  </dialog>
+  <dialog class="details-dialog" id="details" aria-labelledby="detail-title">
+    <div class="close-anchor"><button class="dialog-icon" id="close-detail" type="button" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
+    <div class="dialog-shell"><aside class="dialog-rail" aria-label="Report actions"><button id="run-detail-match" class="rail-match" type="button"><svg class="rail-icon" viewBox="2 2 20 20" aria-hidden="true"><path d="M8.89583 19.375C7.92361 18.9583 7.07292 18.3854 6.34375 17.6562C5.61458 16.9271 5.04167 16.0764 4.625 15.1042C4.20833 14.1319 4 13.0938 4 11.9896C4 10.8854 4.20833 9.85069 4.625 8.88542C5.04167 7.92014 5.61458 7.07292 6.34375 6.34375C7.07292 5.61458 7.92361 5.04167 8.89583 4.625C9.86806 4.20833 10.9062 4 12.0104 4C13.1146 4 14.1493 4.20833 15.1146 4.625C16.0799 5.04167 16.9271 5.61458 17.6562 6.34375C18.3854 7.07292 18.9583 7.92014 19.375 8.88542C19.7917 9.85069 20 10.8854 20 11.9896C20 13.0938 19.7917 14.1319 19.375 15.1042C18.9583 16.0764 18.3854 16.9271 17.6562 17.6562C16.9271 18.3854 16.0799 18.9583 15.1146 19.375C14.1493 19.7917 13.1146 20 12.0104 20C10.9062 20 9.86806 19.7917 8.89583 19.375ZM16.6042 16.6042C17.8681 15.3403 18.5 13.8056 18.5 12C18.5 10.1944 17.8681 8.65972 16.6042 7.39583C15.3403 6.13194 13.8056 5.5 12 5.5C10.1944 5.5 8.65972 6.13194 7.39583 7.39583C6.13194 8.65972 5.5 10.1944 5.5 12C5.5 13.8056 6.13194 15.3403 7.39583 16.6042C8.65972 17.8681 10.1944 18.5 12 18.5C13.8056 18.5 15.3403 17.8681 16.6042 16.6042ZM8.45833 15.5417C7.48611 14.5694 7 13.3889 7 12C7 10.6111 7.48611 9.43056 8.45833 8.45833C9.43056 7.48611 10.6111 7 12 7C13.3889 7 14.5694 7.48611 15.5417 8.45833C16.5139 9.43056 17 10.6111 17 12C17 13.3889 16.5139 14.5694 15.5417 15.5417C14.5694 16.5139 13.3889 17 12 17C10.6111 17 9.43056 16.5139 8.45833 15.5417ZM14.4792 14.4792C15.1597 13.7986 15.5 12.9722 15.5 12C15.5 11.0278 15.1597 10.2014 14.4792 9.52083C13.7986 8.84028 12.9722 8.5 12 8.5C11.0278 8.5 10.2014 8.84028 9.52083 9.52083C8.84028 10.2014 8.5 11.0278 8.5 12C8.5 12.9722 8.84028 13.7986 9.52083 14.4792C10.2014 15.1597 11.0278 15.5 12 15.5C12.9722 15.5 13.7986 15.1597 14.4792 14.4792ZM10.9375 13.0625C10.6458 12.7708 10.5 12.4167 10.5 12C10.5 11.5833 10.6458 11.2292 10.9375 10.9375C11.2292 10.6458 11.5833 10.5 12 10.5C12.4167 10.5 12.7708 10.6458 13.0625 10.9375C13.3542 11.2292 13.5 11.5833 13.5 12C13.5 12.4167 13.3542 12.7708 13.0625 13.0625C12.7708 13.3542 12.4167 13.5 12 13.5C11.5833 13.5 11.2292 13.3542 10.9375 13.0625Z"/></svg><span>Match</span></button><p id="rail-result" class="rail-result" hidden></p><button class="rail-status" id="status-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-dialog"></button><button class="rail-action" id="download-report" type="button" hidden><svg class="rail-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg><span>Download report</span></button><button class="rail-action copy-request" id="copy-request" type="button" hidden><svg class="rail-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg><span>Tailor my CV</span></button><span id="copy-feedback" class="copy-feedback" role="status" aria-live="polite"></span></aside><div class="dialog-main"><div class="dialog-head"><span id="detail-company"></span></div>
+    <h2 id="detail-title"></h2><p class="dialog-meta" id="detail-meta"></p><p class="published-line" id="published-line"></p>
+    <section id="description-panel"></section><p class="source-line"><span id="source-facts"></span><a id="job-source" target="_blank" rel="noopener noreferrer" hidden>View original job ↗</a><span id="source-missing" hidden>Original job link unavailable</span></p>
+    <section id="match-panel"></section>
+    <p class="dialog-note">Demo vacancies and example results</p>
+    <textarea class="agent-request" id="agent-request" aria-label="Request for your agent" hidden readonly></textarea></div></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <!-- EDIT CONTENT HERE. All companies, vacancies and the match report are fictional demo data. -->
+  <script type="application/json" id="figma-data">{"id":"figma-8335-11-v1","saved":["demo-extra-4","demo-extra-9"],"ui":{"view":"all","format":"all","grade":"all","sort":null,"ascending":false},"jobs":[{"id":"demo-extra-1","company":"Northline (demo)","title":"Product Designer","location":"Berlin","format":"hybrid","grade":"middle","salaryMin":60000,"salaryMax":80000,"publishedAt":"2026-11-24","match":null,"currency":"EUR","foundAt":"2026-11-23","description":"Northline (demo) is a fictional company used to show how the board works. We are looking for a Product Designer to own onboarding and settings in our B2B analytics app. You will work with a product manager and four engineers, run usability tests and maintain components in our design system.\n\nRequirements\n- 3+ years of product design for web apps\n- Interaction design and prototyping in Figma\n- Running usability tests\n- Working with a design system\n- Experience with data-heavy dashboards (nice to have)\n- German (nice to have)","descriptionStatus":"full","sourceName":"Example Jobs (demo)","sourceUrl":"https://example.com/jobs/northline-product-designer","checkedAt":"2026-11-23","listingStatus":"open_confirmed"},{"id":"demo-extra-2","company":"Orbit (demo)","title":"UX/UI Designer","location":"Europe","format":"remote","grade":"middle","salaryMin":63000,"salaryMax":83000,"publishedAt":"2026-11-23","match":null,"currency":"EUR","foundAt":"2026-11-23"},{"id":"demo-extra-3","company":"Studio Six (demo)","title":"Design Engineer","location":"Europe","format":"remote","grade":"middle","salaryMin":66000,"salaryMax":86000,"publishedAt":"2026-11-22","match":null,"currency":"EUR","foundAt":"2026-11-23"},{"id":"demo-extra-4","company":"Fieldwork (demo)","title":"Design Manager","location":"Europe","format":"remote","grade":"leadership","salaryMin":69000,"salaryMax":89000,"publishedAt":"2026-11-21","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-5","company":"Forma (demo)","title":"Head of Design","location":"Berlin","format":"hybrid","grade":"leadership","salaryMin":72000,"salaryMax":92000,"publishedAt":"2026-11-20","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-6","company":"Plain (demo)","title":"Head of Product Design","location":"Europe","format":"remote","grade":"leadership","salaryMin":75000,"salaryMax":95000,"publishedAt":"2026-11-19","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-7","company":"Tandem (demo)","title":"Design Director","location":"Europe","format":"remote","grade":"leadership","salaryMin":78000,"salaryMax":98000,"publishedAt":"2026-11-18","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-8","company":"Canvas (demo)","title":"Product Designer","location":"Europe","format":"remote","grade":"middle","salaryMin":81000,"salaryMax":101000,"publishedAt":"2026-11-17","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-9","company":"Daylight (demo)","title":"UX/UI Designer","location":"Berlin","format":"hybrid","grade":"middle","salaryMin":84000,"salaryMax":104000,"publishedAt":"2026-11-16","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-10","company":"Outline (demo)","title":"Design Engineer","location":"Europe","format":"remote","grade":"senior","salaryMin":87000,"salaryMax":107000,"publishedAt":"2026-11-15","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-11","company":"Signal (demo)","title":"Design Manager","location":"Europe","format":"remote","grade":"leadership","salaryMin":90000,"salaryMax":110000,"publishedAt":"2026-11-14","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-12","company":"Common (demo)","title":"Product Designer","location":"Europe","format":"remote","grade":"senior","salaryMin":93000,"salaryMax":113000,"publishedAt":"2026-11-13","match":null,"currency":"EUR","foundAt":"2026-11-16"}],"updatedAt":"2026-11-23","reports":[{"jobId":"demo-extra-1","createdAt":"2026-11-23","cvLabel":"Demo CV (fictional)","methodVersion":"demo","score":86,"matchLevel":"high","summary":"Strong fit for the core of the role. The demo CV shows onboarding work, prototyping and regular usability testing. The main uncertainty is design system ownership, which the CV mentions only briefly.","requirements":[{"text":"3+ years of product design for web apps","priority":"required","status":"supported","evidence":"Product Designer, 2021 to now, B2B web platform","note":""},{"text":"Interaction design and prototyping in Figma","priority":"required","status":"supported","evidence":"Built clickable Figma prototypes for every onboarding test","note":""},{"text":"Running usability tests","priority":"required","status":"supported","evidence":"Ran 12 moderated usability sessions per quarter","note":""},{"text":"Working with a design system","priority":"required","status":"partly_supported","evidence":"Contributed components to the shared UI kit","note":"Contribution is clear, ownership is not"},{"text":"Experience with data-heavy dashboards","priority":"preferred","status":"not_evidenced","evidence":"","note":"Not mentioned in the CV"},{"text":"German","priority":"preferred","status":"unclear","evidence":"","note":"Languages are not listed"}],"strengths":["Onboarding redesign with a measured result","Regular usability testing","Close work with engineers on a B2B product"],"gaps":["No dashboard or data visualisation examples","Design system ownership is not shown"],"openQuestions":["Did you lead any part of the UI kit, or only contribute to it?","Do you speak German, and at what level?"],"cvImprovements":[{"text":"Add one line on how you maintained or evolved the UI kit","needsConfirmation":true},{"text":"Move the onboarding result to the first line of your current role","needsConfirmation":false}],"coverage":{"descriptionStatus":"full","checkedAt":"2026-11-23","limitations":"Demo description written for this example"}}]}</script>
+  <script>
+  (function () {
+    'use strict';
+    var $ = function (id) { return document.getElementById(id); };
+    var data = JSON.parse($('figma-data').textContent);
+    // Vacancies come from an agent and may be incomplete: keep only usable records, never fail the whole board.
+    // Both the board's own fields and the Job Finder format are accepted (workMode, level, salary {min, max, currency, period}).
+    // Level "lead" is listed under Senior in the grade filter.
+    var levelToGrade = {middle:'middle', senior:'senior', lead:'senior', leadership:'leadership'};
+    function normalizeJob(j) {
+      var job = Object.assign({}, j); job.id = String(j.id);
+      if (!job.format && ['remote','hybrid','onsite'].includes(j.workMode)) job.format = j.workMode;
+      if (!job.grade && levelToGrade[j.level]) job.grade = levelToGrade[j.level];
+      if (j.salary && typeof j.salary === 'object') {
+        if (job.salaryMin == null) job.salaryMin = j.salary.min;
+        if (job.salaryMax == null) job.salaryMax = j.salary.max;
+        if (!job.currency) job.currency = j.salary.currency;
+        if (!job.salaryPeriod) job.salaryPeriod = j.salary.period;
+      }
+      if (job.location === 'not_stated') job.location = '';
+      return job;
+    }
+    function normalizeJobs(list) {
+      return (Array.isArray(list) ? list : []).filter(function (j) { return j && typeof j === 'object' && j.id != null; }).map(normalizeJob);
+    }
+    // Match reports from Job Matcher, one per vacancy. Accepts a list or an object keyed by vacancy id.
+    function normalizeReports(value) {
+      var out = {}, list = Array.isArray(value) ? value : value && typeof value === 'object' ?
+        Object.keys(value).map(function (k) { return Object.assign({jobId:k}, value[k]); }) : [];
+      list.forEach(function (r) { if (r && typeof r === 'object' && r.jobId != null) out[String(r.jobId)] = r; });
+      return out;
+    }
+    data.jobs = normalizeJobs(data.jobs);
+    data.reports = normalizeReports(data.reports);
+    if (!Array.isArray(data.saved)) data.saved = [];
+    var agentHasCV = false;
+    // Greeting, search date and CV line come from the data; setData can change them later.
+    function applyHeader() {
+      // The host must explicitly provide this status; this standalone page cannot inspect the agent chat.
+      agentHasCV = !!(data.agentCV && data.agentCV.status === 'available');
+      $('cv-status-label').textContent = agentHasCV ? (data.agentCV.name || 'Available in agent chat') : 'Add your CV in the agent chat';
+      // An empty profileName uses a neutral heading.
+      var profileName = typeof data.profileName === 'string' ? data.profileName.trim() : '';
+      $('greeting').textContent = profileName ? 'Hello ' + profileName + ',' : 'Your personal job board';
+      if (profileName) { $('greeting').appendChild(document.createElement('br')); $('greeting').appendChild(document.createTextNode('this is your personal job board')); }
+      // Date of the agent's last search, from updatedAt; hidden when unknown.
+      var updatedText = searchDateLabel(data.updatedAt);
+      $('updated-date').textContent = updatedText;
+      $('last-updated').hidden = !updatedText;
+    }
+    applyHeader();
+    // Tailor my CV (Resume Matcher) is stage 2: the button stays in the code but is not shown in the first version.
+    var features = {tailor:false};
+    var defaults = {view:'all',format:'all',grade:'all',sort:'date',ascending:false};
+    // Application statuses are set only by the person, in the card menu or the vacancy dialog; the agent never sets them.
+    // A job is in one pile at most: Saved, one of these statuses, or Hidden. All jobs shows every job that is not hidden.
+    var statusConfig = {applied:{label:'Applied'}, progress:{label:'In progress'}, rejected:{label:'Rejected'}};
+    // Pile icons from the Icons frame in Figma (Material Symbols), always drawn at their Figma size (one unit, one pixel):
+    // filled bookmark, paper plane, two people for In progress, and an outlined crossed-out circle for Rejected.
+    // "Set status" without a pile shows a circled plus.
+    var pileIcons = {
+      saved:'M7 19V6.5C7 6.08333 7.14583 5.72917 7.4375 5.4375C7.72917 5.14583 8.08333 5 8.5 5H15.5C15.9167 5 16.2708 5.14583 16.5625 5.4375C16.8542 5.72917 17 6.08333 17 6.5V19L12 17L7 19Z',
+      applied:'M6.02083 17.5833C5.77083 17.6806 5.53819 17.6563 5.32292 17.5104C5.10764 17.3646 5 17.1597 5 16.8958V14L11 12L5 10V7.10417C5 6.84028 5.10764 6.63542 5.32292 6.48959C5.53819 6.34375 5.77083 6.31945 6.02083 6.41667L18.25 11.3125C18.5694 11.4375 18.7292 11.6667 18.7292 12C18.7292 12.3333 18.5694 12.5625 18.25 12.6875L6.02083 17.5833Z',
+      progress:'M4 18V16.0833C4 15.7222 4.08681 15.3924 4.26042 15.0938C4.43403 14.7951 4.67361 14.5556 4.97917 14.375C5.72917 13.9306 6.52431 13.5903 7.36458 13.3542C8.20486 13.1181 9.08333 13 10 13C10.9167 13 11.7951 13.1181 12.6354 13.3542C13.4757 13.5903 14.2708 13.9306 15.0208 14.375C15.3264 14.5556 15.566 14.7951 15.7396 15.0938C15.9132 15.3924 16 15.7222 16 16.0833V18H4ZM17.5 18V16.0833C17.5 15.5 17.3646 14.9583 17.0938 14.4583C16.8229 13.9583 16.4583 13.5486 16 13.2292C16.5417 13.3403 17.066 13.4896 17.5729 13.6771C18.0799 13.8646 18.5625 14.0972 19.0208 14.375C19.3264 14.5556 19.566 14.7951 19.7396 15.0938C19.9132 15.3924 20 15.7222 20 16.0833V18H17.5ZM7.875 11.125C7.29167 10.5417 7 9.83333 7 9C7 8.16667 7.29167 7.45833 7.875 6.875C8.45833 6.29167 9.16667 6 10 6C10.8333 6 11.5417 6.29167 12.125 6.875C12.7083 7.45833 13 8.16667 13 9C13 9.83333 12.7083 10.5417 12.125 11.125C11.5417 11.7083 10.8333 12 10 12C9.16667 12 8.45833 11.7083 7.875 11.125ZM16.125 11.125C15.5417 11.7083 14.8333 12 14 12C13.8889 12 13.7847 11.9965 13.6875 11.9896C13.5903 11.9826 13.4861 11.9653 13.375 11.9375C13.7222 11.5347 13.9965 11.0868 14.1979 10.5938C14.3993 10.1007 14.5 9.56944 14.5 9C14.5 8.43056 14.3993 7.89931 14.1979 7.40625C13.9965 6.91319 13.7222 6.46528 13.375 6.0625C13.4861 6.03472 13.5903 6.01736 13.6875 6.01042C13.7847 6.00347 13.8889 6 14 6C14.8333 6 15.5417 6.29167 16.125 6.875C16.7083 7.45833 17 8.16667 17 9C17 9.83333 16.7083 10.5417 16.125 11.125Z',
+      rejected:'M8.89583 19.375C7.92361 18.9583 7.07292 18.3854 6.34375 17.6562C5.61458 16.9271 5.04167 16.0764 4.625 15.1042C4.20833 14.1319 4 13.0972 4 12C4 10.8889 4.20833 9.85069 4.625 8.88542C5.04167 7.92014 5.61458 7.07292 6.34375 6.34375C7.07292 5.61458 7.92361 5.04167 8.89583 4.625C9.86806 4.20833 10.9062 4 12.0104 4C13.1146 4 14.1493 4.20833 15.1146 4.625C16.0799 5.04167 16.9271 5.61458 17.6562 6.34375C18.3854 7.07292 18.9583 7.92014 19.375 8.88542C19.7917 9.85069 20 10.8889 20 12C20 13.0972 19.7917 14.1319 19.375 15.1042C18.9583 16.0764 18.3854 16.9271 17.6562 17.6562C16.9271 18.3854 16.0799 18.9583 15.1146 19.375C14.1493 19.7917 13.1146 20 12.0104 20C10.9062 20 9.86806 19.7917 8.89583 19.375ZM12 18.5C12.7639 18.5 13.4861 18.375 14.1667 18.125C14.8472 17.875 15.4653 17.5278 16.0208 17.0833L6.91667 7.97917C6.47222 8.53472 6.125 9.15278 5.875 9.83333C5.625 10.5139 5.5 11.2361 5.5 12C5.5 13.8056 6.13194 15.3403 7.39583 16.6042C8.65972 17.8681 10.1944 18.5 12 18.5ZM17.0833 16.0208C17.5278 15.4653 17.875 14.8472 18.125 14.1667C18.375 13.4861 18.5 12.7639 18.5 12C18.5 10.1944 17.8681 8.65972 16.6042 7.39583C15.3403 6.13194 13.8056 5.5 12 5.5C11.2361 5.5 10.5139 5.625 9.83333 5.875C9.15278 6.125 8.53472 6.47222 7.97917 6.91667L17.0833 16.0208Z'
+    };
+    function statusIcon(key,cls) {
+      var figma = pileIcons[key], box = !figma ? '0 0 24 24' : cls === 'rail-icon' ? '2 2 20 20' : '3 3 18 18';
+      return '<svg' + (cls ? ' class="' + cls + '"' : '') + ' viewBox="' + box + '" data-status="' + key + '" aria-hidden="true"><path d="' +
+        (figma || 'M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z') + '"/></svg>';
+    }
+    function validStatuses(value,anyJob) {
+      var out = {};
+      if (value && typeof value === 'object') Object.keys(value).forEach(function (id) {
+        var s = value[id];
+        if (s && statusConfig[s.status] && (anyJob || data.jobs.some(function (j) { return j.id === id; }))) out[id] = {status:s.status, at:dayOf(s.at)};
+      });
+      return out;
+    }
+    var state = {saved:data.saved.slice(),viewed:Array.isArray(data.viewed) ? data.viewed.slice() : [],demoMatches:Array.isArray(data.demoMatches) ? data.demoMatches.slice() : [],savedReports:Array.isArray(data.savedReports) ? data.savedReports.slice() : [],hidden:Array.isArray(data.hidden) ? data.hidden.slice() : [],statuses:validStatuses(data.statuses),ui:normalizeUI(data.ui)};
+    var matching = new Set();
+    var active = null, toastTimer, filterKey = null, filterTrigger = null, menuJobId = null, filterAnimation = null, closeAnimation = null;
+    var checkIcon = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0Ij48cGF0aCBkPSJNMCAwaDI0djI0SDB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTkgMTYuMTdMNC44MyAxMmwtMS40MiAxLjQxTDkgMTkgMjEgN2wtMS40MS0xLjQxeiIvPjwvc3ZnPg==';
+    // Bookmark drawn inline: the Figma outline, and an ink layer (the filled Figma icon) that shows when the job is saved.
+    var bookmarkIcon = '<span class="bm" aria-hidden="true"><svg viewBox="3 3 18 18"><path d="M7 19V6.5C7 6.0875 7.14687 5.73438 7.44062 5.44063C7.73437 5.14688 8.0875 5 8.5 5H15.5C15.9125 5 16.2656 5.14688 16.5594 5.44063C16.8531 5.73438 17 6.0875 17 6.5V19L12 17L7 19ZM8.5 16.7708L12 15.375L15.5 16.7708V6.5H8.5V16.7708Z"/></svg>' +
+      '<svg class="bm-ink" viewBox="3 3 18 18"><path d="' + pileIcons.saved + '"/></svg></span>';
+    // Match icon from Figma (Material Symbols target), drawn at its Figma size.
+    var matchIcon = '<svg viewBox="3 3 18 18" aria-hidden="true"><path d="M8.89583 19.375C7.92361 18.9583 7.07292 18.3854 6.34375 17.6562C5.61458 16.9271 5.04167 16.0764 4.625 15.1042C4.20833 14.1319 4 13.0938 4 11.9896C4 10.8854 4.20833 9.85069 4.625 8.88542C5.04167 7.92014 5.61458 7.07292 6.34375 6.34375C7.07292 5.61458 7.92361 5.04167 8.89583 4.625C9.86806 4.20833 10.9062 4 12.0104 4C13.1146 4 14.1493 4.20833 15.1146 4.625C16.0799 5.04167 16.9271 5.61458 17.6562 6.34375C18.3854 7.07292 18.9583 7.92014 19.375 8.88542C19.7917 9.85069 20 10.8854 20 11.9896C20 13.0938 19.7917 14.1319 19.375 15.1042C18.9583 16.0764 18.3854 16.9271 17.6562 17.6562C16.9271 18.3854 16.0799 18.9583 15.1146 19.375C14.1493 19.7917 13.1146 20 12.0104 20C10.9062 20 9.86806 19.7917 8.89583 19.375ZM16.6042 16.6042C17.8681 15.3403 18.5 13.8056 18.5 12C18.5 10.1944 17.8681 8.65972 16.6042 7.39583C15.3403 6.13194 13.8056 5.5 12 5.5C10.1944 5.5 8.65972 6.13194 7.39583 7.39583C6.13194 8.65972 5.5 10.1944 5.5 12C5.5 13.8056 6.13194 15.3403 7.39583 16.6042C8.65972 17.8681 10.1944 18.5 12 18.5C13.8056 18.5 15.3403 17.8681 16.6042 16.6042ZM8.45833 15.5417C7.48611 14.5694 7 13.3889 7 12C7 10.6111 7.48611 9.43056 8.45833 8.45833C9.43056 7.48611 10.6111 7 12 7C13.3889 7 14.5694 7.48611 15.5417 8.45833C16.5139 9.43056 17 10.6111 17 12C17 13.3889 16.5139 14.5694 15.5417 15.5417C14.5694 16.5139 13.3889 17 12 17C10.6111 17 9.43056 16.5139 8.45833 15.5417ZM14.4792 14.4792C15.1597 13.7986 15.5 12.9722 15.5 12C15.5 11.0278 15.1597 10.2014 14.4792 9.52083C13.7986 8.84028 12.9722 8.5 12 8.5C11.0278 8.5 10.2014 8.84028 9.52083 9.52083C8.84028 10.2014 8.5 11.0278 8.5 12C8.5 12.9722 8.84028 13.7986 9.52083 14.4792C10.2014 15.1597 11.0278 15.5 12 15.5C12.9722 15.5 13.7986 15.1597 14.4792 14.4792ZM10.9375 13.0625C10.6458 12.7708 10.5 12.4167 10.5 12C10.5 11.5833 10.6458 11.2292 10.9375 10.9375C11.2292 10.6458 11.5833 10.5 12 10.5C12.4167 10.5 12.7708 10.6458 13.0625 10.9375C13.3542 11.2292 13.5 11.5833 13.5 12C13.5 12.4167 13.3542 12.7708 13.0625 13.0625C12.7708 13.3542 12.4167 13.5 12 13.5C11.5833 13.5 11.2292 13.3542 10.9375 13.0625Z"/></svg>';
+    // Card menu icons: three dots, and a light eye (1.8 line) for Hide (with a slash) and Show again (open).
+    var moreIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>';
+    function eyeIcon(off) {
+      return '<svg class="mi eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.75 12C5 8 8.2 6 12 6s7 2 9.25 6C19 16 15.8 18 12 18s-7-2-9.25-6Z"/><circle cx="12" cy="12" r="2.5"/>' +
+        (off ? '<path d="M4.5 4.5l15 15"/>' : '') + '</svg>';
+    }
+    var filterConfig = {
+      format:{title:'Work format',options:[['all','All formats'],['remote','Remote'],['hybrid','Hybrid'],['onsite','Onsite']]},
+      grade:{title:'Grade',options:[['all','All grades'],['middle','Middle'],['senior','Senior'],['leadership','Leadership']]},
+      sort:{title:'Sort',options:[['match-desc','Best match'],['date-desc','Newest'],['date-asc','Oldest'],['salary-desc','Salary: high to low'],['salary-asc','Salary: low to high']]},
+      status:{title:'Status',options:[['saved','Saved'],['applied','Applied'],['progress','In progress'],['rejected','Rejected'],['none','No status']]}
+    };
+    function normalizeUI(value) {
+      var ui = Object.assign({},defaults,value || {});
+      if (!['all','saved','hidden','applied','progress','rejected'].includes(ui.view)) ui.view = 'all';
+      if (!['all','remote','hybrid','onsite'].includes(ui.format)) ui.format = 'all';
+      if (!['all','middle','senior','leadership'].includes(ui.grade)) ui.grade = 'all';
+      if (!['salary','date','match'].includes(ui.sort)) { ui.sort = 'date'; ui.ascending = false; }
+      ui.ascending = ui.ascending === true && ui.sort !== 'match';
+      return ui;
+    }
+    try {
+      var previous = JSON.parse(localStorage.getItem(data.id) || 'null');
+      if (previous && Array.isArray(previous.saved)) {
+        state.saved = Array.from(new Set(previous.saved.filter(function (id) { return data.jobs.some(function (j) { return j.id === id; }); })));
+        state.ui = normalizeUI(previous.ui);
+        state.viewed = Array.isArray(previous.viewed) ? previous.viewed.filter(function (id) { return data.jobs.some(function (j) { return j.id === id; }); }) : state.viewed;
+        state.demoMatches = Array.isArray(previous.demoMatches) ? previous.demoMatches.filter(function (id) { return data.jobs.some(function (j) { return j.id === id; }); }) : state.demoMatches;
+        state.savedReports = Array.isArray(previous.savedReports) ? previous.savedReports.filter(function (id) { return data.jobs.some(function (j) { return j.id === id; }); }) : state.savedReports;
+        state.hidden = Array.isArray(previous.hidden) ? previous.hidden.filter(function (id) { return data.jobs.some(function (j) { return j.id === id; }); }) : state.hidden;
+        if (previous.statuses) state.statuses = validStatuses(previous.statuses);
+      }
+    } catch (_) {}
+    state.saved = Array.from(new Set(state.saved.concat(state.savedReports)));
+    state.savedReports = [];
+    // Older saved states could put a job in several piles: a status wins, then Hidden, then Saved.
+    state.hidden = state.hidden.filter(function (id) { return !state.statuses[id]; });
+    state.saved = state.saved.filter(function (id) { return !state.hidden.includes(id) && !state.statuses[id]; });
+    function escapeHTML(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g,function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
+    }
+    function persist() { try { localStorage.setItem(data.id,JSON.stringify(state)); } catch (_) {} emitState(); }
+    // Soft entrance for things that appear after a pointer action; skipped when the system asks for less motion.
+    function softly(el, frames, ms) {
+      if (!el || !el.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      el.animate(frames, {duration: ms, easing: 'cubic-bezier(.22,1,.36,1)'});
+    }
+    function revealResults() {
+      softly($('empty').hidden ? $('jobs') : $('empty'), [{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}], 260);
+    }
+    // Short message at the bottom; an optional action (Undo) keeps it open while it is hovered or focused.
+    function hideToast() { clearTimeout(toastTimer); $('toast').hidden = true; }
+    function scheduleToast(ms) { clearTimeout(toastTimer); toastTimer = setTimeout(hideToast,ms); }
+    function notify(message, action) {
+      var toast = $('toast');
+      clearTimeout(toastTimer); toast.textContent = message;
+      if (action) {
+        var button = document.createElement('button');
+        button.type = 'button'; button.className = 'toast-action'; button.textContent = action.label;
+        button.onclick = function () { hideToast(); action.run(); };
+        toast.appendChild(button);
+      }
+      toast.hidden = false;
+      softly(toast, [{opacity:0,transform:'translate(-50%,8px)'},{opacity:1,transform:'translate(-50%,0)'}], 240);
+      scheduleToast(action ? 5000 : 4000);
+    }
+    $('toast').addEventListener('mouseenter',function () { clearTimeout(toastTimer); });
+    $('toast').addEventListener('focusin',function () { clearTimeout(toastTimer); });
+    $('toast').addEventListener('mouseleave',function () { if (!$('toast').contains(document.activeElement)) scheduleToast(3000); });
+    $('toast').addEventListener('focusout',function (event) { if (!$('toast').contains(event.relatedTarget)) scheduleToast(3000); });
+    function visibleJobs() {
+      var jobs = data.jobs.filter(function (j) {
+        var hidden = state.hidden.includes(j.id);
+        var inView = state.ui.view === 'hidden' ? hidden : statusConfig[state.ui.view] ? !hidden && statusOf(j.id) === state.ui.view :
+          !hidden && (state.ui.view !== 'saved' || state.saved.includes(j.id) || state.savedReports.includes(j.id));
+        return inView &&
+          (state.ui.format === 'all' || j.format === state.ui.format) &&
+          (state.ui.grade === 'all' || j.grade === state.ui.grade);
+      });
+      if (state.ui.sort) jobs.sort(function (a,b) {
+        var av = sortKey(a), bv = sortKey(b);
+        var aMissing = av == null || isNaN(av), bMissing = bv == null || isNaN(bv);
+        if (aMissing || bMissing) return aMissing && bMissing ? 0 : aMissing ? 1 : -1;
+        return state.ui.ascending ? av - bv : bv - av;
+      });
+      return jobs;
+    }
+    function sortValue() { return state.ui.sort + (state.ui.ascending ? '-asc' : '-desc'); }
+    // Match level and percentage from the report, for example "High match · 86%"; "Not enough data" without a percentage.
+    var matchLevels = {high:'High match', above_average:'Above average', average:'Average', below_average:'Below average', insufficient_data:'Not enough data'};
+    function reportOf(id) { return data.reports[id] || null; }
+    // Host mode: once a host has sent real vacancies, demo matches are neither run nor shown.
+    var hostData = false;
+    function demoShown(id) { return !hostData && state.demoMatches.includes(id); }
+    function reportScore(r) {
+      var n = Number(r && r.score);
+      return r && r.score != null && r.score !== '' && isFinite(n) && r.matchLevel !== 'insufficient_data' ? Math.round(n) : null;
+    }
+    function reportLabel(r) {
+      var score = reportScore(r);
+      if (r.matchLevel === 'insufficient_data' || (!matchLevels[r.matchLevel] && score == null)) return 'Not enough data';
+      return (matchLevels[r.matchLevel] || 'Match') + (score != null ? ' · ' + score + '%' : '');
+    }
+    // Best match uses the match percentage; vacancies without a percentage go to the end.
+    function matchValue(job) {
+      if (reportOf(job.id)) return reportScore(reportOf(job.id));
+      var n = Number(job.match); return job.match != null && job.match !== '' && isFinite(n) ? n : null;
+    }
+    function sortKey(job) { return state.ui.sort === 'salary' ? salaryValue(job) : state.ui.sort === 'match' ? matchValue(job) : Date.parse(job.publishedAt); }
+    function dayOf(value) { return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value) ? value.slice(0,10) : ''; }
+    function isNew(job) { return !!dayOf(job.foundAt) && dayOf(job.foundAt) === dayOf(data.updatedAt) && !state.viewed.includes(job.id); }
+    function statusOf(id) { return state.statuses[id] ? state.statuses[id].status : ''; }
+    // The job's pile for the status lists: a status, Saved, or none (also for hidden jobs).
+    function pileValue(id) { return statusOf(id) || (state.saved.includes(id) ? 'saved' : 'none'); }
+    // Number of jobs in a section; All jobs counts everything that is not hidden.
+    function pileCount(view) {
+      return data.jobs.filter(function (j) {
+        var hidden = state.hidden.includes(j.id);
+        return view === 'hidden' ? hidden : !hidden && (view === 'all' || (view === 'saved' ? state.saved.includes(j.id) : statusOf(j.id) === view));
+      }).length;
+    }
+    function statusText(id) {
+      var s = state.statuses[id]; if (!s) return '';
+      var day = s.at ? new Date(s.at + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+      return statusConfig[s.status].label + (day ? ' · ' + day : '');
+    }
+    function statusBadge(id) {
+      var s = state.statuses[id];
+      return '<span class="card-status" data-status="' + s.status + '" data-tip="' + escapeHTML(statusText(id)) + '" role="img" aria-label="' +
+        escapeHTML('Status: ' + statusText(id)) + '">' + statusIcon(s.status) + '</span>';
+    }
+    function publishedLabel(value) {
+      if (!value || !/^\d{4}-\d{2}-\d{2}/.test(value)) return '';
+      var parts = value.slice(0,10).split('-').map(Number), date = new Date(parts[0],parts[1]-1,parts[2]);
+      if (date.getFullYear() !== parts[0] || date.getMonth() !== parts[1]-1 || date.getDate() !== parts[2]) return '';
+      var now = new Date(), today = Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
+      var days = Math.round((today - Date.UTC(parts[0],parts[1]-1,parts[2])) / 86400000);
+      return days === 0 ? 'Today' : days === 1 ? 'Yesterday' : date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    }
+    function searchDateLabel(value) {
+      if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}/.test(value)) return '';
+      var parts = value.slice(0,10).split('-').map(Number), date = new Date(parts[0],parts[1]-1,parts[2]);
+      if (date.getMonth() !== parts[1]-1 || date.getDate() !== parts[2]) return '';
+      return date.toLocaleDateString('en-US',{weekday:'short'}) + ' ' + parts[2] + ' ' + date.toLocaleDateString('en-US',{month:'short'}) + ', ' + parts[0];
+    }
+    // Missing location, format or salary is left out instead of printing "null" or "$NaN".
+    function amount(value) { var n = Number(value); return value != null && value !== '' && isFinite(n) && n > 0 ? n : null; }
+    function salaryValue(job) { var max = amount(job.salaryMax); return max != null ? max : amount(job.salaryMin); }
+    // Currency comes from the vacancy (ISO code); without it the amount is shown without a sign.
+    var currencySigns = {EUR:'€', USD:'$', GBP:'£'};
+    function currencyPrefix(code) { if (typeof code !== 'string' || !code.trim()) return ''; code = code.trim().toUpperCase(); return currencySigns[code] || code + ' '; }
+    // Yearly amounts are shown in thousands; a month or hour period adds /mo or /h.
+    function salaryLabel(job) {
+      var min = amount(job.salaryMin), max = amount(job.salaryMax), sign = currencyPrefix(job.currency);
+      var per = job.salaryPeriod === 'month' ? '/mo' : job.salaryPeriod === 'hour' ? '/h' : '';
+      if (min == null && max == null) return '';
+      var k = (min == null || min >= 1000) && (max == null || max >= 1000), unit = function (n) { return k ? n / 1000 : n; };
+      if (min == null || max == null) return sign + unit(min != null ? min : max) + (k ? 'k' : '') + per;
+      return sign + unit(min) + '–' + unit(max) + (k ? 'k' : '') + per;
+    }
+    function formatName(value) { return typeof value === 'string' && value ? value.charAt(0).toUpperCase() + value.slice(1) : ''; }
+    function metaLine(job) {
+      var place = [typeof job.location === 'string' ? job.location.trim() : '', formatName(job.format)].filter(Boolean).join(', ');
+      return [place, salaryLabel(job)].filter(Boolean).join(' · ');
+    }
+    function jobName(job) { return [job.title, job.company].filter(Boolean).join(' at '); }
+    function bookmarkLabel(job,saved) { return (saved ? 'Unsave ' : 'Save ') + jobName(job); }
+    function renderJobs() {
+      var jobs = visibleJobs();
+      $('jobs').innerHTML = jobs.map(function (j) {
+        var saved = state.saved.includes(j.id), report = reportOf(j.id);
+        return '<article class="job" data-id="' + escapeHTML(j.id) + '"><div class="job-header"><span class="company">' +
+          (isNew(j) ? '<span class="new-dot" aria-hidden="true"></span><span class="sr-only">New: </span>' : '') + escapeHTML(j.company) +
+          '</span>' + (publishedLabel(j.publishedAt) ? '<span class="card-date">' + escapeHTML(publishedLabel(j.publishedAt)) + '</span>' : '') +
+          '<div class="card-actions"><button type="button" class="card-more" data-more="' + escapeHTML(j.id) + '" aria-label="' + escapeHTML('More actions for ' + jobName(j)) +
+          '" aria-haspopup="menu" aria-expanded="false" aria-controls="filter-dialog" data-tip="More">' + moreIcon + '</button>' +
+          (statusOf(j.id) ? statusBadge(j.id) : '<button type="button" class="bookmark" data-save="' + escapeHTML(j.id) + '" aria-label="' +
+          escapeHTML(bookmarkLabel(j,saved)) + '" aria-pressed="' + saved + '" data-tip="' + (saved ? 'Remove from saved' : 'Save') + '">' + bookmarkIcon + '</button>') +
+          '</div></div>' +
+          '<div class="job-main"><h2 class="job-title"><button type="button" class="title-button" data-open="' + escapeHTML(j.id) +
+          '">' + escapeHTML(j.title) + '</button></h2><p class="job-meta">' + escapeHTML(metaLine(j)) +
+          '</p></div><div class="card-bottom">' +
+          (!report && !j.match && !demoShown(j.id) ? '<button class="card-match" type="button" data-run-match="' + escapeHTML(j.id) + '" aria-label="' +
+          escapeHTML((matching.has(j.id) ? 'Matching… ' : 'Match: ') + jobName(j)) + '"' + (matching.has(j.id) ? ' disabled' : '') + '>' +
+          matchIcon + '<span>' + (matching.has(j.id) ? 'Matching…' : 'Match') + '</span></button>' : '') +
+          '<span class="match-status">' + (report ? escapeHTML(reportLabel(report)) : j.match ? 'Match ' + escapeHTML(j.match) + '%' :
+          demoShown(j.id) ? 'Demo match' : '') + '</span></div></article>';
+      }).join('');
+      $('result-count').textContent = jobs.length + (jobs.length === 1 ? ' job' : ' jobs');
+      $('empty').hidden = jobs.length > 0;
+      // An empty section says how jobs get there; otherwise the filters are the reason.
+      var view = state.ui.view, emptyPile = view !== 'all' && !pileCount(view);
+      var pileText = {saved:['No saved jobs yet','Tap a bookmark on any vacancy to keep it here.'],
+        applied:['No applied jobs yet','Choose Applied in the ⋯ menu of any vacancy to keep it here.'],
+        progress:['No jobs in progress yet','Choose In progress in the ⋯ menu of any vacancy to keep it here.'],
+        rejected:['No rejected jobs yet','Choose Rejected in the ⋯ menu of any vacancy to keep it here.'],
+        hidden:['No hidden jobs','Choose Hide in the ⋯ menu of any vacancy to move it here.']}[view];
+      $('empty-title').textContent = emptyPile ? pileText[0] : 'No jobs match these filters';
+      $('empty-copy').textContent = emptyPile ? pileText[1] : 'Try a different format or grade.';
+      $('empty-action').textContent = emptyPile ? 'Browse all jobs' : 'Clear filters';
+    }
+    function renderControls() {
+      // Every section is always listed, with its count (also 0).
+      ['all','saved','hidden'].concat(Object.keys(statusConfig)).forEach(function (v) {
+        var button = $(v + '-jobs');
+        $(v + '-count').textContent = pileCount(v);
+        if (state.ui.view === v) button.setAttribute('aria-current','page'); else button.removeAttribute('aria-current');
+      });
+      ['format','grade'].forEach(function (key) {
+        var label = filterConfig[key].options.find(function (o) { return o[0] === state.ui[key]; })[1];
+        $(key + '-label').textContent = label;
+        $(key + '-trigger').setAttribute('aria-label',filterConfig[key].title + ': ' + label);
+        $(key + '-trigger').dataset.filtered = String(state.ui[key] !== 'all');
+        $(key + '-clear').hidden = state.ui[key] === 'all';
+      });
+      var sort = sortValue(), selected = filterConfig.sort.options.find(function (o) { return o[0] === sort; });
+      $('sort-label').textContent = sort === 'none' ? 'Sort' : selected[1];
+      $('sort-trigger').setAttribute('aria-label','Sort: ' + selected[1]);
+      $('sort-trigger').dataset.filtered = String(sort !== defaults.sort + '-desc');
+    }
+    function render() { renderControls(); renderJobs(); persist(); }
+    function toggleSaved(id) {
+      var job = data.jobs.find(function (j) { return j.id === id; });
+      if (!job) return;
+      var saved = !state.saved.includes(id), moved = saved && (state.hidden.includes(id) || !!state.statuses[id]);
+      state.saved = saved ? state.saved.concat(id) : state.saved.filter(function (v) { return v !== id; });
+      // A job is in one pile at most: saving brings a hidden job back and drops a status.
+      if (saved) { state.hidden = state.hidden.filter(function (v) { return v !== id; }); delete state.statuses[id]; }
+      persist(); renderControls();
+      if (state.ui.view !== 'all' || moved) {
+        var oldCards = Array.from($('jobs').querySelectorAll('.job'));
+        var oldIndex = oldCards.findIndex(function (c) { return c.dataset.id === id; });
+        renderJobs();
+        var remaining = $('jobs').querySelectorAll('.bookmark');
+        if (!$('details').open) (remaining[Math.min(oldIndex,remaining.length - 1)] || $('saved-jobs')).focus();
+      } else {
+        document.querySelectorAll('[data-save]').forEach(function (button) {
+          if (button.dataset.save !== id) return;
+          button.setAttribute('aria-pressed',String(saved));
+          button.setAttribute('aria-label',bookmarkLabel(job,saved));
+          button.dataset.tip = saved ? 'Remove from saved' : 'Save';
+          if (saved) burst(button);
+        });
+      }
+      if (active && active.id === id) updateDetailStatus();
+    }
+    // Saving: the bookmark pops a little and throws eight square "pixel" sparks that fade out.
+    function burst(button) {
+      var icon = button && button.querySelector('.bm');
+      if (!icon || !icon.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      icon.animate([{transform:'scale(1)'},{transform:'scale(1.25)',offset:.35},{transform:'scale(1)'}],{duration:380,easing:'cubic-bezier(.22,1,.36,1)'});
+      for (var i = 0; i < 8; i++) {
+        var angle = (i + .5) / 8 * Math.PI * 2, near = 10, far = i % 2 ? 19 : 16;
+        var spark = document.createElement('span');
+        spark.className = 'spark'; icon.appendChild(spark);
+        spark.animate([
+          {opacity:1,transform:'translate(' + Math.round(Math.cos(angle) * near) + 'px,' + Math.round(Math.sin(angle) * near) + 'px)'},
+          {opacity:0,transform:'translate(' + Math.round(Math.cos(angle) * far) + 'px,' + Math.round(Math.sin(angle) * far) + 'px)'}
+        ],{duration:420,delay:60,easing:'cubic-bezier(.22,1,.36,1)'}).onfinish = function () { this.effect.target.remove(); };
+      }
+    }
+    // Hiding takes a job out of All jobs and Saved; it comes back via Undo or the Hidden list.
+    function toggleHidden(id,event) {
+      var job = data.jobs.find(function (j) { return j.id === id; });
+      if (!job) return;
+      var hide = !state.hidden.includes(id), keyboard = !!event && event.detail === 0, wasSaved = false;
+      var cards = Array.from($('jobs').querySelectorAll('.job'));
+      var card = cards.find(function (c) { return c.dataset.id === id; }), oldIndex = cards.indexOf(card);
+      var animate = !keyboard && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function finish() {
+        var before = {};
+        Array.from($('jobs').querySelectorAll('.job')).forEach(function (c) { before[c.dataset.id] = c.getBoundingClientRect(); });
+        // Hiding a saved job removes it from saved; Undo puts it back.
+        if (hide) { wasSaved = state.saved.includes(id); state.saved = state.saved.filter(function (v) { return v !== id; }); }
+        state.hidden = hide ? state.hidden.concat(id) : state.hidden.filter(function (v) { return v !== id; });
+        render();
+        if (animate) Array.from($('jobs').querySelectorAll('.job')).forEach(function (c) {
+          var was = before[c.dataset.id];
+          if (!was) { if (c.dataset.id === id && c.animate) c.animate([{opacity:0,transform:'scale(.96)'},{opacity:1,transform:'none'}],{duration:260,easing:'cubic-bezier(.22,1,.36,1)'}); return; }
+          var now = c.getBoundingClientRect(), dx = was.left - now.left, dy = was.top - now.top;
+          if ((dx || dy) && c.animate) c.animate([{transform:'translate(' + dx + 'px,' + dy + 'px)'},{transform:'none'}],{duration:340,easing:'cubic-bezier(.22,1,.36,1)'});
+        });
+        if (keyboard) focusCardMore(id,oldIndex);
+        if (hide) notify('Job hidden', {label:'Undo', run:function () {
+          toggleHidden(id);
+          if (wasSaved && !state.saved.includes(id)) { state.saved = state.saved.concat(id); render(); }
+        }});
+      }
+      if (card && animate && card.animate) {
+        card.style.zIndex = 1;
+        card.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(1.06)'}],{duration:220,easing:'cubic-bezier(.23,1,.32,1)',fill:'forwards'}).onfinish = finish;
+      } else finish();
+    }
+    // Keyboard focus goes back to the job's "more" button, or to the nearest one when the job has left the list.
+    function focusCardMore(id,oldIndex) {
+      var card = $('jobs').querySelector('.job[data-id="' + CSS.escape(id) + '"]'), rest = $('jobs').querySelectorAll('.card-more');
+      ((card && card.querySelector('.card-more')) || rest[Math.min(oldIndex,rest.length - 1)] || $('all-jobs')).focus();
+    }
+    function todayISO() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+    // One pile per job: choosing Saved or a status takes the job out of the other piles (and out of Hidden).
+    // "No status" takes it out of Saved and the statuses; a hidden job stays hidden.
+    function setStatus(id,value) {
+      if (!data.jobs.some(function (j) { return j.id === id; })) return;
+      if (statusConfig[value]) state.statuses[id] = {status:value, at:todayISO()}; else delete state.statuses[id];
+      state.saved = state.saved.filter(function (v) { return v !== id; });
+      if (value === 'saved') state.saved.push(id);
+      if (value !== 'none') state.hidden = state.hidden.filter(function (v) { return v !== id; });
+      render();
+      if (active && active.id === id) updateDetailStatus();
+    }
+    // The dialog has one button for the pile: it shows Saved, the status, or "Set status", and opens the same list as the card menu.
+    function updateDetailStatus() {
+      var pile = active ? pileValue(active.id) : 'none', trigger = $('status-trigger');
+      var label = pile === 'saved' ? 'Saved' : statusConfig[pile] ? statusConfig[pile].label : 'Set status';
+      trigger.innerHTML = statusIcon(pile,'rail-icon') + '<span>' + label + '</span>';
+      trigger.setAttribute('aria-label','Status: ' + (statusConfig[pile] ? statusText(active.id) : pile === 'saved' ? 'Saved' : 'not set'));
+      trigger.dataset.set = String(pile !== 'none');
+    }
+    function openDetails(id,instant) {
+      active = data.jobs.find(function (j) { return j.id === id; });
+      if (!active) return;
+      var dialog = $('details');
+      // Opening another vacancy while the previous one is still fading out keeps the dialog open.
+      if (closeAnimation) { closeAnimation.onfinish = null; closeAnimation.cancel(); closeAnimation = null; delete dialog.dataset.closing; }
+      // Keyboard-opened dialogs appear without animation.
+      if (instant) dialog.dataset.instant = 'true'; else delete dialog.dataset.instant;
+      if (!state.viewed.includes(id)) {
+        state.viewed.push(id); persist();
+        var openedCard = document.querySelector('.job[data-id="' + CSS.escape(id) + '"]');
+        // Opening a job clears its "New" mark.
+        var dot = openedCard && openedCard.querySelector('.new-dot');
+        if (dot) { dot.nextElementSibling.remove(); dot.remove(); }
+      }
+      $('detail-company').textContent = active.company || '';
+      $('detail-title').textContent = active.title || '';
+      $('detail-meta').textContent = metaLine(active);
+      $('published-line').textContent = publishedLabel(active.publishedAt) ? 'Published ' + publishedLabel(active.publishedAt) : 'Publication date unavailable';
+      var source = ''; try { var parsed = new URL(active.employerUrl || active.url || active.sourceUrl || ''); if (['http:','https:'].includes(parsed.protocol)) source = parsed.href; } catch (_) {}
+      $('job-source').hidden = !source; $('source-missing').hidden = !!source; if (source) $('job-source').href = source; else $('job-source').removeAttribute('href');
+      // Where the vacancy was found, when the listing was checked and whether it is still open.
+      var listing = {open_confirmed:'Open', unverified:'Not verified', closed:'Closed'}[active.listingStatus];
+      var facts = [active.sourceName ? 'Found on ' + active.sourceName : '', dayOf(active.checkedAt) ? 'checked ' + new Date(dayOf(active.checkedAt) + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '', listing || ''].filter(Boolean);
+      $('source-facts').textContent = facts.length ? facts.join(' · ') + ' · ' : '';
+      $('description-panel').innerHTML = '<h3>Job description</h3><p>' + (active.description ? escapeHTML(active.description).replace(/\n/g,'<br>') : 'Full job description is not available in this demo.') + '</p>';
+      renderMatchPanel();
+      updateDetailStatus();
+      $('agent-request').hidden = true; $('copy-feedback').textContent = '';
+      if (!dialog.open) dialog.showModal();
+    }
+    function positionFilter() {
+      if (!$('filter-dialog').open || !filterTrigger) return;
+      var panel = $('filter-dialog'), small = matchMedia('(max-width:640px)').matches;
+      panel.dataset.placement = small ? 'sheet' : 'popover';
+      if (small) { panel.style.left = ''; panel.style.top = ''; panel.style.width = ''; panel.style.maxHeight = ''; return; }
+      // The card menu lines up with the right edge of the actions panel; filters line up with their left edge.
+      var card = filterKey === 'card', rect = (card ? filterTrigger.closest('.card-actions') : filterTrigger).getBoundingClientRect(), width = 240;
+      panel.style.width = width + 'px';
+      panel.style.left = Math.max(12,Math.min(card ? rect.right - width : rect.left,innerWidth - width - 12)) + 'px';
+      var height = panel.getBoundingClientRect().height;
+      var top = rect.bottom + (card ? 6 : 8);
+      if (top + height > innerHeight - 12) top = Math.max(12,rect.top - height - 8);
+      panel.style.top = top + 'px';
+      panel.style.maxHeight = Math.max(120,innerHeight - top - 12) + 'px';
+    }
+    // One popover for the filters, the dialog's status list and the card menu ("card": Saved and the statuses, then Hide or Show again).
+    function openFilter(key,keyboard,last,trigger,jobId) {
+      var menu = key === 'card', statuses = menu || key === 'status';
+      var job = menu ? data.jobs.find(function (j) { return j.id === jobId; }) : active;
+      if (statuses && !job) return;
+      filterKey = key; filterTrigger = trigger || $(key + '-trigger'); menuJobId = statuses ? job.id : null;
+      var config = filterConfig[statuses ? 'status' : key], panel = $('filter-dialog');
+      var title = menu ? job.title || job.company || 'Vacancy' : config.title;
+      var current = key === 'sort' ? sortValue() : statuses ? pileValue(job.id) : state.ui[key];
+      $('filter-title').textContent = title;
+      panel.setAttribute('aria-label',menu ? 'Actions for ' + jobName(job) : config.title);
+      $('filter-options').setAttribute('role',menu ? 'menu' : 'listbox');
+      $('filter-options').setAttribute('aria-label',title);
+      $('filter-options').innerHTML = config.options.map(function (option) {
+        var selected = option[0] === current;
+        return '<button type="button" class="filter-option" role="' + (menu ? 'menuitemradio' : 'option') + '" data-option="' + option[0] + '" ' +
+          (menu ? 'aria-checked' : 'aria-selected') + '="' + selected + '" tabindex="' + (selected ? '0' : '-1') + '">' +
+          (statuses ? (option[0] !== 'none' ? statusIcon(option[0],'mi') : '<span class="mi"></span>') : '') +
+          '<span>' + option[1] + '</span><img class="icon" src="' + checkIcon + '" alt=""></button>';
+      }).join('') + (menu && !statusOf(job.id) ? (function (hidden) {
+        // A job with a status cannot be hidden, so its menu has no Hide.
+        return '<hr><button type="button" class="filter-option" role="menuitem" data-option="' + (hidden ? 'unhide' : 'hide') + '" tabindex="-1">' +
+          eyeIcon(!hidden) + '<span>' + (hidden ? 'Show again' : 'Hide') + '</span></button>';
+      })(state.hidden.includes(job.id)) : '');
+      panel.showModal(); filterTrigger.setAttribute('aria-expanded','true'); positionFilter();
+      var options = panel.querySelectorAll('.filter-option');
+      (last ? options[options.length - 1] : panel.querySelector('.filter-option[tabindex="0"]')).focus({preventScroll:true});
+      if (filterAnimation) filterAnimation.cancel();
+      if (!keyboard && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
+        var sheet = panel.dataset.placement === 'sheet';
+        panel.style.transformOrigin = sheet ? 'bottom center' : menu ? 'top right' : 'top left';
+        filterAnimation = panel.animate([{opacity:.4,transform:sheet ? 'translateY(16px)' : 'translateY(-3px) scale(.98)'},{opacity:1,transform:'none'}],{duration:200,easing:'cubic-bezier(.22,1,.36,1)'});
+      }
+    }
+    function closeFilter(restore) {
+      if (filterAnimation) { filterAnimation.cancel(); filterAnimation = null; }
+      if ($('filter-dialog').open) $('filter-dialog').close();
+      if (filterTrigger) {
+        filterTrigger.setAttribute('aria-expanded','false');
+        if (restore !== false) filterTrigger.focus({preventScroll:true});
+      }
+    }
+    $('jobs').addEventListener('click',function (event) {
+      if (event.target.closest('[data-save], [data-run-match], [data-more]')) return;
+      var card = event.target.closest('.job');
+      if (card) openDetails(card.dataset.id,event.detail === 0);
+    });
+    document.addEventListener('click',function (event) {
+      var button = event.target.closest('button');
+      if (!button) return;
+      if (button.dataset.save) return toggleSaved(button.dataset.save);
+      if (button.dataset.more) return openFilter('card',event.detail === 0,false,button,button.dataset.more);
+      if (button.dataset.runMatch) return requestMatch(button.dataset.runMatch);
+      if (button.dataset.filter) return openFilter(button.dataset.filter,event.detail === 0,false);
+      if (button.dataset.option) {
+        if (filterKey === 'status' || filterKey === 'card') return chooseStatusOption(button.dataset.option,event);
+        if (filterKey === 'sort') { var choice = button.dataset.option.split('-'); state.ui.sort = choice[0] === 'none' ? null : choice[0]; state.ui.ascending = choice[1] === 'asc'; } else state.ui[filterKey] = button.dataset.option;
+        closeFilter(); render(); if (event.detail !== 0) revealResults(); return;
+      }
+    });
+    // Card menu and the dialog's status list. Keyboard users stay on the job's "more" button afterwards.
+    function chooseStatusOption(value,event) {
+      var id = menuJobId, fromCard = filterKey === 'card', keyboard = event.detail === 0;
+      var oldIndex = Array.from($('jobs').querySelectorAll('.job')).findIndex(function (c) { return c.dataset.id === id; });
+      closeFilter(!fromCard);
+      if (value === 'hide' || value === 'unhide') return toggleHidden(id,event);
+      setStatus(id,value);
+      if (fromCard && keyboard) focusCardMore(id,oldIndex);
+    }
+    $('jobs').addEventListener('keydown',function (event) {
+      var more = event.target.closest('[data-more]');
+      if (more && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) { event.preventDefault(); openFilter('card',true,event.key === 'ArrowUp',more,more.dataset.more); }
+    });
+    ['format','grade','sort'].forEach(function (key) {
+      $(key + '-trigger').addEventListener('keydown',function (event) {
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); openFilter(key,true,event.key === 'ArrowUp'); }
+      });
+    });
+    $('filter-dialog').addEventListener('keydown',function (event) {
+      var options = Array.from(this.querySelectorAll('.filter-option'));
+      var index = options.indexOf(document.activeElement), next = index;
+      if (event.key === 'ArrowDown') next = (index + 1) % options.length;
+      else if (event.key === 'ArrowUp') next = (index - 1 + options.length) % options.length;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = options.length - 1;
+      else if (event.key === 'Tab') {
+        event.preventDefault();
+        if (filterKey === 'status') { closeFilter(); return; }
+        var trigger = filterTrigger;
+        closeFilter(false);
+        var controls = Array.from(document.querySelectorAll('button,a[href],textarea')).filter(function (el) { return !el.closest('dialog') && el.getClientRects().length && !el.disabled; });
+        var targetIndex = controls.indexOf(trigger) + (event.shiftKey ? -1 : 1);
+        (controls[targetIndex] || trigger).focus(); return;
+      } else return;
+      event.preventDefault();
+      options.forEach(function (el) { el.tabIndex = -1; });
+      options[next].tabIndex = 0; options[next].focus();
+    });
+    $('filter-dialog').addEventListener('cancel',function (event) { event.preventDefault(); closeFilter(); });
+    $('close-filter').onclick = function () { closeFilter(); };
+    ['filter-dialog','details'].forEach(function (id) {
+      $(id).addEventListener('click',function (event) {
+        if (event.target !== this) return;
+        var rect = this.getBoundingClientRect();
+        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
+          if (id === 'filter-dialog') closeFilter(); else closeDetails();
+        }
+      });
+    });
+    addEventListener('resize',positionFilter);
+    function syncStickyRefresh() {
+      var sticky = matchMedia('(min-width:761px)').matches && document.querySelector('.hero').getBoundingClientRect().bottom <= -12;
+      $('sticky-refresh').hidden = !sticky;
+      $('refresh').hidden = sticky;
+    }
+    addEventListener('scroll',syncStickyRefresh,{passive:true});
+    addEventListener('resize',syncStickyRefresh);
+    function alignSidebarToJobs() {
+      var grid = $('jobs');
+      document.documentElement.style.setProperty('--jobs-top', (grid.getBoundingClientRect().top + scrollY) + 'px');
+    }
+    addEventListener('resize',alignSidebarToJobs);
+    alignSidebarToJobs();
+    syncStickyRefresh();
+    $('all-jobs').onclick = function (event) { state.ui.view = 'all'; render(); if (event.detail !== 0) revealResults(); };
+    $('saved-jobs').onclick = function (event) { state.ui.view = 'saved'; render(); if (event.detail !== 0) revealResults(); };
+    $('hidden-jobs').onclick = function (event) { state.ui.view = 'hidden'; render(); if (event.detail !== 0) revealResults(); };
+    Object.keys(statusConfig).forEach(function (key) {
+      $(key + '-jobs').onclick = function (event) { state.ui.view = key; render(); if (event.detail !== 0) revealResults(); };
+    });
+    $('status-trigger').onclick = function (event) { if (active) openFilter('status',event.detail === 0,false); };
+    function resetFilters(event) { state.ui = Object.assign({},defaults,{view:state.ui.view}); render(); if (event && event.detail !== 0) revealResults(); }
+    // The cross next to a set work format or grade clears that filter only.
+    ['format','grade'].forEach(function (key) {
+      $(key + '-clear').onclick = function (event) {
+        state.ui[key] = 'all'; render(); if (event.detail !== 0) revealResults(); else $(key + '-trigger').focus();
+      };
+    });
+    $('empty-action').onclick = function (event) {
+      if (state.ui.view !== 'all' && !pileCount(state.ui.view)) state.ui.view = 'all';
+      resetFilters(event);
+    };
+    // Tooltip for the card icons (mouse after a short pause, keyboard focus at once); hidden on scroll, press or leave.
+    var tip = document.createElement('div'), tipTimer = null, tipTarget = null;
+    tip.className = 'tip'; tip.hidden = true; tip.setAttribute('aria-hidden','true'); document.body.appendChild(tip);
+    function hideTip() { clearTimeout(tipTimer); tipTarget = null; tip.hidden = true; }
+    function showTip(el,delay) {
+      clearTimeout(tipTimer); tipTarget = el;
+      tipTimer = setTimeout(function () {
+        if (tipTarget !== el || !el.isConnected || !el.dataset.tip) return;
+        tip.textContent = el.dataset.tip; tip.hidden = false;
+        var r = el.getBoundingClientRect(), w = tip.offsetWidth;
+        tip.style.left = Math.max(8,Math.min(r.left + r.width / 2 - w / 2,innerWidth - w - 8)) + 'px';
+        tip.style.top = (r.bottom + 6) + 'px';
+      },delay);
+    }
+    document.addEventListener('pointerover',function (event) {
+      if (event.pointerType !== 'mouse') return;
+      var el = event.target.closest && event.target.closest('.job [data-tip]');
+      if (el && el !== tipTarget) showTip(el,250); else if (!el && tipTarget) hideTip();
+    });
+    document.addEventListener('focusin',function (event) {
+      var el = event.target.closest && event.target.closest('.job [data-tip]');
+      if (el && el.matches(':focus-visible')) showTip(el,0); else hideTip();
+    });
+    document.addEventListener('pointerdown',hideTip);
+    document.documentElement.addEventListener('mouseleave',hideTip);
+    addEventListener('scroll',hideTip,{passive:true});
+    function showRefreshInfo() { notify('This is your saved demo collection. Ask your agent to run a new search.'); }
+    function requestRefresh() {
+      if (runAction('refresh')) return;
+      if (hostData) copyRequest('Refresh my Personal Job Board search with my saved preferences.', null); else showRefreshInfo();
+    }
+    $('refresh').onclick = requestRefresh;
+    $('sticky-refresh').onclick = requestRefresh;
+    // Keyboard closing is instant; pointer closing fades out quickly with an ease-out curve.
+    function closeDetails(instant) {
+      var dialog = $('details');
+      if (!dialog.open || dialog.dataset.closing === 'true') return;
+      if (instant || matchMedia('(prefers-reduced-motion: reduce)').matches) { dialog.close(); return; }
+      dialog.dataset.closing = 'true';
+      closeAnimation = dialog.animate([{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(8px)'}],{duration:160,easing:'cubic-bezier(.23,1,.32,1)'});
+      closeAnimation.onfinish = function () { closeAnimation = null; delete dialog.dataset.closing; dialog.close(); };
+    }
+    $('details').addEventListener('cancel',function (event) { event.preventDefault(); closeDetails(true); });
+    $('close-detail').onclick = function (event) { closeDetails(event.detail === 0); };
+    function renderMatchPanel() {
+      if (!active) return;
+      var report = reportOf(active.id), result = report || active.match || demoShown(active.id);
+      $('match-panel').innerHTML = report ? reportHTML(report) : '<h3>' + (active.match ? 'Match ' + escapeHTML(active.match) + '%' : result ? 'Demo match' : 'Match report') + '</h3>' +
+        (matching.has(active.id) ? '<p>Matching…</p>' : result ? '<p>Demo only — no CV analysis has been performed.</p><p>Matches: not assessed.<br>Gaps: not assessed.<br>To clarify: CV and full vacancy description are needed.</p>' : '<p>Compare this job with your CV.</p>');
+      $('run-detail-match').hidden = !!result;
+      $('run-detail-match').disabled = matching.has(active.id);
+      $('run-detail-match').querySelector('span').textContent = matching.has(active.id) ? 'Matching…' : 'Match';
+      $('rail-result').hidden = !result; $('rail-result').textContent = report ? reportLabel(report) : active.match ? 'Match ' + active.match + '%' : 'Demo match';
+      $('download-report').hidden = !result;
+      $('copy-request').hidden = !result || !features.tailor;
+    }
+    // The report in the dialog: level and percentage, the AI note, which CV and when, the summary,
+    // then requirements with their status and CV evidence, strengths, gaps, questions, CV improvements and coverage.
+    function reportHTML(r) {
+      var esc = escapeHTML, list = function (items) { return Array.isArray(items) ? items.filter(Boolean) : []; };
+      var html = '<h3>' + esc(reportLabel(r)) + '</h3>' +
+        '<p class="report-note">AI estimate of how well your CV fits this job description. A guide, not a prediction of an interview invitation.</p>' +
+        (reportMeta(r) ? '<p class="report-note">' + esc(reportMeta(r)) + '</p>' : '') + (r.summary ? '<p>' + esc(r.summary) + '</p>' : '');
+      if (list(r.requirements).length) html += '<h4>Requirements</h4><ul class="report-reqs">' + list(r.requirements).map(function (q) {
+        return '<li><span class="req-status">' + (requirementStatus[q.status] || 'Unclear') + '</span><div><p>' + esc(q.text) +
+          (requirementPriority[q.priority] ? ' <span class="req-priority">' + requirementPriority[q.priority] + '</span>' : '') + '</p>' +
+          (q.evidence ? '<p class="req-detail">“' + esc(q.evidence) + '”</p>' : '') + (q.note ? '<p class="req-detail">' + esc(q.note) + '</p>' : '') + '</div></li>';
+      }).join('') + '</ul>';
+      [['Strengths', r.strengths], ['Gaps', r.gaps], ['Questions for you', r.openQuestions]].forEach(function (part) {
+        if (list(part[1]).length) html += '<h4>' + part[0] + '</h4><ul class="report-list">' + list(part[1]).map(function (t) { return '<li>' + esc(t && typeof t === 'object' ? t.text : t) + '</li>'; }).join('') + '</ul>';
+      });
+      if (list(r.cvImprovements).length) html += '<h4>What to improve in the CV</h4><ul class="report-list">' + list(r.cvImprovements).map(function (c) {
+        return '<li>' + esc(c.text) + (c.needsConfirmation ? ' <span class="req-priority">needs your confirmation</span>' : '') + '</li>';
+      }).join('') + '</ul>';
+      if (coverageText(r.coverage)) html += '<h4>Coverage</h4><p class="report-note">' + esc(coverageText(r.coverage)) + '</p>';
+      return html;
+    }
+    var requirementStatus = {supported:'Supported', partly_supported:'Partly', not_evidenced:'Not evidenced', unclear:'Unclear'};
+    var requirementPriority = {required:'Required', preferred:'Preferred'};
+    function shortDay(value) { return dayOf(value) ? new Date(dayOf(value) + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : ''; }
+    function coverageText(c) {
+      if (!c) return '';
+      if (typeof c === 'string') return c;
+      var desc = {full:'Full description', partial:'Partial description', unavailable:'Description unavailable'}[c.descriptionStatus || c.description] || '';
+      return [desc, c.checkedAt ? 'link checked ' + shortDay(c.checkedAt) : '', c.limitations || ''].filter(Boolean).join(' · ');
+    }
+    // Which CV the report is based on and when it was made, for example "Based on CV v2 · Report 25 Nov 2026".
+    function reportMeta(r) { return [r.cvLabel ? 'Based on ' + r.cvLabel : '', r.createdAt ? 'Report ' + shortDay(r.createdAt) : ''].filter(Boolean).join(' · '); }
+    // Markdown version of a Job Matcher report, for Download report.
+    function reportMarkdown(r) {
+      var list = function (items) { return (Array.isArray(items) ? items : []).map(function (t) { return '- ' + (t && typeof t === 'object' ? t.text : t); }); };
+      var out = ['## Match report', '', '**' + reportLabel(r) + '**', '',
+        'AI estimate of how well your CV fits this job description. A guide, not a prediction of an interview invitation.', ''];
+      var meta = reportMeta(r);
+      if (meta) out.push(meta, '');
+      if (r.summary) out.push(r.summary, '');
+      if (Array.isArray(r.requirements) && r.requirements.length) {
+        out.push('### Requirements', '');
+        r.requirements.forEach(function (q) {
+          out.push('- **' + (requirementStatus[q.status] || 'Unclear') + '** · ' + q.text + (requirementPriority[q.priority] ? ' (' + requirementPriority[q.priority] + ')' : ''));
+          if (q.evidence) out.push('  - From the CV · “' + q.evidence + '”');
+          if (q.note) out.push('  - ' + q.note);
+        });
+        out.push('');
+      }
+      [['Strengths', r.strengths], ['Gaps', r.gaps], ['Questions for you', r.openQuestions]].forEach(function (part) {
+        if (Array.isArray(part[1]) && part[1].length) { out.push('### ' + part[0], ''); out.push.apply(out, list(part[1])); out.push(''); }
+      });
+      if (Array.isArray(r.cvImprovements) && r.cvImprovements.length) {
+        out.push('### What to improve in the CV', '');
+        r.cvImprovements.forEach(function (c) { out.push('- ' + c.text + (c.needsConfirmation ? ' (needs your confirmation)' : '')); });
+        out.push('');
+      }
+      if (coverageText(r.coverage)) out.push('*' + coverageText(r.coverage) + '*', '');
+      return out;
+    }
+    function runDemoMatch(id) {
+      if (matching.has(id) || state.demoMatches.includes(id)) return;
+      matching.add(id); renderJobs(); if (active && active.id === id && $('details').open) renderMatchPanel();
+      setTimeout(function () { matching.delete(id); if (!state.demoMatches.includes(id)) state.demoMatches.push(id); persist(); renderJobs(); if (active && active.id === id && $('details').open) renderMatchPanel(); }, 1000);
+    }
+    // Match on a card or in the dialog: a host may take it over (onAction). With real data from a host the demo never runs:
+    // when the chat cannot be reached, the request is copied for the person to paste. Without a host the built-in demo runs.
+    function requestMatch(id) {
+      if (runAction('match', id)) return;
+      if (!hostData) return runDemoMatch(id);
+      var job = data.jobs.find(function (j) { return j.id === id; });
+      if (!job) return;
+      copyRequest('Match request from Personal Job Board. Vacancy "' + (job.title || 'Untitled') + '"' + (job.company ? ' at ' + job.company : '') +
+        ', id ' + job.id + '. Compare it with my CV and save the report to the board.', job.id);
+    }
+    // Copies within the same click. If the browser refuses, a Match request is shown selected in the vacancy dialog.
+    function copyRequest(text, jobId) {
+      function shown() {
+        if (jobId == null) return notify("Couldn't reach the chat. Ask Claude to refresh your Personal Job Board search with your saved preferences.");
+        if (!active || active.id !== jobId || !$('details').open) openDetails(jobId, true);
+        $('agent-request').value = text; $('agent-request').hidden = false; $('agent-request').focus(); $('agent-request').select();
+        $('copy-feedback').textContent = "Couldn't reach the chat. Copy this request into your chat with Claude.";
+      }
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.writeText) return shown();
+        navigator.clipboard.writeText(text).then(function () {
+          notify("Couldn't reach the chat. The request is copied, paste it into your chat with Claude.");
+        }, shown);
+      } catch (_) { shown(); }
+    }
+    $('run-detail-match').onclick = function () { if (active) requestMatch(active.id); };
+    $('download-report').onclick = function () {
+      if (!active) return;
+      var source = $('job-source').hidden ? null : $('job-source').href, report = reportOf(active.id);
+      var label = active.match ? 'Match ' + active.match + '%' : 'Demo match';
+      var lines = ['# ' + active.title, '', '**Company:** ' + active.company, '**Conditions:** ' + $('detail-meta').textContent,
+        '**Published:** ' + (active.publishedAt || 'Not provided'), '**Source:** ' + (source ? '[View original job](<' + source + '>)' : 'Not provided'), ''];
+      lines = lines.concat(report ? reportMarkdown(report) : ['## Match report', '', '**' + label + '**', '', 'Demo only — no CV analysis has been performed.', '',
+        '- Matches: not assessed.', '- Gaps: not assessed.', '- To clarify: CV and full vacancy description are needed.', '']);
+      lines.push('## Job description', '', active.description || 'Full job description is not available in this demo.', '');
+      saveTextFile('job-match-report.md', lines.join('\n'), 'text/markdown;charset=utf-8');
+    };
+    $('copy-request').onclick = async function () {
+      if (!active) return;
+      if (runAction('tailor', active.id)) return;
+      var source = $('job-source').hidden ? 'Not provided' : $('job-source').href;
+      var description = active.description || 'Full job description not provided.';
+      var report = $('match-panel').innerText.trim();
+      // Based on the Resume Matcher method, without its permission to estimate numbers: nothing is invented.
+      var request = ['Please tailor my CV for this vacancy, using the match report below and its recommendations.', '',
+        'Rules:',
+        '- Use only facts from my CV. Never invent or exaggerate experience, skills, results or numbers.',
+        '- Keep every job and project from my CV.',
+        '- CV headline: use this vacancy\'s job title if it honestly describes my experience; otherwise suggest the closest truthful title and explain why. Keep my original job titles in the experience section.',
+        '- Rewrite each role as results relevant to this vacancy (action, context, result). Keep existing metrics; where there are none, describe scope, before and after, and the qualitative outcome instead of adding numbers.',
+        '- Skills: add the vacancy\'s skills only where my experience supports them.',
+        '- Keep my original achievements; add up to three standout ones from my roles without repeating the experience section.',
+        '- List what you changed and why, and ask me about anything missing or unclear.',
+        '- If tailoring would not help for this vacancy, say so and explain why.', '', '# Vacancy', active.title + ' — ' + active.company, $('detail-meta').textContent, 'Published: ' + (active.publishedAt || 'Not provided'), 'Source: ' + source, '', '## Job description', description, '', '## Existing match report', report, '', 'Use my CV if it is available in this conversation; otherwise ask me to provide it.'].join('\n');
+      try { await navigator.clipboard.writeText(request); $('copy-feedback').textContent = agentHasCV ? 'Copied. Paste it into your agent chat.' : 'Copied. Paste it into your agent chat and add your CV if needed.'; }
+      catch (_) { $('agent-request').value = request; $('agent-request').hidden = false; $('agent-request').focus(); $('agent-request').select(); $('copy-feedback').textContent = 'Select and copy the request.'; }
+    };
+    // Egor's portrait. The first click (tap, Enter) shows the greeting, each next click the next line; the last line then stays.
+    // The bubble stays open until a click elsewhere, Escape or moving focus away.
+    // The order starts over when the page is reloaded.
+    var egorLines = [
+      "Hi! I'm Egor. I hope this board helps you find a job faster. I'd also recommend the <a href=\"https://github.com/egor-krasnoperov/design-growth-skills\" target=\"_blank\" rel=\"noopener noreferrer\">other skills on GitHub</a>.",
+      "Got a rejection? Ask for feedback. It might help with the next one.",
+      "Kerning your CV for the fifth time? It's fine. Send it.",
+      "If a job post lists 15 tools, they probably use three. Apply anyway.",
+      "Somewhere, a hiring manager is looking at a portfolio with lorem ipsum in it. Yours is already better.",
+      "Small request. Please don't send your CV in dark mode.",
+      "Hearing nothing back? Try the Resume Checker or Portfolio Checker from my skills. They might show what's holding you back.",
+      "You've clicked me eight times now. That's more engagement than most job posts get.",
+      "Ghosted after the final round? That says more about their process than about your work.",
+      "Nobody matches 100% of a job description. Not even the person who wrote it.",
+      "Take a break if you need one. The board will still be here tomorrow.",
+      "You'll get there. Small steps count too.",
+      "You've reached the end. I'm out of jokes, so back to the job search."
+    ];
+    var egorStep = 0, egorTimer = null;
+    function showEgor(pointer) {
+      clearTimeout(egorTimer);
+      var bubble = $('egor-bubble'), wasHidden = bubble.hidden;
+      bubble.innerHTML = egorLines[egorStep]; bubble.hidden = false;
+      $('egor-face').setAttribute('aria-expanded','true');
+      if (pointer) softly(bubble, wasHidden ? [{opacity:0,transform:'translateY(4px)'},{opacity:1,transform:'none'}] : [{opacity:.4},{opacity:1}], 180);
+    }
+    function hideEgor() { clearTimeout(egorTimer); $('egor-bubble').hidden = true; $('egor-face').setAttribute('aria-expanded','false'); }
+    $('egor-face').onclick = function (event) {
+      if (!$('egor-bubble').hidden) egorStep = Math.min(egorStep + 1, egorLines.length - 1);
+      showEgor(event.detail !== 0);
+      // A pointer click makes the portrait spring: a quick squash, a small overshoot, then rest.
+      if (event.detail !== 0 && this.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        this.animate([{transform:'scale(1)'},{transform:'scale(1.1,.86)',offset:.22},{transform:'scale(.95,1.08)',offset:.5},{transform:'scale(1.02,.98)',offset:.75},{transform:'scale(1)'}],
+          {duration:460,easing:'ease-out'});
+      }
+    };
+    $('egor').addEventListener('focusout',function (event) { if (!$('egor').contains(event.relatedTarget)) hideEgor(); });
+    $('egor').addEventListener('keydown',function (event) { if (event.key === 'Escape' && !$('egor-bubble').hidden) { hideEgor(); $('egor-face').focus(); } });
+    document.addEventListener('pointerdown',function (event) { if (!$('egor').contains(event.target)) hideEgor(); });
+    // On desktop the portrait sits under the navigation; it steps aside when the window is too short for both.
+    function placeEgor() {
+      var egor = $('egor'); egor.style.visibility = '';
+      if (!matchMedia('(min-width:761px)').matches) return;
+      if (egor.getBoundingClientRect().top < document.querySelector('.side-nav').getBoundingClientRect().bottom + 24) { egor.style.visibility = 'hidden'; hideEgor(); }
+    }
+    addEventListener('resize',placeEgor);
+    $('download').onclick = function () {
+      var clone = document.documentElement.cloneNode(true);
+      var snap = Object.assign({},data,{id:data.id + '-' + Date.now(),saved:state.saved.slice(),viewed:state.viewed.slice(),demoMatches:state.demoMatches.slice(),savedReports:state.savedReports.slice(),hidden:state.hidden.slice(),statuses:JSON.parse(JSON.stringify(state.statuses)),ui:Object.assign({},state.ui)});
+      clone.querySelector('#figma-data').textContent = JSON.stringify(snap).replace(/</g,String.fromCharCode(92) + 'u003c');
+      clone.querySelector('#jobs').innerHTML = '';
+      clone.querySelectorAll('dialog').forEach(function (dialog) { dialog.removeAttribute('open'); });
+      clone.querySelector('#filter-options').innerHTML = '';
+      clone.querySelectorAll('.filter-trigger').forEach(function (trigger) { trigger.setAttribute('aria-expanded','false'); });
+      clone.querySelector('#toast').hidden = true; clone.querySelector('#toast').textContent = '';
+      clone.querySelector('#egor-bubble').hidden = true; clone.querySelector('#egor-bubble').textContent = '';
+      clone.querySelector('#egor-face').setAttribute('aria-expanded','false'); clone.querySelector('#egor').removeAttribute('style');
+      saveTextFile('personal-job-board.html', '<!doctype html>\n' + clone.outerHTML, 'text/html;charset=utf-8');
+    };
+    // Downloads go through the host when it provides setSaveFile (a plain download link can be blocked inside an artifact).
+    function saveTextFile(name, text, type) {
+      if (saveFile) { try { if (saveFile(name, text, type) !== false) return; } catch (e) { console.error(e); } }
+      var url = URL.createObjectURL(new Blob([text],{type:type}));
+      var a = document.createElement('a'); a.href = url; a.download = name; a.click();
+      setTimeout(function () { URL.revokeObjectURL(url); },10000);
+    }
+
+    // Connection points for a host, for example the Claude artifact layer. Without a host the board works on its own,
+    // with the embedded data and browser storage. The host never needs to touch the page markup.
+    var stateListeners = [], actionListeners = [], saveFile = null, lastEmitted = '', quietState = false;
+    function publicState() {
+      return {saved:state.saved.slice(), viewed:state.viewed.slice(), hidden:state.hidden.slice(), statuses:JSON.parse(JSON.stringify(state.statuses))};
+    }
+    // Called after every save; listeners get a copy, and only when the person's choices actually changed.
+    function emitState() {
+      if (quietState || !stateListeners.length) return;
+      var key = JSON.stringify(publicState());
+      if (key === lastEmitted) return;
+      lastEmitted = key;
+      stateListeners.forEach(function (fn) { try { fn(JSON.parse(key)); } catch (e) { console.error(e); } });
+    }
+    // Asks the host first; true from any listener means the host handled the action.
+    function runAction(type, jobId) {
+      var job = jobId != null ? data.jobs.find(function (j) { return j.id === jobId; }) : null, handled = false;
+      var action = job ? {type:type, jobId:job.id, title:job.title || '', company:job.company || ''} : {type:type};
+      actionListeners.forEach(function (fn) { try { if (fn(Object.assign({}, action)) === true) handled = true; } catch (e) { console.error(e); } });
+      return handled;
+    }
+    function ids(list) { return Array.isArray(list) ? Array.from(new Set(list.filter(function (v) { return v != null; }).map(String))) : null; }
+    function refreshOpenDialog() {
+      if (!active) return;
+      active = data.jobs.find(function (j) { return j.id === active.id; }) || active;
+      if ($('details').open) { renderMatchPanel(); updateDetailStatus(); }
+    }
+    window.PersonalJobBoard = {
+      version: 1,
+      // Replace vacancies and reports (and optionally profileName, updatedAt, agentCV), then redraw.
+      setData: function (next) {
+        next = next || {};
+        if ('jobs' in next) { data.jobs = normalizeJobs(next.jobs); hostData = true; }
+        if ('reports' in next) data.reports = normalizeReports(next.reports);
+        ['profileName','updatedAt','agentCV'].forEach(function (key) { if (key in next) data[key] = next[key]; });
+        Object.keys(data.reports).forEach(function (id) { matching.delete(id); });
+        applyHeader(); refreshOpenDialog(); render(); alignSidebarToJobs(); placeEgor();
+      },
+      // Put in the person's saved choices without sending them back through onStateChange.
+      setState: function (next) {
+        next = next || {};
+        ['saved','viewed','hidden'].forEach(function (key) { var list = ids(next[key]); if (list) state[key] = list; });
+        if (next.statuses && typeof next.statuses === 'object') state.statuses = validStatuses(next.statuses, true);
+        state.hidden = state.hidden.filter(function (id) { return !state.statuses[id]; });
+        state.saved = state.saved.filter(function (id) { return !state.hidden.includes(id) && !state.statuses[id]; });
+        quietState = true;
+        try { render(); refreshOpenDialog(); } finally { quietState = false; }
+        lastEmitted = JSON.stringify(publicState());
+      },
+      getState: publicState,
+      onStateChange: function (fn) {
+        if (typeof fn !== 'function') return function () {};
+        stateListeners.push(fn); lastEmitted = JSON.stringify(publicState());
+        return function () { stateListeners = stateListeners.filter(function (f) { return f !== fn; }); };
+      },
+      // fn({type: 'match' | 'tailor' | 'refresh', jobId, title, company}); return true to replace the built-in behaviour.
+      onAction: function (fn) {
+        if (typeof fn !== 'function') return function () {};
+        actionListeners.push(fn);
+        return function () { actionListeners = actionListeners.filter(function (f) { return f !== fn; }); };
+      },
+      // fn(filename, text, mimeType) for Download HTML and Download report; return false to fall back to a normal download.
+      setSaveFile: function (fn) { saveFile = typeof fn === 'function' ? fn : null; }
+    };
+    render();
+    placeEgor();
+    window.dispatchEvent(new CustomEvent('personaljobboard:ready'));
+  }());
+  </script>
+  <!-- Claude connector. Source: experiments/claude-artifact/claude-connector.js (edit there, then copy here).
+       It runs only inside a Claude artifact; outside Claude it does nothing and the board keeps its embedded data. -->
+  <script>
+/* Personal Job Board — connector to the Claude artifact runtime.
+   Runs only when the board is opened as a Claude artifact (window.claude.use exists).
+   Outside Claude the board keeps its embedded data and browser storage, unchanged.
+   Board contract: window.PersonalJobBoard = { setData, setState, getState, onStateChange, onAction, setSaveFile },
+   announced with the window event 'personaljobboard:ready'.
+   Data contract with the agent: job-search-working-notes/drafts/personal-job-board/board-integration.md */
+(function () {
+  'use strict';
+  var claude = window.claude;
+  if (!claude || typeof claude.use !== 'function') return;
+
+  function str(v) { return typeof v === 'string' && v.trim() ? v.trim() : null; }
+  function day(v) { return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v) ? v.slice(0, 10) : null; }
+  function ids(v) { return Array.isArray(v) ? v.filter(function (x) { return typeof x === 'string'; }) : []; }
+
+  // The user's own choices, in the shape both the board and the stored document use.
+  function toBoardState(doc) {
+    var statuses = {};
+    var raw = doc && doc.statuses && typeof doc.statuses === 'object' ? doc.statuses : {};
+    Object.keys(raw).forEach(function (id) {
+      var s = raw[id];
+      if (s && typeof s.status === 'string') statuses[id] = { status: s.status, at: day(s.at) };
+    });
+    return { saved: ids(doc && doc.saved), viewed: ids(doc && doc.viewed), hidden: ids(doc && doc.hidden), statuses: statuses };
+  }
+
+  if (window.PersonalJobBoard) connect(window.PersonalJobBoard);
+  else window.addEventListener('personaljobboard:ready', function () {
+    if (window.PersonalJobBoard) connect(window.PersonalJobBoard);
+  }, { once: true });
+
+  function connect(board) {
+    Promise.all(['db', 'user', 'room', 'downloads'].map(function (name) {
+      return Promise.resolve(claude.use(name)).catch(function () { return null; });
+    })).then(function (caps) {
+      var db = caps[0], user = caps[1], room = caps[2], downloads = caps[3];
+      if (!db || !user) return; // No storage in this view: the board stays as it is.
+      return user.id().then(function (uid) {
+        if (uid) start(board, db.collection('data/users/' + uid), room, downloads);
+      });
+    }).catch(function () { /* Keep the standalone board working. */ });
+  }
+
+  function start(board, collection, room, downloads) {
+    var lastWritten = '';
+    var writeTimer = null;
+    var sendState = 'unavailable';
+    var jobsById = {};
+
+    // Reading: one subscription to the user's private area. The board reads the
+    // Job Finder format itself (workMode, level, salary, links) and checks link protocols.
+    collection.onSnapshot(function (snap) {
+      var jobs = [], reports = {}, profile = {}, search = {}, stateDoc = null;
+      snap.docs.forEach(function (d) {
+        var v = d.data() || {};
+        if (d.id === 'profile') profile = v;
+        else if (d.id === 'search') search = v;
+        else if (d.id === 'state') stateDoc = v;
+        else if (d.id.indexOf('job-') === 0) jobs.push(Object.assign({}, v, { id: d.id.slice(4) }));
+        else if (d.id.indexOf('report-') === 0) reports[d.id.slice(7)] = v;
+      });
+      jobsById = {};
+      jobs.forEach(function (j) { jobsById[j.id] = j; });
+      board.setData({
+        jobs: jobs,
+        reports: reports,
+        profileName: str(profile.displayName),
+        updatedAt: day(search.searchedAt),
+        agentCV: str(profile.cvLabel) ? { status: 'available', name: profile.cvLabel } : null
+      });
+      // A new board has no stored choices yet: clear the template's example choices
+      // (and anything left in this browser) instead of saving them as the person's own.
+      var incoming = JSON.stringify(toBoardState(stateDoc || {}));
+      if (incoming !== lastWritten) { lastWritten = incoming; board.setState(JSON.parse(incoming)); }
+    }, function () { /* Storage error: the board keeps what it shows. */ });
+
+    // Writing: only the user's own choices, batched.
+    board.onStateChange(function (state) {
+      var next = toBoardState(state);
+      lastWritten = JSON.stringify(next);
+      clearTimeout(writeTimer);
+      writeTimer = setTimeout(function () {
+        collection.doc('state').set(Object.assign({ updatedAt: new Date().toISOString() }, next)).catch(function () {});
+      }, 400);
+    });
+
+    // Sending to the chat: the answer must be known before the click.
+    function checkSend() {
+      if (!room || typeof room.canSendToClaudeSession !== 'function') return;
+      room.canSendToClaudeSession().then(function (v) { sendState = String(v); }).catch(function () { sendState = 'unavailable'; });
+    }
+    checkSend();
+    setInterval(checkSend, 15000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) checkSend(); });
+    window.addEventListener('focus', checkSend);
+
+    board.onAction(function (action) {
+      if (!action || ['match', 'tailor', 'refresh'].indexOf(action.type) < 0) return false;
+      if (!room || (sendState !== 'available' && sendState !== 'available_if_opened')) return false;
+      var job = action.jobId ? jobsById[String(action.jobId)] : null;
+      var payload = { action: action.type };
+      if (action.jobId) payload.jobId = String(action.jobId);
+      var title = str(action.title) || (job && str(job.title));
+      var company = str(action.company) || (job && str(job.company));
+      if (title) payload.title = title.slice(0, 200);
+      if (company) payload.company = company.slice(0, 200);
+      // Called synchronously inside the click: nothing is awaited before it.
+      room.sendToClaudeSession(payload, { deliver: 'stage' }).catch(function () { checkSend(); });
+      return true;
+    });
+
+    // Files: the artifact saves through the platform when it can; otherwise the board downloads itself.
+    board.setSaveFile(function (filename, text) {
+      if (!downloads || typeof downloads.save !== 'function') return false;
+      downloads.save({ filename: filename, data: text }).catch(function () {});
+      return true;
+    });
+  }
+})();
+  </script>
+</body>
+</html>
