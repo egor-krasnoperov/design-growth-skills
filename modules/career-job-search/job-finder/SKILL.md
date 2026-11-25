@@ -13,6 +13,8 @@ Version **0.1 (beta)**
 
 Find current opportunities matching the user's explicit role targets and search conditions. A CV informs the search; it does not decide the user's desired career direction or authorize broadcasting personal information. Present verifiable sources, limitations and a practical shortlist. This skill discovers vacancies; it does not submit applications or claim to know the chance of an interview.
 
+**Language.** Talk to the user in the language they write in, for the whole conversation: the opening, questions, progress notes, the final summary and Match results. The skill files, sources and job postings are often in English; that does not change the language you use with the user. Keep job titles, company names and quotes in their original language.
+
 ## Opening
 
 Use the following opening by default. Preserve its structure, meaning and friendliness, and translate it naturally into the user's language. Skip only what is already obvious from the conversation. Keep the sentence about the board true for the current assistant. Remove "(coming soon)" only when tailoring and PDF export actually exist.
@@ -72,7 +74,7 @@ Use the following opening by default. Preserve its structure, meaning and friend
 
 ## Present the shortlist
 
-Write every message to the user in their language, the final summary included, even when the sources and your notes are in English. Aim for 20–30 verified vacancies when the user's conditions allow, covering each role family and level they selected. Never pad the list with weaker or unverified matches to reach a number. If fewer than 10 remain after verification, say so, show what was searched and offer specific ways to widen the search. Include for each:
+Write every message to the user in their language, the final summary included, even when the sources and your notes are in English. Put every verified vacancy that fits on the board, up to 30, covering each role family and level the user selected. Search widely enough to reach 20–30 when the conditions allow, but never pad the list with weaker or unverified matches to reach a number. Many vacancies in search results turn out to be closed, so fewer is normal. If fewer than 15 remain after verification, say so, explain why (closed postings, sites that could not be read), show what was searched and offer specific ways to widen the search. Include for each:
 
 - job title, employer, location and working arrangement;
 - source link and original employer link when different and available;
