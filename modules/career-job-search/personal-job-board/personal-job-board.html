@@ -598,6 +598,8 @@
     function hideToast() { clearTimeout(toastTimer); $('toast').hidden = true; }
     function scheduleToast(ms) { clearTimeout(toastTimer); toastTimer = setTimeout(hideToast,ms); }
     function notify(message, action) {
+      // The open vacancy dialog covers the toast, so there a plain message goes to the dialog's own line under its actions.
+      if (!action && $('details').open) { $('copy-feedback').textContent = message; return; }
       var toast = $('toast');
       clearTimeout(toastTimer); toast.textContent = message;
       if (action) {
@@ -1361,7 +1363,9 @@
         return function () { actionListeners = actionListeners.filter(function (f) { return f !== fn; }); };
       },
       // fn(filename, text, mimeType) for Download HTML and Download report; return false to fall back to a normal download.
-      setSaveFile: function (fn) { saveFile = typeof fn === 'function' ? fn : null; }
+      setSaveFile: function (fn) { saveFile = typeof fn === 'function' ? fn : null; },
+      // A short message from the host in the board's own toast, for example after Match was handed to the chat.
+      notify: function (text) { if (typeof text === 'string' && text.trim()) notify(text.trim().slice(0, 200)); }
     };
     render();
     placeEgor();
@@ -1467,9 +1471,24 @@
     document.addEventListener('visibilitychange', function () { if (!document.hidden) checkSend(); });
     window.addEventListener('focus', checkSend);
 
+    // How a request reaches the chat. "send": Claude's own window asks the person to send it now, and Claude starts at once.
+    // "stage": the request waits in the message field as an attachment until the person sends it.
+    // Beside the chat a send is preferred, because an attachment alone is easy to miss. If this browser refuses a send once,
+    // later clicks stage instead. On the board's own page a staged send opens the board's chat with the request waiting there.
+    var sendRefused = false;
+    function deliverMode() {
+      if (sendState === 'available') return sendRefused ? 'stage' : 'send';
+      if (sendState === 'available_if_summoned') return sendRefused ? null : 'send';
+      if (sendState === 'available_if_opened') return 'stage';
+      return null;
+    }
+    function say(text) { if (typeof board.notify === 'function') board.notify(text); }
+    var labels = { match: 'Match', tailor: 'Tailor CV', refresh: 'Refresh search' };
+
     board.onAction(function (action) {
       if (!action || ['match', 'tailor', 'refresh'].indexOf(action.type) < 0) return false;
-      if (!room || (sendState !== 'available' && sendState !== 'available_if_opened')) return false;
+      var deliver = room ? deliverMode() : null;
+      if (!deliver) { checkSend(); return false; }
       var job = action.jobId ? jobsById[String(action.jobId)] : null;
       var payload = { action: action.type };
       if (action.jobId) payload.jobId = String(action.jobId);
@@ -1477,8 +1496,20 @@
       var company = str(action.company) || (job && str(job.company));
       if (title) payload.title = title.slice(0, 200);
       if (company) payload.company = company.slice(0, 200);
+      // A short name the platform shows next to the request, for example "Match · Product Designer".
+      payload.label = (labels[action.type] + (title ? ' · ' + title : '')).slice(0, 120);
+      var name = action.type === 'refresh' ? 'Refresh' : labels[action.type];
+      var result = action.type === 'refresh' ? 'new vacancies will appear here.' : 'the report will appear here.';
       // Called synchronously inside the click: nothing is awaited before it.
-      room.sendToClaudeSession(payload, { deliver: 'stage' }).catch(function () { checkSend(); });
+      room.sendToClaudeSession(payload, { deliver: deliver }).then(function () {
+        say(deliver === 'send'
+          ? name + ' request sent to your chat with Claude. ' + result.charAt(0).toUpperCase() + result.slice(1)
+          : 'The ' + name + ' request is in your chat. Press Send there, ' + result);
+      }, function (error) {
+        if (deliver === 'send' && error && error.code === 'claude_unavailable') sendRefused = true;
+        say("Couldn't reach the chat. Press " + name + ' again.');
+        checkSend();
+      });
       return true;
     });
 
