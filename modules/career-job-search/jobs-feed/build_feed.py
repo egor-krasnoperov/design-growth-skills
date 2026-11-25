@@ -229,7 +229,7 @@ def build(candidates, out_dir, seen_path=None):
     import duckdb
     today = datetime.date.today().isoformat()
     seen = json.load(open(seen_path)) if seen_path and os.path.exists(seen_path) else {}
-    cur = duckdb.connect().execute(f"select * from '{candidates}'")
+    cur = duckdb.connect().execute(f"select * from '{candidates}' order by posted_at desc nulls last")  # newest first, so a duplicate keeps the newest
     cols = [c[0] for c in cur.description]
     jobs, keys = [], set()
     for row in cur.fetchall():
@@ -244,7 +244,8 @@ def build(candidates, out_dir, seen_path=None):
         mode = work_mode(r['workplace_type'], r['is_remote'], r['location'])
         scope = remote_scope(mode, cc, r['location'], r['description'])
         region = scope if scope in ('EUROPE', 'LATAM', 'NA') else ('WORLDWIDE' if scope == 'worldwide' else region_of(cc) or 'NOT_STATED')
-        key = (low(r['company']).split()[0] if r['company'] else '', low(r['title']).strip(), cc, scope)
+        # The same posting is often published once per office; a remote one open to a region or the world counts once.
+        key = (low(r['company']).split()[0] if r['company'] else '', low(r['title']).strip(), scope if scope in ('EUROPE', 'LATAM', 'NA', 'worldwide') else cc)
         if key in keys:
             continue
         keys.add(key)

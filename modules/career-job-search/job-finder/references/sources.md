@@ -38,11 +38,11 @@ At the last check in November 2026 DesignX returned an empty accessible view, Wo
 
 ## Checking a posting on its job platform
 
-Many employers publish vacancies through Greenhouse, Lever, Workable or Ashby. Each has a public address that returns the posting as data, without a browser. It is the most reliable way to check that a vacancy is still open and to copy its full text. These addresses were checked in November 2026; they are public read-only endpoints, not integrations, and may change.
+Many employers publish vacancies through Greenhouse, Lever, Workable or Ashby. Each has a public address that returns the posting as data, without a browser. It is the most reliable way to check that a vacancy is still open and to read its full text. These addresses were checked in November 2026; they are public read-only endpoints, not integrations, and may change.
 
 Find the platform from the posting link (or from the employer's "Apply" link on an aggregator), take the company name and posting id from it, and read the address yourself.
 
-**Always add a unique check string** such as `check=20261125-1` to these addresses (`?check=…`, or `&check=…` after an existing `?`), with a new value in each search. Without it the page-reading tool may return an old saved copy. In November 2026 it showed a Greenhouse posting as open with data from June, although the posting had been closed for months. All addresses below accept the extra string. Never keep it in links shown to the user.
+**Always add a unique check string** such as `check=20261125-1` to these addresses (`?check=…`, or `&check=…` after an existing `?`), with a new value in each search. Without it the page-reading tool may return an old saved copy. In November 2026 it showed a Greenhouse posting as open with data from June, although the posting had been closed for months. All addresses below accept the extra string, but some page-reading tools refuse any address that has one (ChatGPT's did in November 2026); then read the same address in a work environment with internet access, which returns the live page without the string (Job Finder, live check rules). Never keep it in links shown to the user.
 
 | Platform | Posting link looks like | All postings of the employer (start here) | One posting |
 | --- | --- | --- | --- |

@@ -11,7 +11,7 @@ These skills help Product, UX, and UI designers and design leaders prepare their
 
 ## Personal Job Board *(beta)*
 
-Job Finder can collect the vacancies it finds on your own [Personal Job Board](personal-job-board/README.md). It's a private page where you filter and save vacancies, mark where you've applied and run Match on any of them. The match report appears right on the board.
+Job Finder collects the vacancies it finds on your own [Personal Job Board](personal-job-board/README.md). It's a private page where you filter and save vacancies, mark where you've applied and get a deep analysis of any of them. Each card shows Job match, how well your CV fits the job.
 
 - In Claude on a paid plan, the board is a private artifact in your own chat, and your saved vacancies, statuses and reports are stored in it.
 - In other assistants and on free plans, you get the same list and reports in the chat.
@@ -19,38 +19,59 @@ Job Finder can collect the vacancies it finds on your own [Personal Job Board](p
 
 Tailoring your CV for a vacancy and exporting it as a PDF is coming next.
 
+## Getting started
+
+1. Open a new chat in Claude. The board needs a paid plan.
+2. Send the link to this repository or to the [Job Finder](job-finder/SKILL.md) skill and attach your CV.
+3. Answer a few short questions about the roles, level, places and work format you want.
+4. When the board is ready, open a vacancy and press Get deep analysis. Claude asks in its own window whether the board may send it a message. Press Send.
+
+There is nothing to install. In ChatGPT and other assistants you can send the same link and get the vacancies in the chat.
+
 ## How Job Finder works
 
-1. You share your CV and answer two to four short questions about roles, level, location and work format.
-2. Job Finder searches job boards, employer career pages and job platforms such as Greenhouse, Lever, Ashby and Workable. Search results are treated as leads only, because many of them point to vacancies that have already closed.
-3. Every vacancy is checked on a fresh copy of the employer's own posting. If the posting is closed, gone or can't be read, the vacancy doesn't go on the board, and the chat says which ones were left out.
-4. Each vacancy on the board has a short summary of the posting, the source, the date it was checked and a link to the original. Claude doesn't copy the employer's full text, so the original link is always there.
-5. The board gets every checked vacancy that fits, up to 30. If there are fewer than 15, Job Finder explains why and suggests how to widen the search.
+1. Job Finder writes a short profile from your CV with your years of experience, skills, product domains and languages, and shows it to you so you can correct it. Your contacts and the CV text don't go into it.
+2. It reads a shared list of open design vacancies that is rebuilt every morning. See [where the vacancies come from](#where-the-vacancies-come-from).
+3. It keeps the vacancies that fit your roles, level, places and work format. Vacancies that don't state a level or a work format stay, marked as not stated.
+4. It sorts them by Job match, a quick estimate of how many of the posting's key requirements your profile covers.
+5. It opens the 10 best on the employer's live page, drops the closed ones and writes a short summary for each. The other vacancies show the date of the list.
+6. The board gets up to 100 vacancies. If fewer than 15 fit, Job Finder also searches the web and checks every vacancy it finds there on the live page.
 
-## How Match works
+Refresh on the board reads the latest list, adds the new vacancies that fit and marks the ones that have left the list. When the board is ready, Job Finder also gives a few tips on how to search faster.
 
-1. You press Match on a vacancy. Claude reads the full posting again from its live page, so the report is based on the current text and you know if the vacancy has closed in the meantime.
+## How the deep analysis works
+
+1. You open a vacancy and press Get deep analysis. Claude reads the full posting again from its live page, so the report is based on the current text and you know if the vacancy has closed in the meantime.
 2. It lists the vacancy's requirements, keeping required and preferred apart.
 3. For each requirement it looks for evidence in your CV and marks it as supported, partly supported, not evidenced or unclear.
 4. The percentage is calculated from that table. Required items count twice, preferred ones once, and unclear ones are left out. It maps to a level from High to Below average.
-5. The report on the board shows the evidence, strengths, gaps, questions for you and what could be clearer in your CV.
+5. The report on the board shows the evidence, strengths, gaps, questions for you and what could be clearer in your CV. Its percentage replaces the quick Job match on the card.
 
 The percentage shows how much of the vacancy your CV currently supports. It isn't an ATS score or a chance of getting an interview, and a missing line in a CV doesn't mean you lack the skill.
 
+## Where the vacancies come from
+
+The daily list is built from the open job dataset by [Stapply](https://github.com/kalil0321/ats-scrapers), which collects postings from company career pages on Greenhouse, Lever, Ashby, Workable and other job platforms. The data is under CC0 1.0. A [small program](jobs-feed/README.md) in this repository keeps the digital design roles every morning and adds the place, work format, level and requirement keywords.
+
+Each vacancy belongs to its employer. The list keeps only short facts, requirement keywords and the link to the employer's posting, never the posting text. It holds no personal data.
+
 ## What was tested in this beta
 
-Job Finder, Job Matcher and Personal Job Board were built and tested in Claude first. In November 2026 I ran the full flow in Claude on the web, on a paid plan, with a fictional CV of a Product Designer based in Lisbon and real vacancies.
+Job Finder, Job Matcher and Personal Job Board were built and tested in Claude first, on the web and on a paid plan, with fictional CVs.
 
-- In the last two runs every vacancy link on the board opened a live posting (16 of 16 and 14 of 14). The links were checked by a script outside Claude.
-- Match reports appeared on the board, and their percentages matched the formula.
-- A search took about 25 minutes. For this profile the board had 14 to 16 vacancies, because most search results had already closed.
+- The daily list was first built on 25 November 2026 and had about 5,400 design vacancies.
+- With two fictional profiles, a Senior Product Designer in Lisbon and one in London, the selection and the Job match were checked on that list. 115 vacancies fitted the Lisbon profile and 255 the London one.
+- In the earlier version, which searched the web, every vacancy link on the board opened a live posting in the last two runs (16 of 16 and 14 of 14), and the deep analysis percentages matched the formula.
 
 ## Known limits
 
-- Some career sites don't let assistants read them. Vacancies there are skipped and mentioned in the chat.
-- The board shows a summary of each posting, not the full text.
-- When you press Match, Claude asks in its own window whether the board may send it a message. Press Send.
-- Free and Pro plans, the Claude desktop and mobile apps, ChatGPT and other assistants, roles beyond Product, UX and UI design, and regions outside Europe haven't been tested yet.
+- The list has only vacancies from the job platforms in the dataset. Vacancies posted only on LinkedIn or on a company's own site may be missing.
+- About half of the vacancies don't state a work format. The board shows "format not stated" for them.
+- Job match is a rough estimate from keywords. The deep analysis reads the whole posting.
+- Vacancies that weren't checked live may have closed since the list was built. The board shows the date of the list for them.
+- Some career sites don't let assistants read them, so not every vacancy can be checked live.
+- The board shows a summary of a posting, not the full text.
+- Free and Pro plans, the Claude desktop and mobile apps, ChatGPT and other assistants, roles beyond Product, UX and UI design, and regions beyond Lisbon and London haven't been tested yet.
 
 If something doesn't work as described, I'd like to hear about it.
 
