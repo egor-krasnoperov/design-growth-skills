@@ -72,7 +72,7 @@ Job Finder asks for a short analysis of the best vacancies when it builds the bo
 - Read the posting live, as described above. If it can't be read, write no short analysis.
 - Take up to 8 requirements that matter most, each with its priority, its status and a few words of evidence from the CV or the portfolio. No long quotes and no CV improvements; those belong to the deep analysis.
 - Calculate the percentage and the level with the same formula.
-- Add one or two strengths, one or two gaps and one thing to check, such as the place, the working hours or a condition the posting states.
+- Add one or two strengths, one or two gaps and one thing to check, such as the place, the working hours or a condition the posting states. Put the most important one first in each list and keep each to one short line.
 - Write it to the board as a short report, as described in [../personal-job-board/board-integration.md](../personal-job-board/board-integration.md). Don't show each short analysis in the chat; Job Finder reports the progress.
 
 A deep analysis of the same vacancy replaces its short one.

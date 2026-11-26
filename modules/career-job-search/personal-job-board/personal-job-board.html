@@ -118,6 +118,10 @@
     .collection-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 16px; }
     .result-count { margin: 0; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 14px; line-height: 20px; }
     .last-updated { display: flex; gap: 4px; margin: 0; color: var(--muted); font-size: 14px; line-height: 20px; }
+    /* The personal base: the list date, how many vacancies are analysed, and a button for 20 more */
+    .base-info { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0; color: var(--muted); font-size: 14px; line-height: 20px; }
+    .base-info[hidden], .base-info button[hidden] { display: none; }
+    .base-info button { color: var(--ink); font-size: 14px; line-height: 20px; text-decoration: underline; text-underline-offset: 3px; }
     .controls { display: flex; align-items: center; gap: 4px; }
     .control { display: inline-flex; align-items: center; justify-content: flex-start; gap: 4px; min-height: 44px; padding: 10px 12px;
       min-width: 0; border-radius: 999px; color: var(--muted); font-size: 14px; line-height: 20px; white-space: nowrap; }
@@ -179,6 +183,7 @@
     .title-button:focus-visible::after { outline: 2px solid var(--ink); outline-offset: -3px; }
     .job-title { margin: 0; font-size: 18px; line-height: 22px; font-weight: 600; overflow-wrap: anywhere; }
     .job-meta { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+    .dialog-unreadable { margin: 0; color: var(--muted); font-size: 16px; line-height: 24px; }
     .card-bottom { display: flex; align-items: end; justify-content: space-between; gap: 8px; min-height: 44px; margin-top: auto; padding-top: 12px;
       font-size: 14px; line-height: 20px; }
     .match-status { color: var(--muted); }
@@ -260,7 +265,8 @@
     .dialog-rail .rail-match:disabled { color: var(--muted); cursor: default; }
     .dialog-rail .rail-status { display: inline-flex; align-items: center; gap: 8px; }
     .dialog-rail .rail-status[data-set="true"] { color: var(--ink); }
-    .rail-result { margin: 0 0 12px; color: var(--ink); font-size: 14px; line-height: 20px; font-weight: 600; }
+    /* Job match opens the left column of the job window, above Get deep analysis */
+    .rail-result { margin: 0 0 4px; color: var(--ink); font-size: 14px; line-height: 20px; font-weight: 600; }
     .copy-feedback { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 20px; }
     .dialog-main { position: relative; width: 100%; min-width: 0; }
     .dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 24px;
@@ -272,7 +278,8 @@
     .published-line { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 20px; }
     .details-dialog section { margin-top: 32px; }
     .details-dialog section p { max-width: 34em; margin: 0 0 12px; font-size: 16px; line-height: 24px; white-space: normal; overflow-wrap: anywhere; }
-    .source-line { margin: 12px 0 0; color: var(--muted); font-size: 14px; line-height: 22px; }
+    /* The source and the link to the original sit with the title lines, above the description */
+    .source-line { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 22px; }
     .source-line a { color: var(--ink); text-underline-offset: 3px; }
     /* Match report in the dialog: monochrome, the same three type sizes, spacing instead of lines */
     #match-panel h4 { margin: 24px 0 8px; font-size: 14px; line-height: 20px; font-weight: 600; }
@@ -285,6 +292,20 @@
     .report-table td { padding: 12px 16px 12px 0; border-bottom: 1px solid #eeeeee; vertical-align: top; font-size: 16px; line-height: 24px; overflow-wrap: anywhere; }
     .report-table th:nth-child(3), .report-table td:nth-child(3) { width: 140px; padding-right: 0; }
     #match-panel .report-table p { max-width: none; margin: 0; }
+    /* About this job: the facts of the daily list in rows, a grey label on the left, thin lines like the report table.
+       Requirements carry the report's marks: in the profile, partly, not in the profile (grey). */
+    .about-job:not(:first-child) { margin-top: 32px; }
+    #description-panel .about-note { margin: 0; color: var(--muted); font-size: 14px; line-height: 20px; }
+    .about-table { width: 100%; margin: 16px 0 0; border-collapse: collapse; }
+    .about-table th, .about-table td { padding: 12px 0; border-bottom: 1px solid #eeeeee; font-size: 16px; line-height: 24px; text-align: left; vertical-align: top; }
+    .about-table tr:first-child > * { border-top: 1px solid #eeeeee; }
+    .about-table th { width: 140px; padding-right: 16px; color: var(--muted); font-weight: 400; }
+    .about-table td { overflow-wrap: anywhere; }
+    .about-tags { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0; list-style: none; }
+    .about-tags li, .about-legend span { display: inline-flex; align-items: center; gap: 8px; }
+    .about-tags svg, .about-legend svg { flex: none; width: 16px; height: 16px; }
+    .about-tags li[data-status="not_evidenced"] { color: var(--muted); }
+    #description-panel .about-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; max-width: none; margin: 12px 0 0; color: var(--muted); font-size: 14px; line-height: 20px; }
     .req-status { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-size: 16px; line-height: 24px; white-space: nowrap; }
     .req-status svg { flex: none; width: 16px; height: 16px; }
     .req-status[data-status="not_evidenced"], .req-status[data-status="unclear"] { color: var(--muted); }
@@ -416,6 +437,12 @@
       .report-table td, .report-table td:nth-child(3) { display: block; width: auto; padding: 0; border: 0; }
       .report-table td:nth-child(3) { order: -1; }
       .report-table td[data-label]::before { content: attr(data-label); display: block; color: var(--muted); font-size: 16px; line-height: 24px; }
+      /* On phones the label of a fact sits above its value */
+      .about-table, .about-table tbody, .about-table tr { display: block; }
+      .about-table tr { padding: 12px 0; border-bottom: 1px solid #eeeeee; }
+      .about-table tr:first-child { border-top: 1px solid #eeeeee; }
+      .about-table th, .about-table td, .about-table tr:first-child > * { display: block; width: auto; padding: 0; border: 0; }
+      .about-table th { margin-bottom: 4px; font-size: 14px; line-height: 20px; }
       .dialog-shell { display: flex; flex-direction: column; gap: 16px; padding: 24px 24px 48px; }
       .dialog-rail { position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 52px; }
       .dialog-rail .rail-match { margin: 0; }
@@ -477,7 +504,7 @@
 
     </section>
     <section class="toolbar" aria-label="Filter and sort">
-      <div class="collection-meta"><p class="result-count" id="result-count" role="status" aria-live="polite">9 jobs</p><p class="last-updated" id="last-updated">Updated <span id="updated-date">Mon 23 Nov, 2026</span></p></div>
+      <div class="collection-meta"><p class="result-count" id="result-count" role="status" aria-live="polite">9 jobs</p><p class="last-updated" id="last-updated">Updated <span id="updated-date">Mon 23 Nov, 2026</span></p><p class="base-info" id="base-info" hidden><span id="base-list"></span><span id="base-analysed"></span><button id="analyse-more" type="button">Analyse 20 more</button></p></div>
       <div class="controls">
         <button class="control filter-trigger" id="filters-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="filters-panel"><span class="filter-label" id="filters-label">Filters</span><img class="icon" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJrZXlib2FyZF9hcnJvd19kb3duIj4KPG1hc2sgaWQ9Im1hc2swXzBfMzUiIHN0eWxlPSJtYXNrLXR5cGU6YWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IGlkPSJCb3VuZGluZyBib3giIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI0Q5RDlEOSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfMF8zNSkiPgo8cGF0aCBpZD0ia2V5Ym9hcmRfYXJyb3dfZG93bl8yIiBkPSJNMTAgMTMuMDYyNUw1IDguMDYyNUw2LjA2MjUgN0wxMCAxMC45Mzc1TDEzLjkzNzUgN0wxNSA4LjA2MjVMMTAgMTMuMDYyNVoiIGZpbGw9IiMxQzFCMUYiLz4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt=""></button>
         <button class="control filter-trigger" id="sort-trigger" type="button" data-filter="sort" aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-dialog"><span class="filter-label" id="sort-label">Sort</span><img class="icon" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJrZXlib2FyZF9hcnJvd19kb3duIj4KPG1hc2sgaWQ9Im1hc2swXzBfMzUiIHN0eWxlPSJtYXNrLXR5cGU6YWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IGlkPSJCb3VuZGluZyBib3giIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI0Q5RDlEOSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfMF8zNSkiPgo8cGF0aCBpZD0ia2V5Ym9hcmRfYXJyb3dfZG93bl8yIiBkPSJNMTAgMTMuMDYyNUw1IDguMDYyNUw2LjA2MjUgN0wxMCAxMC45Mzc1TDEzLjkzNzUgN0wxNSA4LjA2MjVMMTAgMTMuMDYyNVoiIGZpbGw9IiMxQzFCMUYiLz4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt=""></button>
@@ -513,9 +540,9 @@
   </dialog>
   <dialog class="details-dialog" id="details" aria-labelledby="detail-title">
     <div class="close-anchor"><button class="dialog-icon" id="close-detail" type="button" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
-    <div class="dialog-shell"><aside class="dialog-rail" aria-label="Report actions"><button id="run-detail-match" class="rail-match" type="button"><svg class="rail-icon" viewBox="2 2 20 20" aria-hidden="true"><path d="M8.89583 19.375C7.92361 18.9583 7.07292 18.3854 6.34375 17.6562C5.61458 16.9271 5.04167 16.0764 4.625 15.1042C4.20833 14.1319 4 13.0938 4 11.9896C4 10.8854 4.20833 9.85069 4.625 8.88542C5.04167 7.92014 5.61458 7.07292 6.34375 6.34375C7.07292 5.61458 7.92361 5.04167 8.89583 4.625C9.86806 4.20833 10.9062 4 12.0104 4C13.1146 4 14.1493 4.20833 15.1146 4.625C16.0799 5.04167 16.9271 5.61458 17.6562 6.34375C18.3854 7.07292 18.9583 7.92014 19.375 8.88542C19.7917 9.85069 20 10.8854 20 11.9896C20 13.0938 19.7917 14.1319 19.375 15.1042C18.9583 16.0764 18.3854 16.9271 17.6562 17.6562C16.9271 18.3854 16.0799 18.9583 15.1146 19.375C14.1493 19.7917 13.1146 20 12.0104 20C10.9062 20 9.86806 19.7917 8.89583 19.375ZM16.6042 16.6042C17.8681 15.3403 18.5 13.8056 18.5 12C18.5 10.1944 17.8681 8.65972 16.6042 7.39583C15.3403 6.13194 13.8056 5.5 12 5.5C10.1944 5.5 8.65972 6.13194 7.39583 7.39583C6.13194 8.65972 5.5 10.1944 5.5 12C5.5 13.8056 6.13194 15.3403 7.39583 16.6042C8.65972 17.8681 10.1944 18.5 12 18.5C13.8056 18.5 15.3403 17.8681 16.6042 16.6042ZM8.45833 15.5417C7.48611 14.5694 7 13.3889 7 12C7 10.6111 7.48611 9.43056 8.45833 8.45833C9.43056 7.48611 10.6111 7 12 7C13.3889 7 14.5694 7.48611 15.5417 8.45833C16.5139 9.43056 17 10.6111 17 12C17 13.3889 16.5139 14.5694 15.5417 15.5417C14.5694 16.5139 13.3889 17 12 17C10.6111 17 9.43056 16.5139 8.45833 15.5417ZM14.4792 14.4792C15.1597 13.7986 15.5 12.9722 15.5 12C15.5 11.0278 15.1597 10.2014 14.4792 9.52083C13.7986 8.84028 12.9722 8.5 12 8.5C11.0278 8.5 10.2014 8.84028 9.52083 9.52083C8.84028 10.2014 8.5 11.0278 8.5 12C8.5 12.9722 8.84028 13.7986 9.52083 14.4792C10.2014 15.1597 11.0278 15.5 12 15.5C12.9722 15.5 13.7986 15.1597 14.4792 14.4792ZM10.9375 13.0625C10.6458 12.7708 10.5 12.4167 10.5 12C10.5 11.5833 10.6458 11.2292 10.9375 10.9375C11.2292 10.6458 11.5833 10.5 12 10.5C12.4167 10.5 12.7708 10.6458 13.0625 10.9375C13.3542 11.2292 13.5 11.5833 13.5 12C13.5 12.4167 13.3542 12.7708 13.0625 13.0625C12.7708 13.3542 12.4167 13.5 12 13.5C11.5833 13.5 11.2292 13.3542 10.9375 13.0625Z"/></svg><span>Get deep analysis</span></button><p id="rail-result" class="rail-result" hidden></p><button class="rail-status" id="status-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-dialog"></button><button class="rail-action" id="download-report" type="button" hidden><svg class="rail-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg><span>Download report</span></button><button class="rail-action copy-request" id="copy-request" type="button" hidden><svg class="rail-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg><span>Tailor my CV</span></button><span id="copy-feedback" class="copy-feedback" role="status" aria-live="polite"></span></aside><div class="dialog-main"><div class="dialog-head"><span id="detail-company"></span></div>
-    <h2 id="detail-title"></h2><p class="dialog-meta" id="detail-meta"></p><p class="published-line" id="published-line"></p>
-    <section id="description-panel"></section><p class="source-line"><span id="source-facts"></span><a id="job-source" target="_blank" rel="noopener noreferrer" hidden>View original job ↗</a><span id="source-missing" hidden>Original job link unavailable</span></p>
+    <div class="dialog-shell"><aside class="dialog-rail" aria-label="Report actions"><p id="rail-result" class="rail-result" hidden></p><button id="run-detail-match" class="rail-match" type="button"><svg class="rail-icon" viewBox="2 2 20 20" aria-hidden="true"><path d="M8.89583 19.375C7.92361 18.9583 7.07292 18.3854 6.34375 17.6562C5.61458 16.9271 5.04167 16.0764 4.625 15.1042C4.20833 14.1319 4 13.0938 4 11.9896C4 10.8854 4.20833 9.85069 4.625 8.88542C5.04167 7.92014 5.61458 7.07292 6.34375 6.34375C7.07292 5.61458 7.92361 5.04167 8.89583 4.625C9.86806 4.20833 10.9062 4 12.0104 4C13.1146 4 14.1493 4.20833 15.1146 4.625C16.0799 5.04167 16.9271 5.61458 17.6562 6.34375C18.3854 7.07292 18.9583 7.92014 19.375 8.88542C19.7917 9.85069 20 10.8854 20 11.9896C20 13.0938 19.7917 14.1319 19.375 15.1042C18.9583 16.0764 18.3854 16.9271 17.6562 17.6562C16.9271 18.3854 16.0799 18.9583 15.1146 19.375C14.1493 19.7917 13.1146 20 12.0104 20C10.9062 20 9.86806 19.7917 8.89583 19.375ZM16.6042 16.6042C17.8681 15.3403 18.5 13.8056 18.5 12C18.5 10.1944 17.8681 8.65972 16.6042 7.39583C15.3403 6.13194 13.8056 5.5 12 5.5C10.1944 5.5 8.65972 6.13194 7.39583 7.39583C6.13194 8.65972 5.5 10.1944 5.5 12C5.5 13.8056 6.13194 15.3403 7.39583 16.6042C8.65972 17.8681 10.1944 18.5 12 18.5C13.8056 18.5 15.3403 17.8681 16.6042 16.6042ZM8.45833 15.5417C7.48611 14.5694 7 13.3889 7 12C7 10.6111 7.48611 9.43056 8.45833 8.45833C9.43056 7.48611 10.6111 7 12 7C13.3889 7 14.5694 7.48611 15.5417 8.45833C16.5139 9.43056 17 10.6111 17 12C17 13.3889 16.5139 14.5694 15.5417 15.5417C14.5694 16.5139 13.3889 17 12 17C10.6111 17 9.43056 16.5139 8.45833 15.5417ZM14.4792 14.4792C15.1597 13.7986 15.5 12.9722 15.5 12C15.5 11.0278 15.1597 10.2014 14.4792 9.52083C13.7986 8.84028 12.9722 8.5 12 8.5C11.0278 8.5 10.2014 8.84028 9.52083 9.52083C8.84028 10.2014 8.5 11.0278 8.5 12C8.5 12.9722 8.84028 13.7986 9.52083 14.4792C10.2014 15.1597 11.0278 15.5 12 15.5C12.9722 15.5 13.7986 15.1597 14.4792 14.4792ZM10.9375 13.0625C10.6458 12.7708 10.5 12.4167 10.5 12C10.5 11.5833 10.6458 11.2292 10.9375 10.9375C11.2292 10.6458 11.5833 10.5 12 10.5C12.4167 10.5 12.7708 10.6458 13.0625 10.9375C13.3542 11.2292 13.5 11.5833 13.5 12C13.5 12.4167 13.3542 12.7708 13.0625 13.0625C12.7708 13.3542 12.4167 13.5 12 13.5C11.5833 13.5 11.2292 13.3542 10.9375 13.0625Z"/></svg><span>Get deep analysis</span></button><button class="rail-status" id="status-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-dialog"></button><button class="rail-action" id="download-report" type="button" hidden><svg class="rail-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg><span>Download report</span></button><button class="rail-action copy-request" id="copy-request" type="button" hidden><svg class="rail-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg><span>Tailor my CV</span></button><span id="copy-feedback" class="copy-feedback" role="status" aria-live="polite"></span></aside><div class="dialog-main"><div class="dialog-head"><span id="detail-company"></span></div>
+    <h2 id="detail-title"></h2><p class="dialog-meta" id="detail-meta"></p><p class="published-line" id="published-line"></p><p class="source-line"><span id="source-facts"></span><a id="job-source" target="_blank" rel="noopener noreferrer" hidden>View original job ↗</a><span id="source-missing" hidden>Original job link unavailable</span></p>
+    <section id="description-panel"></section>
     <section id="match-panel"></section>
     <p class="dialog-note" id="demo-note">Demo vacancies and example results</p>
     <textarea class="agent-request" id="agent-request" aria-label="Request for your agent" hidden readonly></textarea></div></div>
@@ -560,7 +587,35 @@
     }
     data.jobs = normalizeJobs(data.jobs);
     data.reports = normalizeReports(data.reports);
-    var profileIsDemo = !!(data.profile && data.jobs.length && data.jobs.every(function (j) { return /\(demo\)\s*$/.test(j.company || ''); }));
+    // The personal base: vacancies.json next to the page ({listDate, builtAt, count, jobs}, rows of the daily list).
+    // The stored job documents (ownJobs) add to its rows and win. A downloaded copy carries the base inside (data.base).
+    var ownJobs = data.jobs, base = null, baseRaw = null;
+    function isDemoJob(j) { return /\(demo\)\s*$/.test(j.company || ''); }
+    function cleanBase(v) {
+      if (!v || typeof v !== 'object' || !Array.isArray(v.jobs) || !v.jobs.length) return null;
+      var listDate = dayOf(v.listDate);
+      return {listDate:listDate, builtAt:typeof v.builtAt === 'string' ? v.builtAt : '', jobs:normalizeJobs(v.jobs.map(function (j) {
+        return Object.assign({listingStatus:'in_list', checkedAt:listDate || null, sourceName:'Open job dataset (Stapply)'}, j);
+      }))};
+    }
+    function mergeJobs() {
+      if (!base) { data.jobs = ownJobs; return; }
+      var own = {}, inBase = {};
+      ownJobs.forEach(function (j) { own[j.id] = j; });
+      data.jobs = base.jobs.map(function (j) { inBase[j.id] = 1; return own[j.id] ? Object.assign({}, j, own[j.id]) : j; })
+        .concat(ownJobs.filter(function (j) { return !inBase[j.id]; }));
+    }
+    // The template's demo vacancies never mix with a real base.
+    function takeBase(raw) {
+      var b = cleanBase(raw);
+      if (!b) return false;
+      base = b; baseRaw = raw;
+      if (ownJobs.length && ownJobs.every(isDemoJob)) ownJobs = [];
+      mergeJobs();
+      return true;
+    }
+    if (data.base) takeBase(data.base);
+    var profileIsDemo = !!(data.profile && !base && data.jobs.length && data.jobs.every(isDemoJob));
     if (!Array.isArray(data.saved)) data.saved = [];
     var agentHasCV = false;
     // Greeting, search date and CV line come from the data; setData can change them later.
@@ -590,7 +645,7 @@
     applyHeader();
     // Tailor my CV (Resume Matcher) is stage 2: the button stays in the code but is not shown in the first version.
     var features = {tailor:false};
-    var defaults = {view:'all',sort:'date',ascending:false};
+    var defaults = {view:'all',sort:'match',ascending:false};
     // Application statuses are set only by the person, in the card menu or the vacancy dialog; the agent never sets them.
     // A job is in one pile at most: Saved, one of these statuses, or Hidden. All jobs shows every job that is not hidden.
     var statusConfig = {applied:{label:'Applied'}, progress:{label:'In progress'}, rejected:{label:'Rejected'}};
@@ -638,7 +693,7 @@
       var ui = Object.assign({},defaults,value || {});
       if (!['all','saved','hidden','applied','progress','rejected'].includes(ui.view)) ui.view = 'all';
       delete ui.format; delete ui.grade;
-      if (!['salary','date','match'].includes(ui.sort)) { ui.sort = 'date'; ui.ascending = false; }
+      if (!['salary','date','match'].includes(ui.sort)) { ui.sort = defaults.sort; ui.ascending = false; }
       ui.ascending = ui.ascending === true && ui.sort !== 'match';
       return ui;
     }
@@ -703,19 +758,23 @@
     $('toast').addEventListener('focusin',function () { clearTimeout(toastTimer); });
     $('toast').addEventListener('mouseleave',function () { if (!$('toast').contains(document.activeElement)) scheduleToast(3000); });
     $('toast').addEventListener('focusout',function (event) { if (!$('toast').contains(event.relatedTarget)) scheduleToast(3000); });
+    function inView(j) {
+      var hidden = state.hidden.includes(j.id);
+      return state.ui.view === 'hidden' ? hidden : statusConfig[state.ui.view] ? !hidden && statusOf(j.id) === state.ui.view :
+        !hidden && (state.ui.view !== 'saved' || state.saved.includes(j.id) || state.savedReports.includes(j.id));
+    }
+    // Best match: analysed vacancies first by their percentage (a short analysis usually reads lower than the quick
+    // estimate, so the two are not mixed), then the others by the quick estimate, then those without a percentage.
+    // Within each group recruiter postings come after employer postings, then the higher percentage, then the newer one.
+    function matchGroup(job) { var r = reportOf(job.id); return r && reportScore(r) != null ? 0 : matchValue(job) != null ? 1 : 2; }
     function visibleJobs() {
-      var jobs = data.jobs.filter(function (j) {
-        var hidden = state.hidden.includes(j.id);
-        var inView = state.ui.view === 'hidden' ? hidden : statusConfig[state.ui.view] ? !hidden && statusOf(j.id) === state.ui.view :
-          !hidden && (state.ui.view !== 'saved' || state.saved.includes(j.id) || state.savedReports.includes(j.id));
-        return inView && passesFilters(j);
-      });
-      // Best match: jobs with a percentage first, recruiter postings after employer postings, then by percentage, then newer first.
+      var jobs = data.jobs.filter(function (j) { return inView(j) && passesFilters(j); });
       if (state.ui.sort === 'match') jobs.sort(function (a,b) {
-        var av = matchValue(a), bv = matchValue(b), am = av == null, bm = bv == null;
-        if (am !== bm) return am ? 1 : -1;
+        var ag = matchGroup(a), bg = matchGroup(b);
+        if (ag !== bg) return ag - bg;
         if (!!a.recruiter !== !!b.recruiter) return a.recruiter ? 1 : -1;
-        if (!am && av !== bv) return bv - av;
+        var av = matchValue(a), bv = matchValue(b);
+        if (av != null && bv != null && av !== bv) return bv - av;
         return (Date.parse(b.publishedAt) || 0) - (Date.parse(a.publishedAt) || 0);
       });
       else if (state.ui.sort) jobs.sort(function (a,b) {
@@ -775,7 +834,12 @@
       return {score:Math.round(Number(q.score)), enough:!q.lowData, matched:lowerList(q.matched).map(tagLabel).concat(lowerList(q.partial).map(function (t) { return tagLabel(t) + ' (partly)'; })),
         missing:lowerList(q.missing).map(tagLabel)};
     }
+    var quickCache = new WeakMap();
     function quickMatch(job) {
+      if (!quickCache.has(job)) quickCache.set(job, computeQuick(job));
+      return quickCache.get(job);
+    }
+    function computeQuick(job) {
       var p = data.profile;
       var tagged = ['skills','domains','languages','yearsMin'].some(function (k) { return job[k] != null; });
       if (!p || typeof p !== 'object' || !tagged) return storedQuick(job);
@@ -819,7 +883,7 @@
       if (known(job.match)) return {text:Math.round(Number(job.match)) + '%', tone:tone(Math.round(Number(job.match))), tip:matchTip()};
       if (demoShown(job.id)) return {text:'Demo match', tip:''};
       var q = quickMatch(job);
-      return q ? {text:q.enough ? q.score + '%' : '—', tone:tone(q.enough ? q.score : null), tip:matchTip()} : null;
+      return q ? {text:q.enough ? '≈' + q.score + '%' : '—', tone:tone(q.enough ? q.score : null), tip:matchTip()} : null;
     }
     // Best match uses the Match percentage, otherwise the quick match; vacancies without either go to the end.
     function matchValue(job) {
@@ -893,7 +957,7 @@
     function renderJobs() {
       var jobs = visibleJobs();
       $('jobs').innerHTML = jobs.map(function (j) {
-        var saved = state.saved.includes(j.id), report = reportOf(j.id);
+        var saved = state.saved.includes(j.id);
         return '<article class="job" data-id="' + escapeHTML(j.id) + '"><div class="job-header"><span class="company">' +
           (isNew(j) ? '<span class="new-dot" aria-hidden="true"></span><span class="sr-only">New: </span>' : '') + escapeHTML(j.company) +
           '</span>' + (publishedLabel(j.publishedAt) ? '<span class="card-date">' + escapeHTML(publishedLabel(j.publishedAt)) + '</span>' : '') +
@@ -909,7 +973,9 @@
             (m && m.tone ? '<span class="sr-only">Job match </span>' : '') + (m ? escapeHTML(m.text) : '') + '</span>'; })(cardMatch(j)) +
           '</div></article>';
       }).join('');
-      $('result-count').textContent = jobs.length + (jobs.length === 1 ? ' job' : ' jobs');
+      var inViewCount = base ? data.jobs.filter(inView).length : jobs.length;
+      $('result-count').textContent = base && jobs.length !== inViewCount ? jobs.length + ' of ' + inViewCount + ' jobs' : jobs.length + (jobs.length === 1 ? ' job' : ' jobs');
+      renderBaseInfo();
       $('empty').hidden = jobs.length > 0;
       // An empty section says how jobs get there; otherwise the filters are the reason.
       var view = state.ui.view, emptyPile = view !== 'all' && !pileCount(view);
@@ -935,6 +1001,17 @@
       $('sort-label').textContent = sort === 'none' ? 'Sort' : selected[1];
       $('sort-trigger').setAttribute('aria-label','Sort: ' + selected[1]);
       $('sort-trigger').dataset.filtered = String(sort !== defaults.sort + '-desc');
+    }
+    // With a base, the toolbar says the list date and how many vacancies are analysed, and offers 20 more.
+    function renderBaseInfo() {
+      $('base-info').hidden = !base;
+      if (!base) return;
+      $('last-updated').hidden = true;
+      var analysed = data.jobs.filter(function (j) { return !!reportOf(j.id); }).length;
+      $('base-list').textContent = base.listDate ? 'list of ' + new Date(base.listDate + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+      $('base-list').hidden = !base.listDate;
+      $('base-analysed').textContent = analysed + ' analysed';
+      $('analyse-more').hidden = !data.jobs.some(function (j) { return !reportOf(j.id) && j.descriptionStatus !== 'unreadable' && j.listingStatus !== 'closed'; });
     }
     // The demo notes show only with the built-in demo data: every company is marked "(demo)". Real vacancies never carry them.
     function renderDemoNotes() {
@@ -1070,9 +1147,6 @@
       var facts = [active.sourceName ? 'Found on ' + active.sourceName : '', checked, listing || ''].filter(Boolean);
       if (facts.length) facts[0] = facts[0].charAt(0).toUpperCase() + facts[0].slice(1);
       $('source-facts').textContent = facts.length ? facts.join(' · ') + ' · ' : '';
-      // Only vacancies read live have a summary; the others show the link to the original and the keywords in Job match.
-      $('description-panel').innerHTML = active.description ? '<h3>Job description</h3><p>' + escapeHTML(glue(active.description)).replace(/\n/g,'<br>') + '</p>' : '';
-      $('description-panel').hidden = !active.description;
       renderMatchPanel();
       updateDetailStatus();
       $('agent-request').hidden = true; $('copy-feedback').textContent = ''; delete $('copy-feedback').dataset.host;
@@ -1264,6 +1338,13 @@
       if (hostData) copyRequest('Refresh my Personal Job Board search with my saved preferences.', null); else showRefreshInfo();
     }
     $('refresh').onclick = requestRefresh;
+    // Analyse 20 more: the host hands {action: "analyze", count: 20} to the chat, the same way as Refresh.
+    $('analyse-more').onclick = function () {
+      if (runAction('analyze', null, {count:20})) return;
+      if (hostData) copyRequest('Analyse the next 20 vacancies on my Personal Job Board with a short analysis.', null,
+        "Couldn't reach the chat. Ask Claude to analyse the next 20 vacancies on your board.");
+      else notify('This is a saved copy of your board. To analyse more vacancies, open your board in Claude.');
+    };
     $('sticky-refresh').onclick = requestRefresh;
     // Keyboard closing is instant; pointer closing fades out quickly with an ease-out curve.
     function closeDetails(instant) {
@@ -1280,23 +1361,71 @@
     function renderMatchPanel() {
       if (!active) return;
       var report = reportOf(active.id), result = report || active.match || demoShown(active.id), quick = !result && !matching.has(active.id) && quickMatch(active);
-      $('match-panel').innerHTML = report ? reportHTML(report) : quick ? quickHTML(quick) : '<h3>' + (active.match ? 'Job match ' + escapeHTML(active.match) + '%' : result ? 'Demo match' : 'Job match') + '</h3>' +
+      // Only vacancies read live have a summary. Without a report the window shows About this job, the facts of the daily list.
+      var about = report ? '' : aboutHTML(active, quick);
+      $('description-panel').innerHTML = (active.description ? '<h3>Job description</h3><p>' + escapeHTML(glue(active.description)).replace(/\n/g,'<br>') + '</p>' : '') +
+        (about || (!active.description && active.descriptionStatus === 'unreadable' ? '<p class="dialog-unreadable">Can\'t read the posting here. Open the original.</p>' : ''));
+      $('description-panel').hidden = !$('description-panel').innerHTML;
+      $('match-panel').innerHTML = report ? reportHTML(report) : quick && about ? '' : '<h3>' + (active.match ? 'Job match ' + escapeHTML(active.match) + '%' : result ? 'Demo match' : 'Job match') + '</h3>' +
         (matching.has(active.id) ? '<p>Analysing…</p>' : result ? '<p>Demo only — no CV analysis has been performed.</p><p>Matches: not assessed.<br>Gaps: not assessed.<br>To clarify: CV and full vacancy description are needed.</p>' : '<p>Compare this job with your CV.</p>');
-      $('run-detail-match').hidden = !!result;
+      // A short analysis keeps the button for the deep one.
+      $('run-detail-match').hidden = !!result && !(report && report.depth === 'short');
       $('run-detail-match').disabled = matching.has(active.id);
       $('run-detail-match').querySelector('span').textContent = matching.has(active.id) ? 'Analysing…' : 'Get deep analysis';
-      $('rail-result').hidden = !result; $('rail-result').textContent = report ? deepLabel(report) : active.match ? 'Job match ≈ ' + active.match + '%' : 'Demo match';
+      $('match-panel').hidden = !$('match-panel').innerHTML;
+      $('rail-result').hidden = !result && !quick;
+      $('rail-result').textContent = report ? deepLabel(report) : active.match ? 'Job match ≈ ' + active.match + '%' : result ? 'Demo match' : quick ? quickLabel(quick) : '';
       $('download-report').hidden = !result;
       $('copy-request').hidden = !result || !features.tailor;
       // Once the report has arrived, the note about the request sent to the chat has done its job.
       if (result && $('copy-feedback').dataset.host === 'true') { $('copy-feedback').textContent = ''; delete $('copy-feedback').dataset.host; }
     }
-    // Quick match in the dialog: the approximate percentage, one line on how it is counted, what matches and what is not in the profile.
-    function quickHTML(q) {
-      var line = function (title, list) { return list.length ? '<h4>' + title + '</h4><p>' + escapeHTML(glue(list.join(', '))) + '</p>' : ''; };
-      return '<h3>' + escapeHTML(quickLabel(q)) + '</h3>' +
-        '<p class="report-note">Approximate. Compares requirement keywords found in the posting with your profile.' + (q.enough ? '' : ' Fewer than four requirements were found.') + '</p>' +
-        line('Matches your profile', q.matched) + line('Not in your profile', q.missing);
+    // About this job: what the daily list knows about the vacancy, one fact per row. Place, format, salary and date are
+    // already under the title. Requirements carry a mark against the profile: from the profile on the board, otherwise
+    // from the estimate the chat stored with the vacancy. Matching ones first. Without a profile there are no marks.
+    var markText = {supported:'In your profile', partly_supported:'Partly', not_evidenced:'Not in your profile'};
+    function markOf(job) {
+      var p = data.profile && typeof data.profile === 'object' ? data.profile : null;
+      if (p) {
+        var have = {skills:lowerList(p.skills), domains:lowerList(p.domains), languages:lowerList(p.languages)};
+        return {tag:function (kind, tag) { return have[kind].includes(tag) ? 'supported' : 'not_evidenced'; },
+          years:function (min) { if (!known(p.years)) return ''; var gap = min - Number(p.years); return gap <= 0 ? 'supported' : gap <= 2 ? 'partly_supported' : 'not_evidenced'; }};
+      }
+      var q = job.quickMatch && typeof job.quickMatch === 'object' ? job.quickMatch : null;
+      if (!q) return null;
+      var got = lowerList(q.matched), part = lowerList(q.partial);
+      return {tag:function (kind, tag) { return got.includes(tag) ? 'supported' : part.includes(tag) ? 'partly_supported' : 'not_evidenced'; }, years:function () { return ''; }};
+    }
+    function aboutHTML(job, quick) {
+      var mark = markOf(job), used = {}, rows = [];
+      var item = function (text, status) {
+        if (status) used[status] = true;
+        return '<li' + (status ? ' data-status="' + status + '">' + requirementIcons[status] + '<span class="sr-only">' + markText[status] + ' </span>' : '>') +
+          '<span>' + escapeHTML(glue(text)) + '</span></li>';
+      };
+      var tags = function (kind, list) {
+        var marked = lowerList(list).map(function (t) { return {t:t, s:mark ? mark.tag(kind, t) : ''}; });
+        var order = {supported:0, partly_supported:1, not_evidenced:2, '':3};
+        marked.sort(function (a, b) { return order[a.s] - order[b.s]; });
+        return marked.length ? '<ul class="about-tags">' + marked.map(function (m) { return item(tagLabel(m.t), m.s); }).join('') + '</ul>' : '';
+      };
+      var row = function (label, value) { if (value) rows.push('<tr><th scope="row">' + label + '</th><td>' + value + '</td></tr>'); };
+      var role = roleOf(job), level = String(job.level || '').toLowerCase();
+      row('Role', escapeHTML([roleNames[role] || '', !leadershipRoles.includes(role) && levelNames[level] ? levelNames[level] : ''].filter(Boolean).join(' · ')));
+      // Where a remote job can be done from: worldwide, a region or one country.
+      var scope = typeof job.remoteScope === 'string' ? job.remoteScope : '';
+      row('Remote from', escapeHTML(scope === 'worldwide' ? 'Anywhere' : scope.indexOf('country:') === 0 ? countryName(scope.slice(8).toUpperCase()) :
+        scope.indexOf('region:') === 0 ? regionNames[scope.slice(7).toUpperCase()] || '' : ''));
+      if (known(job.yearsMin) && Number(job.yearsMin) > 0) row('Experience', '<ul class="about-tags">' + item(Number(job.yearsMin) + '+ years', mark ? mark.years(Number(job.yearsMin)) : '') + '</ul>');
+      row('Languages', tags('languages', job.languages));
+      row('Skills', tags('skills', job.skills));
+      row('Areas', tags('domains', job.domains));
+      if (!rows.length) return '';
+      var note = mark ? 'Facts from the posting, compared with your profile. Job match here is an estimate.' + (quick && !quick.enough ? ' Fewer than four requirements were found.' : '') : '';
+      if (job.descriptionStatus === 'unreadable' && !job.description) note += (note ? ' ' : '') + 'Can\'t read the full posting here. Open the original.';
+      var legend = Object.keys(markText).filter(function (k) { return used[k]; }).map(function (k) { return '<span>' + requirementIcons[k] + markText[k] + '</span>'; }).join('');
+      return '<div class="about-job"><h3>About this job</h3>' + (note ? '<p class="about-note">' + note + '</p>' : '') +
+        '<table class="about-table"><tbody>' + rows.join('') + '</tbody></table>' + (legend ? '<p class="about-legend" aria-hidden="true">' + legend + '</p>' : '') + '</div>';
     }
     // The report in the dialog: level and percentage, the AI note, which CV and when, the summary,
     // then requirements with their status and CV evidence, strengths, gaps, questions, CV improvements and coverage.
@@ -1383,9 +1512,9 @@
         ', id ' + job.id + '. Compare it with my CV and save the report to the board.', job.id);
     }
     // Copies within the same click. If the browser refuses, a Match request is shown selected in the vacancy dialog.
-    function copyRequest(text, jobId) {
+    function copyRequest(text, jobId, fallback) {
       function shown() {
-        if (jobId == null) return notify("Couldn't reach the chat. Ask Claude to refresh your Personal Job Board search with your saved preferences.");
+        if (jobId == null) return notify(fallback || "Couldn't reach the chat. Ask Claude to refresh your Personal Job Board search with your saved preferences.");
         if (!active || active.id !== jobId || !$('details').open) openDetails(jobId, true);
         $('agent-request').value = text; $('agent-request').hidden = false; $('agent-request').focus(); $('agent-request').select();
         $('copy-feedback').textContent = "Couldn't reach the chat. Copy this request into your chat with Claude.";
@@ -1438,7 +1567,7 @@
     addEventListener('resize',placeCorner);
     $('download').onclick = function () {
       var clone = document.documentElement.cloneNode(true);
-      var snap = Object.assign({},data,{id:data.id + '-' + Date.now(),saved:state.saved.slice(),viewed:state.viewed.slice(),demoMatches:state.demoMatches.slice(),savedReports:state.savedReports.slice(),hidden:state.hidden.slice(),statuses:JSON.parse(JSON.stringify(state.statuses)),ui:Object.assign({},state.ui),filters:publicFilters()});
+      var snap = Object.assign({},data,{id:data.id + '-' + Date.now(),saved:state.saved.slice(),viewed:state.viewed.slice(),demoMatches:state.demoMatches.slice(),savedReports:state.savedReports.slice(),hidden:state.hidden.slice(),statuses:JSON.parse(JSON.stringify(state.statuses)),ui:Object.assign({},state.ui),filters:publicFilters()},base ? {jobs:ownJobs, base:baseRaw} : {});
       clone.querySelector('#figma-data').textContent = JSON.stringify(snap).replace(/</g,String.fromCharCode(92) + 'u003c');
       clone.querySelector('#jobs').innerHTML = '';
       clone.querySelectorAll('dialog').forEach(function (dialog) { dialog.removeAttribute('open'); });
@@ -1488,11 +1617,12 @@
       // Replace vacancies and reports (and optionally profileName, updatedAt, agentCV), then redraw.
       setData: function (next) {
         next = next || {};
-        if ('jobs' in next) { data.jobs = normalizeJobs(next.jobs); hostData = true; if (!('profile' in next) && profileIsDemo) { data.profile = null; profileIsDemo = false; } }
+        if ('jobs' in next) { ownJobs = normalizeJobs(next.jobs); mergeJobs(); hostData = true; if (!('profile' in next) && profileIsDemo) { data.profile = null; profileIsDemo = false; } }
         if ('reports' in next) data.reports = normalizeReports(next.reports);
         ['profileName','updatedAt','agentCV','profile','search'].forEach(function (key) { if (key in next) data[key] = next[key]; });
         if ('profile' in next) { profileIsDemo = false; delete state.profile; var fromProfile = filtersFromProfile(data.profile); if (fromProfile) F = fromProfile; }
         Object.keys(data.reports).forEach(function (id) { matching.delete(id); });
+        quickCache = new WeakMap();
         applyHeader(); refreshOpenDialog(); render(); alignSidebarToJobs(); placeCorner();
       },
       // Put in the person's saved choices without sending them back through onStateChange.
@@ -1559,9 +1689,10 @@
     var levelNames = {junior:'Junior', middle:'Middle', senior:'Senior', lead:'Lead', leadership:'Leadership'};
     if (state.profile) data.profile = state.profile;
     // The profile is not edited on the board; the filters (search conditions) are saved in it and sent to the host.
-    function profileChanged() {
+    function profileChanged(drawn) {
       if (data.profile) state.profile = data.profile;
-      renderJobs(); persist(); refreshOpenDialog(); placeCorner();
+      if (!drawn) renderJobs();
+      persist(); refreshOpenDialog(); placeCorner();
       var copy = data.profile ? JSON.parse(JSON.stringify(data.profile)) : null;
       profileListeners.forEach(function (fn) { try { fn(copy); } catch (e) { console.error(e); } });
     }
@@ -1698,7 +1829,7 @@
       state.filters = publicFilters();
       render();
       if ($('filters-panel').open && keepPanel !== false) syncPanel();
-      if (data.profile) profileChanged();
+      if (data.profile) profileChanged(true);
     }
     $('active-filters').addEventListener('click',function (event) {
       var b = event.target.closest('[data-filter-chip]');
@@ -1852,6 +1983,15 @@
     addEventListener('resize',positionPanel);
     // Nothing left after filtering: ask Claude to search the daily list with these filters (the same way as Refresh).
     $('empty-search').onclick = function () { filtersChanged(); requestRefresh(); };
+
+    // The base file next to the page, read on load. A missing file or a failed read leaves the board as it is.
+    try {
+      fetch('vacancies.json', {cache:'no-store'}).then(function (r) { return r.ok ? r.json() : null; }).then(function (raw) {
+        if (!raw || !takeBase(raw)) return;
+        if (profileIsDemo) { data.profile = null; profileIsDemo = false; }
+        quickCache = new WeakMap(); applyHeader(); render(); refreshOpenDialog(); alignSidebarToJobs(); placeCorner();
+      }).catch(function () {});
+    } catch (_) {}
 
     render();
     placeCorner();
@@ -2037,12 +2177,19 @@
           return null;
         }
         function say(text) { if (typeof board.notify === 'function') board.notify(text); }
-        // The words the board uses: the button "Get deep analysis" runs Job Matcher (action "match"), Refresh runs Job Finder.
+        // The words the board uses: the button "Get deep analysis" runs Job Matcher (action "match"), Refresh runs Job Finder,
+        // and "Analyse 20 more" asks Job Finder for short analyses of the next vacancies (action "analyze").
         var kinds = {
           match: { label: 'Deep analysis', what: 'the deep analysis', button: 'Get deep analysis', result: 'The result will appear here.' },
           refresh: { label: 'Refresh search', what: 'the search', button: 'Refresh', result: 'New vacancies will appear here.' },
-          tailor: { label: 'Tailor CV', what: 'CV tailoring', button: 'Tailor my CV', result: 'The result will appear here.' }
+          tailor: { label: 'Tailor CV', what: 'CV tailoring', button: 'Tailor my CV', result: 'The result will appear here.' },
+          analyze: { label: 'Analyse more', what: 'the short analysis', button: 'Analyse more', result: 'The analyses will appear on the cards.' }
         };
+        // How many vacancies "Analyse more" asks for: a whole number from 1 to 100, 20 when the board sends none.
+        function countOf(v) {
+          var n = Math.floor(Number(v));
+          return n >= 1 ? Math.min(n, 100) : 20;
+        }
         // The search conditions travel with Refresh, kept small: a request to the chat holds at most 4 KiB.
         function filtersOf(f) {
           if (!f || typeof f !== 'object') return null;
@@ -2056,6 +2203,11 @@
           var deliver = room ? deliverMode() : null;
           if (!deliver) { checkSend(); return false; }
           var kind = kinds[action.type];
+          if (action.type === 'analyze') {
+            var count = countOf(action.count);
+            var named = 'Analyse ' + count + ' more';
+            kind = Object.assign({}, kind, { label: named, button: named });
+          }
           var job = action.jobId ? jobsById[String(action.jobId)] : null;
           var payload = { action: action.type };
           if (action.jobId) payload.jobId = String(action.jobId);
@@ -2065,7 +2217,8 @@
           if (company) payload.company = company.slice(0, 200);
           var filters = action.type === 'refresh' ? filtersOf(action.filters) : null;
           if (filters) payload.filters = filters;
-          // A short name the platform shows next to the request, for example "Deep analysis · Product Designer".
+          if (action.type === 'analyze') payload.count = count;
+          // A short name the platform shows next to the request, for example "Deep analysis · Product Designer" or "Analyse 20 more".
           payload.label = (kind.label + (title ? ' · ' + title : '')).slice(0, 120);
           // Called synchronously inside the click: nothing is awaited before it.
           room.sendToClaudeSession(payload, { deliver: deliver }).then(function () {
