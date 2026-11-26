@@ -38,7 +38,7 @@ At the last check in November 2026 DesignX returned an empty accessible view, Wo
 
 ## Checking a posting on its job platform
 
-Many employers publish vacancies through Greenhouse, Lever, Workable or Ashby. Each has a public address that returns the posting as data, without a browser. It is the most reliable way to check that a vacancy is still open and to read its full text. These addresses were checked in November 2026; they are public read-only endpoints, not integrations, and may change.
+Many employers publish vacancies through Greenhouse, Lever, Workable, Ashby or BambooHR. Each has a public address that returns the posting as data, without a browser. It is the most reliable way to check that a vacancy is still open and to read its full text. These addresses were checked in November 2026; they are public read-only endpoints, not integrations, and may change.
 
 Find the platform from the posting link (or from the employer's "Apply" link on an aggregator), take the company name and posting id from it, and read the address yourself.
 
@@ -50,6 +50,7 @@ Find the platform from the posting link (or from the employer's "Apply" link on 
 | Lever | `jobs.lever.co/{company}/{id}`; in Europe `jobs.eu.lever.co/{company}/{id}` | `https://api.lever.co/v0/postings/{company}?mode=json`; in Europe `https://api.eu.lever.co/v0/postings/{company}?mode=json` (large; `&limit=50&skip=0` reads it in parts) | `https://api.lever.co/v0/postings/{company}/{id}` (Europe: `api.eu.lever.co`) |
 | Workable | `apply.workable.com/{account}/j/{shortcode}` | `https://apply.workable.com/api/v1/widget/accounts/{account}` | `https://apply.workable.com/api/v2/accounts/{account}/jobs/{shortcode}` |
 | Ashby | `jobs.ashbyhq.com/{org}/{id}` | `https://api.ashbyhq.com/posting-api/job-board/{org}?includeCompensation=true` (full texts of all postings; a large employer comes in several parts) | No public address for one posting, and the posting page shows no text without JavaScript. Use the list: a posting in it is open. |
+| BambooHR | `{company}.bamboohr.com/careers/{id}` | `https://{company}.bamboohr.com/careers/list` (open postings with titles and places, no texts) | `https://{company}.bamboohr.com/careers/{id}/detail`. The posting page shows no text without JavaScript, so always read this address. A closed posting answers 404. |
 | Recruitee | `{company}.recruitee.com/o/{slug}` or a career site on Recruitee | `https://{company}.recruitee.com/api/offers/` | Open the posting page itself |
 | SmartRecruiters | `jobs.smartrecruiters.com/{company}/{id}` | `https://api.smartrecruiters.com/v1/companies/{company}/postings` (large employers come in parts with `limit` and `offset`). In November 2026 these addresses refused the reading tool in claude.ai, so there the posting page itself may be the only way. | `https://api.smartrecruiters.com/v1/companies/{company}/postings/{id}` |
 
@@ -69,6 +70,7 @@ Where the fields are:
 | Lever | `descriptionPlain`, then each of `lists` (heading and items), then `additionalPlain` | not stated (`createdAt` is not a publication date) | `salaryRange` when present | `categories.location`, `workplaceType` |
 | Workable | `description`, `requirements`, `benefits` (HTML) | `published` | `salary_from`, `salary_to`, `salary_currency_iso_code`, `salary_frequency` | `location`, `locations`, `workplace`, `remote` |
 | Ashby | `descriptionPlain` | `publishedAt` | `compensation`: use one tier only; a summary such as "Multiple Ranges" or several tiers are separate ranges | `location`, `secondaryLocations`, `workplaceType`, `isRemote` |
+| BambooHR | `result.jobOpening.description` (HTML) | `datePosted` | `compensation` when present | `location`, `atsLocation` and the posting text; `jobOpeningStatus` is `Open` for an open posting |
 | SmartRecruiters | `jobAd.sections` (`jobDescription`, `qualifications`, `additionalInformation`) | `releasedDate` | rarely given | `location.city`, `location.remote`, `location.hybrid`; `active: true` means open |
 
 To find more vacancies on these platforms, search the platform domains directly with the role and region, for example `site:job-boards.greenhouse.io "Product Designer" remote Europe`, `site:jobs.lever.co`, `site:jobs.ashbyhq.com`, `site:apply.workable.com`. Search results are leads only; check each one as above. Once an employer's list is open, look there for other postings that fit the user's roles too.

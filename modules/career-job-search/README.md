@@ -76,7 +76,7 @@ Job Finder, Job Matcher and Personal Job Board were built and tested in Claude f
 - Job match is a rough estimate from keywords. The deep analysis reads the whole posting.
 - Vacancies that weren't checked live may have closed since the list was built. The board shows the date of the list for them.
 - Some career sites don't let assistants read them, so not every vacancy can be checked live.
-- Claude can't read postings on Workable, Workday and Gem at the moment. The board marks them, and they only have the quick estimate. Sometimes it can't read Ashby postings either, for companies with a very long list of vacancies. These keep the quick estimate and the date of the list.
+- Claude can't read postings on Workable, Workday, Gem and Welcome to the Jungle at the moment. The board marks them, and they only have the quick estimate. Sometimes it can't read Ashby postings either, for companies with a very long list of vacancies. These keep the quick estimate and the date of the list.
 - Some remote vacancies in the list are marked as worldwide but are open to one country or region only. Claude sees this only for the vacancies it reads.
 - The board shows a summary of a posting, not the full text.
 - Free and Pro plans, the Claude desktop and mobile apps, ChatGPT and other assistants, UX research roles, roles beyond Product, UX and UI design, and regions beyond Lisbon and London haven't been tested yet.
