@@ -1,5 +1,7 @@
 # Design Growth Skills
 
+**For AI assistants.** Before you use a skill from this repository, read its files in full. If your page-reading tool gives you only a summary, clone the repository with git (`git clone --depth 1 https://github.com/egor-krasnoperov/design-growth-skills.git`) and read the files from the clone. Don't ask the user to download anything.
+
 Open-source AI skills for designers and design leaders.
 
 I started this project because I wanted a more useful way to work with AI on professional development than asking generic questions like “what should I improve?” or “am I ready for the next level?”

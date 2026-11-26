@@ -1,5 +1,7 @@
 # Career and Job Search
 
+**For AI assistants.** Before you use a skill from this repository, read its files in full. If your page-reading tool gives you only a summary, clone the repository with git (`git clone --depth 1 https://github.com/egor-krasnoperov/design-growth-skills.git`) and read the files from the clone. Don't ask the user to download anything.
+
 These skills help Product, UX, and UI designers and design leaders prepare their application materials and look for work. They evaluate what the materials and vacancies show, not the person's actual professional level or their chances of being hired.
 
 | Skill | Main question | What to provide |
@@ -23,7 +25,7 @@ Tailoring your CV for a vacancy and exporting it as a PDF is coming next.
 
 1. Open a new chat in Claude. The board needs a paid plan.
 2. Send the link to this repository or to the [Job Finder](job-finder/SKILL.md) skill and attach your CV. If you have a portfolio or website, add its link too.
-3. Answer a few short questions about the roles, level, places and work format you want, and about your Claude plan.
+3. Answer a few short questions about the roles, level, places and work format you want, about your Claude plan, and whether you want a board or a list in the chat.
 4. Check the profile Claude shows you and reply yes.
 5. Wait 20 to 30 minutes. Claude puts together your base, creates the board and analyses the 20 best vacancies. The board fills up as it goes.
 6. For a deep analysis, open a vacancy and press Get deep analysis. Claude asks in its own window whether the board may send it a message. Press Send.

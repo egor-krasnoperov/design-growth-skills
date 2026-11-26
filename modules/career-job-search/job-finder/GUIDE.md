@@ -10,7 +10,7 @@ It's made for Product Designers, UX/UI Designers, Design Engineers, UX Researche
 
 - The vacancies come from company career pages on several job platforms at once. You don't need to search each site separately.
 - The vacancies are compared with your CV and portfolio, not with a couple of words in a search box.
-- For the best vacancies, the match percentage is based on the full posting, not on the title.
+- For the 20 best vacancies, Claude reads the full posting and checks up to 8 main requirements against your CV, not only keywords.
 - Claude reads the best vacancies and warns you when one is actually open to a single country only or needs US working hours. It doesn't analyse those.
 - Everything is in one place, with the status of each application. The board is only yours, and nobody else sees it.
 
@@ -25,7 +25,7 @@ There's nothing to install.
 
 ## 4. Your first run, step by step
 
-**Step 1. Send the link and your CV.** Open a new chat in Claude. Send the link to the [Job Finder](SKILL.md) skill and attach your CV. If you have a portfolio or website, add its link. Claude briefly explains how everything works.
+**Step 1. Send the link.** Open a new chat in Claude and send the link to the [Job Finder](SKILL.md) skill. Claude explains what it is, what you get and how it works. If you'd like to try, send your CV and, if you have one, a link to your portfolio or website.
 
 **Step 2. Answer the questions.** Claude asks them in one message. Short answers are fine.
 1. Which roles you're looking for.
@@ -36,8 +36,9 @@ There's nothing to install.
 6. Whether you can work US hours.
 7. Whether you have a minimum salary. You can skip this one.
 8. Which Claude plan you have. Claude can't see it, and the plan decides how much it can do in one go.
+9. Whether you want your own job board or the 10 best vacancies as a list in the chat.
 
-Your answers decide which vacancies go into your base. The question about US hours matters because many remote vacancies require them. If you can't work them, Claude skips those vacancies.
+Your answers decide which vacancies go into your base. The question about US hours matters because many remote vacancies require them. If you can't work them, Claude skips those vacancies. If you choose the list, Claude shows the 10 best vacancies in the chat, each with a short analysis, and you can ask for a board later.
 
 **Step 3. Check your profile.** Claude writes a short profile from your CV and portfolio, with your years of experience, skills and tools, product domains and languages. Anything that only your portfolio shows is marked. Your contacts and the text of your CV aren't in it. If everything is right, reply yes. If something is off, correct it. The search doesn't start until you reply.
 

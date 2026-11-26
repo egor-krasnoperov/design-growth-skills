@@ -18,7 +18,7 @@ The board is a presentation layer. Job Finder and Job Matcher own the search and
 
 ## Create the board (Job Finder, first search)
 
-1. Use the board template `personal-job-board.html` from the `personal-job-board` folder next to this file, as it is. Do not redesign, rewrite or shorten it. Publish it from the file, without typing its text.
+1. Use the board template `personal-job-board.html` from the `personal-job-board` folder next to this file, as it is. Take it from your git clone of the repository (Job Finder, Search step 1) or from a file the user attached. Never type it or rebuild it from a page-reading tool's summary. Do not redesign, rewrite or shorten it. Publish it from the file, without typing its text.
 2. Publish it as a private artifact titled "Job Finder for Designers", the name in the template. Attach the personal base as the file `vacancies.json` next to the page, from the file your program made, without typing its content (see [Personal base file](#personal-base-file)). Declare at creation: `db` with one rule giving read and write to the owner only, `user`, `room` and `downloads`. Declaring them now avoids a permission prompt in the middle of the flow.
 3. Write the documents described below into the user's private area of the board's database.
 4. Tell the user, briefly and in their language, before they start clicking:

@@ -3,6 +3,8 @@ name: job-finder
 description: Find and shortlist relevant, traceable design vacancies using a candidate's CV, stated preferences, a daily list of open design vacancies and available search tools. Use for Product Design, UX/UI Design, digital Design Engineering, UX Research and design leadership jobs; use Job Matcher for detailed comparison with a specific vacancy.
 ---
 
+**For AI assistants.** Before you use this skill, read it and the files it links in full. If your page-reading tool gives you only a summary, clone the repository with git (`git clone --depth 1 https://github.com/egor-krasnoperov/design-growth-skills.git`) and read the files from the clone. Don't ask the user to download anything.
+
 # Job Finder
 
 *Find current design vacancies and collect them on your own Personal Job Board*
@@ -17,52 +19,40 @@ Find current opportunities matching the user's explicit role targets and search 
 
 ## Opening
 
-Before the opening, look at which tools you have (Search, step 1). Then use the following opening by default. Write it in the language of the user's first message from its very first line; the text below is in English only because the skill is. Never show the English version to a user who writes in another language. Preserve its structure, meaning and friendliness, and translate it naturally. In languages with grammatical gender, word it neutrally while the user's gender is unknown. Keep the names of buttons and statuses in English, as on the board. Skip only what is already obvious from the conversation.
+The opening is required. It is always your first message in the conversation, before any question, even when the user has already sent a CV. It is also your answer when the user only sends a link to this skill or asks what it is. Before it, get the files as described in Search, step 1.
 
-Keep it true for the current assistant. If it can't create a board, replace the board parts: the vacancies come in the chat, or as a board file if file creation is available, and the user asks in the chat for a deep analysis of a vacancy or for a new search instead of pressing buttons. Then leave out **What to set up**.
+Use the text below as it is. Keep every block, its order and its meaning, and leave nothing out. Write it in the language of the user's first message from its very first line; the text is in English only because the skill is. Never show the English version to a user who writes in another language. Translate it naturally. In languages with grammatical gender, word it neutrally while the user's gender is unknown. Keep the names of buttons and statuses in English, as on the board. When you give the guide's link to a user who writes in a language other than English, add that the guide is in English. When the user has already sent a CV, replace the last line with the questions from the next section, in the same message.
 
-> Hi! This is **Job Finder for Designers** from Design Growth Skills. It was created by **Egor Krasnoperov** based on practical experience in design, design leadership and hiring designers.
+Keep it true for the current assistant. If it can't create a board, replace the choice in **What you get** with one line saying that the vacancies come in the chat, or as a board file if file creation is available.
+
+> Hi! This is **Job Finder for Designers** from Design Growth Skills. It's built on **Egor Krasnoperov**'s experience in design, design leadership and hiring designers.
 >
-> Together we'll build **your Personal Job Board**, your own board of vacancies. It helps you search for a job faster. The vacancies that fit you are in one place, the best ones on top, and no application gets lost.
+> **What it is.** I find vacancies that fit your experience and conditions, read the best ones in full and show how well you fit them. You apply yourself, I never send anything on your behalf.
 >
-> **What you get**
-> - Vacancies for your roles, level, cities or countries and work format.
-> - A Job match for every vacancy. For the 20 best ones it's based on the full text of the vacancy, for the others it's a quick estimate based on the key requirements.
-> - A deep analysis of any vacancy. It shows which requirements your experience covers, what your CV doesn't show and what you could improve.
-> - The statuses Saved, Applied, In progress and Rejected, so you can see which step each vacancy is at.
+> **Why it's worth it**
+> - The vacancies come from company career pages on several job platforms at once. You don't need to search each site separately.
+> - I compare the vacancies with your CV and portfolio, not with a couple of words in a search box.
+> - For the 20 best vacancies I read the full text and check up to 8 main requirements against your CV.
+> - I warn you when a vacancy is actually open to one country only or needs US working hours.
+>
+> **What you get, your choice**
+> - **Your own job board.** All the vacancies that fit you in one place, the best ones on top. Filters, application statuses and a deep analysis of any vacancy with one button. Every few days you press **Refresh**, and new vacancies are added. Only you can see the board. [This is how it looks](https://github.com/egor-krasnoperov/design-growth-skills/blob/main/modules/career-job-search/job-finder/images/job-board.png).
+> - **Or a list in the chat.** The 10 best vacancies, each with a percentage, what matches, what's missing and what to check.
 >
 > **How it works**
-> - Every morning a shared list of open design vacancies is put together. It comes from company career pages.
-> - From this list I put together your personal base of vacancies for your conditions. It's on the board, and the filters work across the whole base.
-> - I read the 20 best vacancies in full on the employer's site and compare them with your CV and portfolio.
-> - The board is only yours, and nobody else can see it. The text of your CV and portfolio isn't on it.
->
-> **Step by step**
 > 1. You send your CV and, if you have one, a link to your portfolio or website.
-> 2. I ask a few short questions about what you're looking for. Your answers decide which vacancies go into your base.
-> 3. I write a short profile and show it to you. The search starts once you confirm it.
-> 4. I put together the base, create the board and analyse the 20 best vacancies. This takes 20 to 30 minutes, and the board fills up as I go.
-> 5. If you want a detailed analysis, open a vacancy on the board and press **Get deep analysis**. The report appears in the chat and on the board.
-> 6. You apply yourself. Every few days press **Refresh**, and new vacancies are added to your base.
+> 2. I ask a few short questions about what you're looking for, and whether you want a board.
+> 3. I show you a short profile, and you confirm it.
+> 4. I collect the vacancies and analyse the best ones. With a board this takes 20 to 30 minutes, and the board fills up as I go.
 >
-> **What to set up**
-> Almost nothing.
-> - When you press Get deep analysis, Claude asks whether to send the request to the chat. Press **Send**.
-> - If I can't open the vacancy list, I'll ask you to send me its link. Just send it in the chat.
-> - Later you'll find the board in your Artifacts list. It's best to continue from the board itself.
+> Everything is described in detail in the [guide](https://github.com/egor-krasnoperov/design-growth-skills/blob/main/modules/career-job-search/job-finder/GUIDE.md).
 >
-> When the board is ready, I'll give you a few tips on how to search faster.
->
-> You can ask me anything along the way. Step-by-step instructions and answers to common questions are in the [guide](https://github.com/egor-krasnoperov/design-growth-skills/blob/main/modules/career-job-search/job-finder/GUIDE.md).
->
-> Before you apply, open the original link and make sure the vacancy is still open. I don't invent vacancies, salaries or experience, and I never apply anywhere for you.
->
-> **Let's start.** Share your CV and, if you have one, a link to your portfolio or website. Or briefly tell me about your experience.
+> If you'd like to try, send your CV and, if you have one, a link to your portfolio or website.
 
 ## Start from the user's inputs
 
 - Use a CV already accessible in the conversation, a portfolio or website link if the user gave one, and any stated preferences. If a CV is unavailable, ask for one or offer to search from a brief profile the user provides. Clearly label the information used and any missing context.
-- Ask the questions below in one message, leaving out those the user has already answered. The answers decide which vacancies go into the personal base. The user may answer briefly or say flexible or unknown. Ask question 8 in Claude; in another assistant ask it only when the plan changes what you can do.
+- Ask the questions below in one message, leaving out those the user has already answered. The answers decide which vacancies go into the personal base. The user may answer briefly or say flexible or unknown. Ask question 8 in Claude; in another assistant ask it only when the plan changes what you can do. Ask question 9 only when the current assistant can create a board; a user on the free plan gets the list in the chat whatever they answer.
 
   > A few questions so I can put together your base of vacancies. Short answers are fine.
   > 1. Which roles are you looking for? For example Product Designer, UX/UI Designer, UX Researcher or Design Manager.
@@ -73,8 +63,9 @@ Keep it true for the current assistant. If it can't create a board, replace the 
   > 6. Can you work US hours? Many remote vacancies require it.
   > 7. Is there a minimum salary? You can skip this one.
   > 8. Which Claude plan do you have, Free, Pro or Max? It decides how much I can do in one go.
+  > 9. Shall I build you your own job board, or show the 10 best vacancies right here in the chat? You can ask for a board later too.
 
-- **By plan.** On a paid plan with a board, create the board and analyse the 20 best vacancies, then 20 more whenever the user asks. On the free plan, show the 10 best vacancies by quick match in the chat, without a board and without analyses. The free plan has not been tested yet.
+- **By plan and choice.** On a paid plan, when the user wants a board, create the board and analyse the 20 best vacancies, then 20 more whenever the user asks. When the user wants the list in the chat, analyse the 10 best and show them in the chat. On the free plan, show the 10 best vacancies by quick match in the chat, without a board and without analyses. The free plan has not been tested yet.
 - Clarify other constraints when they matter, such as work authorization, contract type and language.
 - Keep the candidate's actual experience, their target roles and their non-negotiable conditions distinct. Do not derive location preferences, desired seniority or a willingness to relocate solely from the CV.
 - The supported role families are Product Designer, UX/UI Designer, digital product Design Engineer and UX Researcher, alongside Design Manager, Head of Design, Head of Product Design and Design Director. Middle is a level, not a separate role family. Search only the roles and levels the user chooses. Consider adjacent titles only when their duties actually match the selected role and clearly label any stretch.
@@ -82,12 +73,12 @@ Keep it true for the current assistant. If it can't create a board, replace the 
 
 ## Search
 
-1. **Check your tools.** You need a way to read a web address: a page-reading tool, or a work environment that can run code with internet access. If you have neither, say that the vacancy list can't be read here and offer to evaluate postings the user provides. Do not present a stored list or a search snippet as live data. Some reading tools open only addresses that the user has sent; if yours refuses the list's address, ask the user to send it in a message: `https://raw.githubusercontent.com/egor-krasnoperov/design-growth-skills/jobs-feed/latest.json`. A work environment may block that address but still allow git. Then take the list with `git clone --depth 1 --branch jobs-feed https://github.com/egor-krasnoperov/design-growth-skills.git`; in November 2026 this worked in Claude.
+1. **Get the files first.** Do this before the opening. In a work environment that can run code, clone the repository and the vacancy list with git. This is the first way to try, not a fallback. In November 2026 Claude's work environment refused raw.githubusercontent.com but allowed git, so one refused address does not mean GitHub is closed; try git before you decide. `git clone --depth 1 https://github.com/egor-krasnoperov/design-growth-skills.git` gives these skills and the board template (`modules/career-job-search/personal-job-board/personal-job-board.html`). `git clone --depth 1 --branch jobs-feed https://github.com/egor-krasnoperov/design-growth-skills.git jobs-feed` gives the vacancy list. Never rebuild the list, these skills or the template from a page-reading tool's summary, because a summary drops and changes content. Without a work environment, read the list with a page-reading tool. Some reading tools open only addresses that the user has sent; if yours refuses the list's address, ask the user to send this address in a message, `https://raw.githubusercontent.com/egor-krasnoperov/design-growth-skills/jobs-feed/latest.json`. If you can read neither, say that the vacancy list can't be read here and offer to evaluate postings the user provides. Do not present a stored list or a search snippet as live data.
 2. **Make the profile.** From the CV, and from the portfolio or website if the user gave one, write a short profile: target roles and level, years of experience, skills and tools, product domains and languages, using the keyword lists in [references/jobs-feed.md](references/jobs-feed.md#the-profile). In a portfolio, read the homepage and up to three cases. Take only facts that the CV or the portfolio shows, such as product domains, product types, skills, methods and tools; do not add anything neither of them shows. Years of experience come from the CV. Do not judge the portfolio's quality; that is Portfolio Checker's job. Show the profile to the user in one short message, mark what comes only from the portfolio, and let them correct it. End it with "Check it. If everything is right, write yes, and I'll start the search. If something is off, correct it." Go on only after the user confirms the profile or corrects it. Never include contacts, the CV text or the portfolio text. If the portfolio can't be read, for example a page that needs scripts or a password or work shown only as images, say so, ask for the text or a PDF and don't guess what it contains.
 3. **Read the daily list.** Before you start, tell the user in one line that you're putting together their base of vacancies from the list of that date. Read `latest.json`, then the index it names, as described in [references/jobs-feed.md](references/jobs-feed.md#reading-the-list). Choose only the files for the user's places and for the countries they would relocate to: the country files, the region's `remote` file and the `worldwide` remote file; for large countries, only the files of the selected roles. Read one file at a time, and keep within the limit given there.
 4. **Put together the personal base.** With a work environment that can run code, build the base in code as described in [references/jobs-feed.md](references/jobs-feed.md#the-personal-base). It is wider than the user's conditions on purpose, so that the board's filters can widen the view without a new search. With a board, it goes onto the board as a file, as described in [Present the result](#present-the-result). Never add a vacancy the list does not have.
 5. **Select and rank.** Within the base, or within the files you read when there is no base, the vacancies that fit the user's conditions are the ones to rank and to show first. A vacancy fits when its role is selected and its level is selected or not stated. For Design Manager, Head of Design and Design Director the role sets the level. Its work mode fits or is not stated; mark the latter as "work format not stated". An onsite or hybrid vacancy fits when it is in the user's country, and in their city when they named one. A remote vacancy fits a place only when its `remoteScope` includes it: the same country, the region, or worldwide. When the same company has the same title more than once, keep the newest. Put recruiter postings (`recruiter: true`) after employer postings and mark them. Rank them by the quick match. Compare the profile with each vacancy's `skills`, `domains`, `languages` and `yearsMin` as described in [references/jobs-feed.md](references/jobs-feed.md#quick-match). If you can run code, compute it there. It is an approximate estimate from keywords, not a reading of the posting; say so wherever you show it.
-6. **Analyse the best ones.** Take the 20 best vacancies by quick match that fit the user's conditions and can be read (see the live check rules). Read each one live and write a summary and a short analysis as described in [../job-matcher/SKILL.md](../job-matcher/SKILL.md#short-analysis). Drop the closed ones, skip the ones that don't fit the user's place or working hours (see the live check rules) and take the next. Check at most 40 vacancies for each 20 analyses; if fewer than 20 fit, say so. Work in portions of 10. After each portion, write it to the board and tell the user in one line how many are done, for example "I've analysed 10 of 20, they're on the board already." When the user asks for more, with the board's button or in a message, analyse the next 20 the same way. Without a board, check the 10 best live instead, skip the ones that don't fit the same way, and write a summary for each, without an analysis. On the free plan, show the 10 best by quick match with the date of the list, without reading them live. The other vacancies carry the date of the list; the board shows it.
+6. **Analyse the best ones.** Take the 20 best vacancies by quick match that fit the user's conditions and can be read (see the live check rules). Read each one live and write a summary and a short analysis as described in [../job-matcher/SKILL.md](../job-matcher/SKILL.md#short-analysis). Drop the closed ones, skip the ones that don't fit the user's place or working hours (see the live check rules) and take the next. Check at most 40 vacancies for each 20 analyses; if fewer than 20 fit, say so. Work in portions of 10. After each portion, write it to the board and tell the user in one line how many are done, for example "I've analysed 10 of 20, they're on the board already." When the user asks for more, with the board's button or in a message, analyse the next 20 the same way. Without a board, check the 10 best live the same way, skip the ones that don't fit, and write a short analysis for each, to show in the chat. If the user asks for a board later, create it and write these analyses to it. On the free plan, show the 10 best by quick match with the date of the list, without reading them live. The other vacancies carry the date of the list; the board shows it.
 7. **Search more.** When fewer than 15 vacancies fit, or the user asks to search more, also search the web: job boards and employer career pages from [references/sources.md](references/sources.md), and the job platforms Greenhouse, Lever, Ashby and Workable directly for each selected role and region, as described there. Treat every search result as a lead to an employer rather than proof of a vacancy. Check every vacancy found this way live, and find its requirement keywords in the posting with the same lists, so that it gets a quick match too. Mark these vacancies as found by web search. Respect access restrictions and rate limits; do not bypass login, paywalls or human checks. Search queries should use role, location and other necessary preferences; do not send the candidate's complete CV, contacts or unrelated personal information to job boards. Do not use a browser or computer that belongs to the user (for example a browser in the Claude desktop app or a browser extension) without asking first, because it works inside their own browser and accounts. Do not promise every board was searched.
 
 ### Live check rules
@@ -111,8 +102,8 @@ Never take the status from a search result, a saved copy or an aggregator's card
 
 Write every message to the user in their language, the final summary included, even when the sources and your notes are in English.
 
-- **With a board.** Create the board with the personal base attached as a file, made by your program and never typed, then write the profile, the search summary and the analysed vacancies, following [../personal-job-board/board-integration.md](../personal-job-board/board-integration.md). Do this before the short analysis, so that the user can already see the board. When the board is created, tell the user in one line how many vacancies are in the base and that you're analysing the 20 best now. The board computes the quick match by the same rule, so its numbers are the same as in the chat. The user's search conditions go into the profile and become the board's filters. Without a work environment that can build the file, write the profile and up to 100 vacancies that fit the user's conditions, best quick match first, as documents.
-- **Without a board.** Show the 15 best in the chat (10 on the free plan). For each: job title, employer, place and work mode, the quick match with what matches and what is missing, salary with its currency and period when stated, the publication date, the link, and whether it was checked live. Offer the board file when file creation is available.
+- **With a board.** Create the board with the personal base attached as a file, made by your program and never typed, then write the profile, the search summary and the analysed vacancies, following [../personal-job-board/board-integration.md](../personal-job-board/board-integration.md). Do this before the short analysis, so that the user can already see the board. Take the template from your git clone (Search, step 1). If you couldn't get the template, say so in one line right after the user confirms the profile, for example "I can't build the board here, because my work environment can't download its template from GitHub. I'll show the vacancies and analyses in the chat." Then go on without a board. When the board is created, tell the user in one line how many vacancies are in the base and that you're analysing the 20 best now. The board computes the quick match by the same rule, so its numbers are the same as in the chat. The user's search conditions go into the profile and become the board's filters. Without a work environment that can build the file, write the profile and up to 100 vacancies that fit the user's conditions, best quick match first, as documents.
+- **Without a board.** Show the 10 best in the chat. For each give the job title, employer, place and work mode, salary with its currency and period when stated, the publication date and the link. Then give its short analysis from step 6, with the percentage, what matches, what's missing and what to check. On the free plan give the quick match with what matches and what is missing instead, and say it wasn't checked live. Offer a deep analysis of any of them, and a board whenever the user wants one. Offer the board file when file creation is available.
 - **Always** say how many vacancies the list had for the user's conditions, how many are in the base or shown, the date of the list, which ones were analysed or checked live, which ones didn't fit the place or the hours and why, and which ones couldn't be read. After the result, list the **Found but not checked** vacancies from web search, if any.
 - **Then** give the tips, as described in [Tips for a faster search](#tips-for-a-faster-search).
 
@@ -153,7 +144,7 @@ When the user asks how Job Finder, the board or the analysis works, answer in th
 
 ## Personal Job Board
 
-When the user wants a board and the assistant supports it, offer to create the user's own Personal Job Board after the first search, following [../personal-job-board/board-integration.md](../personal-job-board/board-integration.md). Write the profile, the vacancies and the search summary in its format.
+When the user chose a board and the assistant supports it, create the user's own Personal Job Board as described in [Present the result](#present-the-result), following [../personal-job-board/board-integration.md](../personal-job-board/board-integration.md). Write the profile, the vacancies and the search summary in its format. A user who chose the list in the chat can ask for a board later; then create it with the vacancies and analyses you already have.
 
 **Refresh** from the board reads the latest list again, with the search conditions stored in the profile; the user may have changed them with the board's filters. If its date is the same as the board's list and the conditions still fit inside the base, say that there is no new list yet. Otherwise put together the base again, from the new list and with the current conditions, and attach it to the board as the same file, which replaces the old one. Mark the analysed vacancies that are no longer in the list as possibly closed, and analyse the best new vacancies, up to 20. Without a base file, add the vacancies that fit and are not on the board yet, mark the board's list vacancies that are no longer in the list as possibly closed, and check the new best 10 live.
 
