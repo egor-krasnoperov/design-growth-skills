@@ -1,0 +1,46 @@
+name: Daily design jobs list
+
+# Builds the list of digital design vacancies that Job Finder reads, and publishes it to the jobs-feed branch.
+on:
+  schedule:
+    - cron: '30 6 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'modules/career-job-search/jobs-feed/**'
+      - '.github/workflows/jobs-feed.yml'
+
+permissions:
+  contents: write
+
+concurrency: jobs-feed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install duckdb==1.4.5
+      - name: Bring the previous list
+        run: |
+          mkdir -p feed-out
+          if git fetch --depth=1 origin jobs-feed; then
+            git archive FETCH_HEAD | tar -x -C feed-out
+          fi
+      - name: Build today's list
+        run: python modules/career-job-search/jobs-feed/build_feed.py feed-out
+      - name: Keep the last three days and publish
+        run: |
+          cp modules/career-job-search/jobs-feed/FEED_README.md feed-out/README.md
+          cd feed-out
+          ls -d 20??-??-?? | sort | head -n -3 | xargs -r rm -rf
+          git init -q -b jobs-feed
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Design jobs list $(date -u +%F)"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" jobs-feed

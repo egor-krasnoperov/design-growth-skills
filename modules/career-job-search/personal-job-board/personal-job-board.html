@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#ffffff">
   <meta name="color-scheme" content="light">
-  <title>Your personal job board — Design Growth Skills</title>
+  <title>Job Finder for Designers</title>
   <link rel="icon" href="data:,">
   <style>
     /* Personal Job Board. One layer: tokens, base, components, then screen sizes. */
@@ -43,7 +43,6 @@
     /* Header */
     .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding: 28px 28px 0; }
     .brand-name { margin: 0; font-size: 18px; line-height: 19px; font-weight: 600; }
-    .byline { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: var(--muted); }
     .refresh { display: inline-flex; align-items: flex-start; gap: 7px; min-height: 44px; padding: 0 0 10px 12px; border-radius: 12px;
       color: var(--ink); background: transparent; font-size: 18px; line-height: 19px; font-weight: 600; }
 
@@ -57,21 +56,72 @@
     .side-link[aria-current="page"] { color: var(--ink); font-weight: 600; }
     .side-link[aria-current="page"] .nav-count { color: var(--ink); }
     .nav-count { min-width: 18px; text-align: right; font-variant-numeric: tabular-nums; }
-    .cv-link { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 4px; width: 100%;
-      min-height: 44px; margin-top: 20px; padding: 6px 0; font-size: 14px; line-height: 20px; }
-    .cv-link strong { font-weight: 600; }
-    /* The CV name wraps anywhere and shows at most two lines; the full name is in the browser's own hint */
-    .cv-link span { max-width: 100%; color: var(--muted); text-align: left; overflow-wrap: anywhere;
-      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+    /* Your CV: its short label and date; a tap shows which CV the job match uses */
+    .profile { display: grid; gap: 4px; width: 100%; margin-top: 20px; font-size: 14px; line-height: 20px; }
+    .profile h2 { margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; }
+    /* The CV name wraps anywhere and shows at most two lines; the full name is in the hint */
+    .profile-cv { display: -webkit-box; max-width: 100%; margin: 0; padding: 0; color: var(--muted); text-align: left;
+      font-size: 14px; line-height: 20px; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+    .chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; list-style: none; }
+    .chips[hidden] { display: none; }
+    #where-chips { margin-bottom: 8px; }
+    .chip { display: inline-flex; align-items: center; gap: 2px; min-height: 28px; padding: 4px 4px 4px 10px; border-radius: 999px;
+      background: var(--card); color: var(--ink); font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+    .chip button { display: inline-grid; place-items: center; flex: none; width: 20px; height: 20px; border-radius: 50%; color: var(--muted); }
+    .chip svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+
+    /* Filters panel (variant A): a popover under the Filters button, a bottom sheet on small screens */
+    .filters-panel { position: fixed; inset: auto; width: 360px; max-width: calc(100vw - 24px); max-height: calc(100dvh - 24px);
+      margin: 0; padding: 0; overflow: hidden; border: 0; border-radius: 16px; background: #fff; color: var(--ink);
+      box-shadow: 0 8px 32px rgb(0 0 0 / .14); }
+    .filters-panel[open] { display: flex; flex-direction: column; }
+    .filters-panel::backdrop { background: transparent; }
+    .filters-head { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 0 20px; }
+    .filters-head h2 { margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; }
+    .filters-head button { min-height: 44px; padding: 10px 12px; color: var(--muted); font-size: 14px; line-height: 20px; }
+    .filters-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 20px 16px; }
+    .filter-group { padding-top: 16px; }
+    .filter-group h3 { margin: 0 0 8px; font-size: 14px; line-height: 20px; font-weight: 600; }
+    /* Every choice in the panel is a pill: grey outline at rest, grey fill and ink text when chosen */
+    .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill { min-height: 32px; padding: 6px 12px; border-radius: 999px; color: var(--muted); font-size: 14px; line-height: 20px;
+      box-shadow: inset 0 0 0 1px #e3e3e3; }
+    .pill[aria-pressed="true"] { color: #fff; background: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+    .check { display: flex; align-items: center; gap: 10px; min-height: 28px; margin-top: 8px; font-size: 14px; line-height: 20px; cursor: pointer; }
+    .check input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--ink); }
+    .field { width: 100%; min-width: 0; min-height: 40px; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 10px; background: #fff;
+      color: var(--ink); font: inherit; font-size: 14px; line-height: 20px; }
+    /* Fields and check boxes keep the board's grey focus ring instead of the browser's colour */
+    .field:focus { outline: none; border-color: var(--ink); }
+    .check input:focus-visible { outline: 2px solid #777; outline-offset: 2px; }
+    .where-suggest { display: grid; gap: 2px; margin-top: 4px; }
+    .where-suggest[hidden] { display: none; }
+    .where-kind { margin-left: auto; color: var(--muted); }
+    .where-input + .where-suggest + .pills, .where-input + .pills { margin-top: 8px; }
+    .salary-row { display: flex; gap: 8px; }
+    .salary-row .field:last-child { flex: 0 0 96px; }
+    /* The currency list looks like the amount field: same height and outline, a small arrow on the right */
+    select.field { appearance: none; -webkit-appearance: none; padding-right: 32px; cursor: pointer;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 8l4 4 4-4' fill='none' stroke='%23777' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center / 16px; }
+    .filters-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 8px 20px calc(8px + env(safe-area-inset-bottom,0px)); box-shadow: 0 -1px 0 #eeeeee; }
+    .filters-foot button { min-height: 44px; font-size: 14px; line-height: 20px; }
+    #filters-reset { color: var(--muted); }
+    #filters-show { font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+    .empty-actions { display: flex; flex-wrap: wrap; gap: 0 24px; }
     .hero { grid-column: 2; grid-row: 1; display: block; }
     .greeting { margin: 0; font-size: 18px; line-height: 19px; font-weight: 600; overflow-wrap: anywhere; text-wrap: balance; }
 
     /* Toolbar: counts, filters and sort */
-    .toolbar { grid-column: 2; grid-row: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    .toolbar { grid-column: 2; grid-row: 2; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px;
       min-height: 44px; margin: 24px 0 16px; }
     .collection-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 16px; }
     .result-count { margin: 0; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 14px; line-height: 20px; }
     .last-updated { display: flex; gap: 4px; margin: 0; color: var(--muted); font-size: 14px; line-height: 20px; }
+    /* The personal base: the list date, how many vacancies are analysed, and a button for 20 more */
+    .base-info { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0; color: var(--muted); font-size: 14px; line-height: 20px; }
+    .base-info[hidden], .base-info button[hidden] { display: none; }
+    .base-info button { color: var(--ink); font-size: 14px; line-height: 20px; text-decoration: underline; text-underline-offset: 3px; }
     .controls { display: flex; align-items: center; gap: 4px; }
     .control { display: inline-flex; align-items: center; justify-content: flex-start; gap: 4px; min-height: 44px; padding: 10px 12px;
       min-width: 0; border-radius: 999px; color: var(--muted); font-size: 14px; line-height: 20px; white-space: nowrap; }
@@ -79,11 +129,9 @@
     .control .icon { opacity: .55; transition: opacity 160ms ease; }
     .filter-trigger[aria-expanded="true"], .filter-trigger[data-filtered="true"] { color: var(--ink); }
     .filter-trigger[aria-expanded="true"] .icon, .filter-trigger[data-filtered="true"] .icon { opacity: 1; }
-    /* A set work format or grade shows a small cross instead of the arrow; the cross clears only that filter */
-    .clearable[data-filtered="true"] .icon { display: none; }
-    .clearable[data-filtered="true"] { padding-right: 4px; }
-    .filter-clear { display: inline-grid; place-items: center; width: 28px; height: 28px; margin-left: -4px; border-radius: 50%; color: var(--muted); }
-    .filter-clear svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+    /* The row of set filters under the toolbar: a chip per value, its cross removes that value */
+    .active-filters { display: flex; flex-wrap: wrap; gap: 4px; flex-basis: 100%; margin: 0; padding: 0; list-style: none; }
+    .active-filters[hidden] { display: none; }
     .filter-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 
     /* Job cards */
@@ -98,7 +146,8 @@
     /* "New": found in the latest search and not opened yet */
     .new-dot { display: inline-block; width: 8px; height: 8px; margin: 0 6px 1px 0; border-radius: 50%; background: var(--ink); vertical-align: middle; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-    .company { flex: 1; min-width: 0; font-size: 14px; line-height: 20px; font-weight: 600; overflow-wrap: anywhere; }
+    /* One line, so the card keeps its height when the icons appear on hover */
+    .company { flex: 1; min-width: 0; overflow: hidden; font-size: 14px; line-height: 20px; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; }
     .card-date { flex: 0 0 auto; margin-left: auto; color: var(--muted); font-size: 14px; line-height: 20px; text-align: right; white-space: nowrap; }
     /* Saved jobs and jobs with a status show no date, which leaves the company name more room */
     .job:has(.bookmark[aria-pressed="true"]) .card-date, .job:has(.card-status) .card-date { display: none; }
@@ -121,7 +170,7 @@
     .spark { position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px; background: var(--ink); opacity: 0; pointer-events: none; }
     /* One shared tooltip for the card icons: centred under the icon, kept inside the window, fades in without moving */
     .tip { position: fixed; z-index: 20; padding: 2px 8px; border-radius: 6px; background: #2c2c2c; color: #fff; font-size: 14px; line-height: 20px;
-      white-space: nowrap; pointer-events: none; }
+      max-width: min(280px,calc(100vw - 16px)); white-space: pre-line; text-align: center; pointer-events: none; }
     .tip:not([hidden]) { animation: tip-in 150ms ease both; }
     @keyframes tip-in { from { opacity: 0; } }
     .rail-icon { width: 20px; height: 20px; flex: none; fill: currentColor; }
@@ -134,9 +183,18 @@
     .title-button:focus-visible::after { outline: 2px solid var(--ink); outline-offset: -3px; }
     .job-title { margin: 0; font-size: 18px; line-height: 22px; font-weight: 600; overflow-wrap: anywhere; }
     .job-meta { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+    .dialog-unreadable { margin: 0; color: var(--muted); font-size: 16px; line-height: 24px; }
     .card-bottom { display: flex; align-items: end; justify-content: space-between; gap: 8px; min-height: 44px; margin-top: auto; padding-top: 12px;
       font-size: 14px; line-height: 20px; }
     .match-status { color: var(--muted); }
+    /* Job match on a card is a coloured pill by percentage (Figma, Self-Presentation): green from 80, yellow from 60,
+       purple below 60, grey when the posting gives too little data. These are the only colours on the board. */
+    .match-status[data-tone] { position: relative; z-index: 2; display: inline-flex; align-items: center; min-height: 20px; padding: 0 6px;
+      border-radius: 10px; cursor: pointer; }
+    .match-status[data-tone="high"] { background: #bcfba4; color: #1c6304; }
+    .match-status[data-tone="mid"] { background: #ffea82; color: #895d00; }
+    .match-status[data-tone="low"] { background: #d9b5ff; color: #39096e; }
+    .match-status[data-tone="none"] { background: #ececec; color: var(--muted); }
 
     /* Empty state, footer links and toast */
     .empty { grid-column: 2; grid-row: 3; max-width: 420px; padding: 48px 0; }
@@ -152,17 +210,21 @@
     .toast:has(.toast-action) { display: flex; align-items: center; gap: 12px; padding-top: 6px; padding-bottom: 6px; }
     .toast-action { min-height: 32px; margin-right: -10px; padding: 6px 12px; border-radius: 999px; color: #fff; font-weight: 600; }
 
-    /* Egor's portrait in the bottom-left corner: 48 square pixels wide, so each one is exactly 1 px.
-       A small speech bubble shows a greeting on hover and a new line on each click; 12 px is used only here. */
-    .egor { position: fixed; left: 28px; bottom: 28px; z-index: 3; width: 48px; }
-    /* Grey at rest so it does not draw attention; full ink on hover, keyboard focus and while its bubble is open */
-    .egor-face { display: block; width: 48px; border-radius: 6px; color: var(--ink); opacity: .4; transform-origin: 50% 100%; }
-    .egor-face:focus-visible, .egor-face[aria-expanded="true"] { opacity: 1; }
-    .egor-face svg { display: block; width: 100%; height: auto; shape-rendering: crispEdges; }
-    .egor-bubble { position: absolute; left: 0; bottom: calc(100% + 10px); width: max-content; max-width: 200px; margin: 0; padding: 6px 10px;
-      border-radius: 10px; background: #2c2c2c; color: #fff; font-size: 12px; line-height: 16px; }
-    .egor-bubble::after { content: ""; position: absolute; left: 18px; top: 100%; border: 6px solid transparent; border-top-color: #2c2c2c; border-bottom: 0; }
-    .egor-bubble a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
+    /* The logo: the square-pixel portrait in ink, 39 by 38 squares of 1 px, as tall as the two lines of the name */
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo { position: relative; display: block; flex: none; width: 39px; height: 38px; padding: 0; border-radius: 4px; color: var(--ink); }
+    .logo svg { display: block; width: 39px; height: 38px; shape-rendering: crispEdges; }
+    /* Every 6th or 7th click the head says "Ouch!" for a moment, in the tooltip's look */
+    .ouch { position: absolute; left: 50%; top: calc(100% + 6px); z-index: 2; translate: -50% 0; padding: 2px 8px; border-radius: 6px;
+      background: #2c2c2c; color: #fff; font-size: 14px; line-height: 20px; font-weight: 600; white-space: nowrap; pointer-events: none; }
+    .ouch[hidden] { display: none; }
+    /* The repository link in the bottom-left corner, under the navigation */
+    .repo-corner { position: fixed; left: 28px; bottom: 0; z-index: 3; }
+    /* The repository link: grey, dark on hover and focus */
+    .repo-link { display: inline-flex; align-items: center; gap: 6px; width: max-content; min-height: 44px; color: var(--muted);
+      font-size: 14px; line-height: 20px; text-decoration: none; }
+    .repo-link svg { flex: none; }
+    .repo-link:hover, .repo-link:focus-visible { color: var(--ink); }
 
     /* Filter popover; becomes a bottom sheet on small screens */
     .filter-dialog { position: fixed; inset: auto; width: 240px; max-width: calc(100vw - 24px); max-height: min(420px,calc(100dvh - 24px));
@@ -203,7 +265,8 @@
     .dialog-rail .rail-match:disabled { color: var(--muted); cursor: default; }
     .dialog-rail .rail-status { display: inline-flex; align-items: center; gap: 8px; }
     .dialog-rail .rail-status[data-set="true"] { color: var(--ink); }
-    .rail-result { margin: 0 0 12px; color: var(--ink); font-size: 14px; line-height: 20px; font-weight: 600; }
+    /* Job match opens the left column of the job window, above Get deep analysis */
+    .rail-result { margin: 0 0 4px; color: var(--ink); font-size: 14px; line-height: 20px; font-weight: 600; }
     .copy-feedback { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 20px; }
     .dialog-main { position: relative; width: 100%; min-width: 0; }
     .dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 24px;
@@ -215,18 +278,40 @@
     .published-line { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 20px; }
     .details-dialog section { margin-top: 32px; }
     .details-dialog section p { max-width: 34em; margin: 0 0 12px; font-size: 16px; line-height: 24px; white-space: normal; overflow-wrap: anywhere; }
-    .source-line { margin: 12px 0 0; color: var(--muted); font-size: 14px; line-height: 22px; }
+    /* The source and the link to the original sit with the title lines, above the description */
+    .source-line { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 22px; }
     .source-line a { color: var(--ink); text-underline-offset: 3px; }
     /* Match report in the dialog: monochrome, the same three type sizes, spacing instead of lines */
     #match-panel h4 { margin: 24px 0 8px; font-size: 14px; line-height: 20px; font-weight: 600; }
     #match-panel .report-note { margin: 0 0 4px; color: var(--muted); font-size: 14px; line-height: 20px; }
     #match-panel .report-note + p:not(.report-note) { margin-top: 16px; }
-    .report-reqs, .report-list { max-width: 34em; margin: 0; padding: 0; list-style: none; }
-    .report-reqs li { display: grid; grid-template-columns: 104px minmax(0,1fr); gap: 12px; padding: 6px 0; }
-    .req-status { color: var(--muted); font-size: 14px; line-height: 24px; }
-    #match-panel .report-reqs p { margin: 0; }
+    .report-list { max-width: 34em; margin: 0; padding: 0; list-style: none; }
+    /* Requirements as a table: the requirement, what the CV shows, the status with a small icon; thin lines between rows */
+    .report-table { width: 100%; margin: 24px 0 0; border-collapse: collapse; table-layout: fixed; }
+    .report-table th { padding: 0 16px 8px 0; border-bottom: 1px solid #e6e6e6; color: var(--ink); font-size: 14px; line-height: 20px; font-weight: 600; text-align: left; }
+    .report-table td { padding: 12px 16px 12px 0; border-bottom: 1px solid #eeeeee; vertical-align: top; font-size: 16px; line-height: 24px; overflow-wrap: anywhere; }
+    .report-table th:nth-child(3), .report-table td:nth-child(3) { width: 140px; padding-right: 0; }
+    #match-panel .report-table p { max-width: none; margin: 0; }
+    /* About this job: the facts of the daily list in rows, a grey label on the left, thin lines like the report table.
+       Requirements carry the report's marks: in the profile, partly, not in the profile (grey). */
+    .about-job:not(:first-child) { margin-top: 32px; }
+    #description-panel .about-note { margin: 0; color: var(--muted); font-size: 14px; line-height: 20px; }
+    .about-table { width: 100%; margin: 16px 0 0; border-collapse: collapse; }
+    .about-table th, .about-table td { padding: 12px 0; border-bottom: 1px solid #eeeeee; font-size: 16px; line-height: 24px; text-align: left; vertical-align: top; }
+    .about-table tr:first-child > * { border-top: 1px solid #eeeeee; }
+    .about-table th { width: 140px; padding-right: 16px; color: var(--muted); font-weight: 400; }
+    .about-table td { overflow-wrap: anywhere; }
+    .about-tags { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0; list-style: none; }
+    .about-tags li, .about-legend span { display: inline-flex; align-items: center; gap: 8px; }
+    .about-tags svg, .about-legend svg { flex: none; width: 16px; height: 16px; }
+    .about-tags li[data-status="not_evidenced"] { color: var(--muted); }
+    #description-panel .about-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; max-width: none; margin: 12px 0 0; color: var(--muted); font-size: 14px; line-height: 20px; }
+    .req-status { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-size: 16px; line-height: 24px; white-space: nowrap; }
+    .req-status svg { flex: none; width: 16px; height: 16px; }
+    .req-status[data-status="not_evidenced"], .req-status[data-status="unclear"] { color: var(--muted); }
     .req-priority { color: var(--muted); font-size: 14px; }
-    #match-panel .req-detail { margin-top: 2px; color: var(--muted); font-size: 14px; line-height: 20px; }
+    /* Grey text in the table (Required or Preferred, the note) has the same size as the rest, only the colour differs */
+    #match-panel .req-detail { margin-top: 2px; color: var(--muted); font-size: 16px; line-height: 24px; }
     .report-list li { position: relative; padding-left: 16px; font-size: 16px; line-height: 24px; }
     .report-list li::before { content: "–"; position: absolute; left: 0; color: var(--muted); }
     .report-list li + li { margin-top: 4px; }
@@ -239,7 +324,7 @@
       .job:hover, .job:has(.card-more[aria-expanded="true"]) { background: var(--hover); }
       /* The actions panel opens on hover, on keyboard focus inside the card and while its menu is open */
       .job:is(:hover, :has(:focus-visible), :has(.card-more[aria-expanded="true"])) .job-header { padding-right: var(--actions-open,64px); }
-      .job:is(:hover, :has(:focus-visible), :has(.card-more[aria-expanded="true"])) .card-date { opacity: 0; }
+      .job:is(:hover, :has(:focus-visible), :has(.card-more[aria-expanded="true"])) .card-date { position: absolute; right: 0; opacity: 0; }
       .job:is(:hover, :has(:focus-visible)) .card-actions::before { opacity: 1; }
       /* Transparent rather than hidden, so keyboard users can still reach them */
       .card-more, .bookmark[aria-pressed="false"] { opacity: 0; }
@@ -254,7 +339,8 @@
       .dialog-icon:hover { background: var(--card); }
       .details-dialog[data-scrolled="true"] #close-detail:hover { background: var(--card); }
       .dialog-rail button:not(.rail-match):hover { color: var(--ink); }
-      .egor-face:hover { opacity: 1; }
+      .chip button:hover { color: var(--ink); background: #e8e8e8; }
+      .profile-cv:hover, #filters-reset:hover, .filters-head button:hover, .pill:not([aria-pressed="true"]):hover { color: var(--ink); }
     }
     /* Touch screens */
     @media (hover:none), (pointer:coarse) {
@@ -282,7 +368,7 @@
     }
     @media (min-width:1700px) {
       .topbar .brand { left: 48px; }
-      .egor { left: 48px; }
+      .repo-corner { left: 48px; }
       .side-nav { left: 48px; width: 224px; }
     }
     @media (min-width:901px) and (max-width:1230px) {
@@ -316,7 +402,7 @@
       .side-link { position: relative; justify-content: flex-start; gap: 6px; min-height: 44px; padding: 10px 0; }
       .side-link[aria-current="page"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--ink); }
       .nav-count { min-width: 0; }
-      .cv-link { flex-basis: 100%; gap: 2px; min-height: 0; margin: 12px 0 0; padding: 0; }
+      .profile { flex-basis: 100%; margin: 12px 0 0; }
       /* Count, date and filters share a line when it fits; filters move to the next line only when it does not */
       .toolbar { order: 3; flex-wrap: wrap; gap: 8px 16px; min-height: 0; margin: 20px 0 16px; }
       .collection-meta { gap: 4px 12px; }
@@ -326,11 +412,8 @@
       .empty { order: 4; }
       .utilities { order: 5; gap: 4px 20px; margin-top: 16px; }
       .utilities span { flex-basis: 100%; }
-      /* On phones the portrait sits at the end of the page instead of covering the cards */
-      .egor { position: relative; left: auto; bottom: auto; order: 6; margin-top: 24px; }
-      /* The bubble opens to the right of the portrait, so it never covers Download HTML above it */
-      .egor-bubble { left: calc(100% + 10px); bottom: auto; top: 50%; translate: 0 -50%; }
-      .egor-bubble::after { left: auto; right: 100%; top: 50%; margin-top: -6px; border: 6px solid transparent; border-right-color: #2c2c2c; border-left: 0; }
+      /* On phones the repository link sits at the end of the page */
+      .repo-corner { position: relative; left: auto; bottom: auto; order: 6; margin-top: 8px; }
       .job { min-height: 176px; }
       .close-anchor { top: 12px; }
       #close-detail { right: 12px; }
@@ -340,13 +423,26 @@
       .filter-dialog { inset: auto 0 0; width: 100%; max-width: none; max-height: min(520px,calc(100dvh - 24px));
         padding: 8px 16px calc(16px + env(safe-area-inset-bottom,0px)); border-radius: 24px 24px 0 0; box-shadow: 0 -8px 40px rgb(0 0 0 / .1); }
       .filter-dialog::backdrop { background: rgb(0 0 0 / .22); }
+      .filters-panel { inset: auto 0 0; width: 100%; max-width: none; border-radius: 24px 24px 0 0; box-shadow: 0 -8px 40px rgb(0 0 0 / .1); }
+      .filters-panel::backdrop { background: rgb(0 0 0 / .22); }
       .filter-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 4px 12px; }
       .filter-heading h2 { margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; }
       .filter-heading button { min-height: 44px; padding: 8px 0 8px 12px; color: var(--muted); font-size: 14px; }
       .filter-option { min-height: 52px; padding: 14px 16px; border-radius: 12px; font-size: 16px; }
       .details-dialog { width: 100%; height: auto; max-height: calc(100dvh - 16px); margin: auto 0 0; border-radius: 24px 24px 0 0; }
-      .report-reqs li { grid-template-columns: minmax(0,1fr); gap: 2px; }
-      .req-status { line-height: 20px; }
+      /* On phones each requirement is a block: the status first, then the requirement, then what the CV shows */
+      .report-table, .report-table tbody { display: block; }
+      .report-table thead { display: none; }
+      .report-table tr { display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid #eeeeee; }
+      .report-table td, .report-table td:nth-child(3) { display: block; width: auto; padding: 0; border: 0; }
+      .report-table td:nth-child(3) { order: -1; }
+      .report-table td[data-label]::before { content: attr(data-label); display: block; color: var(--muted); font-size: 16px; line-height: 24px; }
+      /* On phones the label of a fact sits above its value */
+      .about-table, .about-table tbody, .about-table tr { display: block; }
+      .about-table tr { padding: 12px 0; border-bottom: 1px solid #eeeeee; }
+      .about-table tr:first-child { border-top: 1px solid #eeeeee; }
+      .about-table th, .about-table td, .about-table tr:first-child > * { display: block; width: auto; padding: 0; border: 0; }
+      .about-table th { margin-bottom: 4px; font-size: 14px; line-height: 20px; }
       .dialog-shell { display: flex; flex-direction: column; gap: 16px; padding: 24px 24px 48px; }
       .dialog-rail { position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 52px; }
       .dialog-rail .rail-match { margin: 0; }
@@ -389,7 +485,7 @@
 </head>
 <body>
   <div class="topbar">
-    <header class="brand"><p class="brand-name">Design Growth<br>Skills Beta</p><p class="byline">by Egor Krasnoperov</p></header>
+    <header class="brand"><button class="logo" id="logo" type="button" aria-label="Job Finder"><svg viewBox="0 0 39 38" aria-hidden="true"><path d="M21 0h5v1h-5zM27 0h1v1h-1zM18 1h12v1h-12zM16 2h17v1h-17zM14 3h2v1h-2zM18 3h1v1h-1zM20 3h14v1h-14zM14 4h2v1h-2zM17 4h18v1h-18zM8 5h13v1h-13zM22 5h2v1h-2zM25 5h10v1h-10zM4 6h23v1h-23zM28 6h9v1h-9zM2 7h35v1h-35zM1 8h28v1h-28zM30 8h8v1h-8zM0 9h14v1h-14zM23 9h1v1h-1zM25 9h13v1h-13zM1 10h11v1h-11zM27 10h11v1h-11zM2 11h9v1h-9zM28 11h5v1h-5zM34 11h4v1h-4zM4 12h7v1h-7zM29 12h1v1h-1zM31 12h8v1h-8zM6 13h5v1h-5zM28 13h11v1h-11zM9 14h2v1h-2zM19 14h1v1h-1zM23 14h1v1h-1zM29 14h1v1h-1zM31 14h1v1h-1zM33 14h6v1h-6zM17 15h6v1h-6zM30 15h2v1h-2zM33 15h5v1h-5zM8 16h4v1h-4zM13 16h1v1h-1zM17 16h2v1h-2zM23 16h13v1h-13zM37 16h2v1h-2zM7 17h3v1h-3zM11 17h7v1h-7zM19 17h2v1h-2zM22 17h12v1h-12zM36 17h1v1h-1zM38 17h1v1h-1zM6 18h1v1h-1zM8 18h3v1h-3zM13 18h2v1h-2zM16 18h2v1h-2zM20 18h1v1h-1zM23 18h1v1h-1zM25 18h2v1h-2zM31 18h2v1h-2zM36 18h1v1h-1zM6 19h4v1h-4zM11 19h1v1h-1zM13 19h1v1h-1zM16 19h2v1h-2zM23 19h1v1h-1zM30 19h3v1h-3zM37 19h1v1h-1zM7 20h1v1h-1zM9 20h1v1h-1zM17 20h1v1h-1zM23 20h2v1h-2zM28 20h1v1h-1zM31 20h2v1h-2zM34 20h1v1h-1zM37 20h1v1h-1zM7 21h3v1h-3zM17 21h1v1h-1zM23 21h1v1h-1zM29 21h1v1h-1zM31 21h2v1h-2zM34 21h1v1h-1zM37 21h1v1h-1zM8 22h1v1h-1zM16 22h1v1h-1zM19 22h1v1h-1zM22 22h1v1h-1zM28 22h1v1h-1zM30 22h1v1h-1zM32 22h1v1h-1zM34 22h1v1h-1zM8 23h2v1h-2zM12 23h1v1h-1zM17 23h1v1h-1zM20 23h1v1h-1zM28 23h1v1h-1zM30 23h1v1h-1zM32 23h1v1h-1zM36 23h1v1h-1zM11 24h1v1h-1zM14 24h3v1h-3zM18 24h1v1h-1zM28 24h1v1h-1zM31 24h2v1h-2zM36 24h1v1h-1zM26 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM35 25h1v1h-1zM13 26h4v1h-4zM18 26h1v1h-1zM27 26h1v1h-1zM29 26h1v1h-1zM32 26h3v1h-3zM12 27h2v1h-2zM15 27h1v1h-1zM17 27h1v1h-1zM19 27h2v1h-2zM28 27h1v1h-1zM31 27h3v1h-3zM10 28h1v1h-1zM12 28h1v1h-1zM17 28h1v1h-1zM20 28h2v1h-2zM29 28h1v1h-1zM31 28h3v1h-3zM11 29h1v1h-1zM13 29h2v1h-2zM16 29h1v1h-1zM18 29h2v1h-2zM22 29h1v1h-1zM27 29h1v1h-1zM31 29h3v1h-3zM28 30h1v1h-1zM30 30h3v1h-3zM14 31h1v1h-1zM16 31h1v1h-1zM26 31h1v1h-1zM28 31h1v1h-1zM15 32h1v1h-1zM27 32h1v1h-1zM29 32h1v1h-1zM12 33h1v1h-1zM26 33h1v1h-1zM13 34h1v1h-1zM25 34h1v1h-1zM20 35h1v1h-1zM22 35h2v1h-2zM15 36h1v1h-1zM17 36h2v1h-2zM20 36h2v1h-2zM16 37h1v1h-1z" fill="currentColor"/></svg><span class="ouch" id="ouch" aria-hidden="true" hidden>Ouch!</span></button><p class="brand-name">Job Finder<br>for Designers</p></header>
     <button class="refresh" id="refresh" type="button">Refresh</button>
   </div>
   <div class="app-layout">
@@ -400,7 +496,7 @@
     <button class="side-link" id="progress-jobs" type="button"><span>In progress</span><span class="nav-count" id="progress-count">0</span></button>
     <button class="side-link" id="rejected-jobs" type="button"><span>Rejected</span><span class="nav-count" id="rejected-count">0</span></button>
     <button class="side-link" id="hidden-jobs" type="button"><span>Hidden</span><span class="nav-count" id="hidden-count">0</span></button>
-    <div class="cv-link" id="cv-status"><strong>My current CV</strong><span id="cv-status-label">Add your CV in the agent chat</span></div>
+    <section class="profile" id="profile" aria-labelledby="profile-title"><h2 id="profile-title">Your CV</h2><button class="profile-cv" id="cv-status-label" type="button">Add your CV in the agent chat</button></section>
   </nav>
   <main class="workspace">
     <section class="hero">
@@ -408,46 +504,52 @@
 
     </section>
     <section class="toolbar" aria-label="Filter and sort">
-      <div class="collection-meta"><p class="result-count" id="result-count" role="status" aria-live="polite">9 jobs</p><p class="last-updated" id="last-updated">Updated <span id="updated-date">Mon 23 Nov, 2026</span></p></div>
+      <div class="collection-meta"><p class="result-count" id="result-count" role="status" aria-live="polite">9 jobs</p><p class="last-updated" id="last-updated">Updated <span id="updated-date">Mon 23 Nov, 2026</span></p><p class="base-info" id="base-info" hidden><span id="base-list"></span><span id="base-analysed"></span><button id="analyse-more" type="button">Analyse 20 more</button></p></div>
       <div class="controls">
-        <button class="control filter-trigger clearable" id="format-trigger" type="button" data-filter="format" aria-label="Work format: All formats" aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-dialog">
-          <span class="filter-label" id="format-label">All formats</span><img class="icon" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJrZXlib2FyZF9hcnJvd19kb3duIj4KPG1hc2sgaWQ9Im1hc2swXzBfMzUiIHN0eWxlPSJtYXNrLXR5cGU6YWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IGlkPSJCb3VuZGluZyBib3giIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI0Q5RDlEOSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfMF8zNSkiPgo8cGF0aCBpZD0ia2V5Ym9hcmRfYXJyb3dfZG93bl8yIiBkPSJNMTAgMTMuMDYyNUw1IDguMDYyNUw2LjA2MjUgN0wxMCAxMC45Mzc1TDEzLjkzNzUgN0wxNSA4LjA2MjVMMTAgMTMuMDYyNVoiIGZpbGw9IiMxQzFCMUYiLz4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt="">
-        </button>
-        <button class="filter-clear" id="format-clear" type="button" data-clear="format" aria-label="Clear work format" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8l8 8M16 8l-8 8"/></svg></button>
-        <button class="control filter-trigger clearable" id="grade-trigger" type="button" data-filter="grade" aria-label="Grade: All grades" aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-dialog">
-          <span class="filter-label" id="grade-label">All grades</span><img class="icon" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJrZXlib2FyZF9hcnJvd19kb3duIj4KPG1hc2sgaWQ9Im1hc2swXzBfMzUiIHN0eWxlPSJtYXNrLXR5cGU6YWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IGlkPSJCb3VuZGluZyBib3giIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI0Q5RDlEOSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfMF8zNSkiPgo8cGF0aCBpZD0ia2V5Ym9hcmRfYXJyb3dfZG93bl8yIiBkPSJNMTAgMTMuMDYyNUw1IDguMDYyNUw2LjA2MjUgN0wxMCAxMC45Mzc1TDEzLjkzNzUgN0wxNSA4LjA2MjVMMTAgMTMuMDYyNVoiIGZpbGw9IiMxQzFCMUYiLz4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt="">
-        </button>
-        <button class="filter-clear" id="grade-clear" type="button" data-clear="grade" aria-label="Clear grade" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8l8 8M16 8l-8 8"/></svg></button>
+        <button class="control filter-trigger" id="filters-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="filters-panel"><span class="filter-label" id="filters-label">Filters</span><img class="icon" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJrZXlib2FyZF9hcnJvd19kb3duIj4KPG1hc2sgaWQ9Im1hc2swXzBfMzUiIHN0eWxlPSJtYXNrLXR5cGU6YWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IGlkPSJCb3VuZGluZyBib3giIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI0Q5RDlEOSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfMF8zNSkiPgo8cGF0aCBpZD0ia2V5Ym9hcmRfYXJyb3dfZG93bl8yIiBkPSJNMTAgMTMuMDYyNUw1IDguMDYyNUw2LjA2MjUgN0wxMCAxMC45Mzc1TDEzLjkzNzUgN0wxNSA4LjA2MjVMMTAgMTMuMDYyNVoiIGZpbGw9IiMxQzFCMUYiLz4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt=""></button>
         <button class="control filter-trigger" id="sort-trigger" type="button" data-filter="sort" aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-dialog"><span class="filter-label" id="sort-label">Sort</span><img class="icon" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJrZXlib2FyZF9hcnJvd19kb3duIj4KPG1hc2sgaWQ9Im1hc2swXzBfMzUiIHN0eWxlPSJtYXNrLXR5cGU6YWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IGlkPSJCb3VuZGluZyBib3giIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI0Q5RDlEOSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfMF8zNSkiPgo8cGF0aCBpZD0ia2V5Ym9hcmRfYXJyb3dfZG93bl8yIiBkPSJNMTAgMTMuMDYyNUw1IDguMDYyNUw2LjA2MjUgN0wxMCAxMC45Mzc1TDEzLjkzNzUgN0wxNSA4LjA2MjVMMTAgMTMuMDYyNVoiIGZpbGw9IiMxQzFCMUYiLz4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt=""></button>
       </div>
       <button class="refresh" id="sticky-refresh" type="button" hidden>Refresh</button>
+      <ul class="active-filters" id="active-filters" aria-label="Set filters" hidden></ul>
     </section>
     <section class="grid" id="jobs" aria-label="Job results"></section>
     <section class="empty" id="empty" hidden>
       <h2 id="empty-title">No jobs match these filters</h2>
-      <p id="empty-copy">Try a different format or grade.</p>
-      <button class="text-button" id="empty-action" type="button">Clear filters</button>
+      <p id="empty-copy">Try other filters, or search the daily list with these.</p>
+      <div class="empty-actions"><button class="text-button" id="empty-search" type="button">Search with these filters</button><button class="text-button" id="empty-action" type="button">Clear filters</button></div>
     </section>
     <footer class="utilities"><span id="demo-footer">Design examples · Demo data</span><button id="download" type="button">Download HTML</button></footer>
-    <div class="egor" id="egor"><div class="egor-bubble" id="egor-bubble" role="status" aria-live="polite" hidden></div><button class="egor-face" id="egor-face" type="button" aria-label="Egor" aria-controls="egor-bubble" aria-expanded="false"><svg viewBox="2 9 48 47" aria-hidden="true"><path d="M27 9h9v1h-9zM25 10h14v1h-14zM23 11h18v1h-18zM20 12h23v1h-23zM19 13h3v1h-3zM24 13h1v1h-1zM26 13h18v1h-18zM18 14h3v1h-3zM23 14h11v1h-11zM35 14h9v1h-9zM12 15h1v1h-1zM14 15h15v1h-15zM30 15h2v1h-2zM33 15h4v1h-4zM38 15h8v1h-8zM7 16h20v1h-20zM28 16h18v1h-18zM5 17h29v1h-29zM35 17h12v1h-12zM3 18h36v1h-36zM40 18h7v1h-7zM2 19h46v1h-46zM2 20h17v1h-17zM20 20h1v1h-1zM27 20h1v1h-1zM29 20h1v1h-1zM31 20h18v1h-18zM2 21h15v1h-15zM34 21h14v1h-14zM2 22h14v1h-14zM36 22h5v1h-5zM42 22h7v1h-7zM4 23h11v1h-11zM36 23h1v1h-1zM38 23h11v1h-11zM6 24h9v1h-9zM35 24h1v1h-1zM37 24h13v1h-13zM9 25h6v1h-6zM37 25h2v1h-2zM40 25h1v1h-1zM42 25h7v1h-7zM10 26h5v1h-5zM37 26h13v1h-13zM13 27h1v1h-1zM24 27h4v1h-4zM30 27h1v1h-1zM32 27h1v1h-1zM39 27h1v1h-1zM41 27h1v1h-1zM43 27h6v1h-6zM22 28h8v1h-8zM38 28h12v1h-12zM11 29h7v1h-7zM22 29h2v1h-2zM29 29h16v1h-16zM47 29h2v1h-2zM10 30h5v1h-5zM16 30h8v1h-8zM25 30h2v1h-2zM28 30h1v1h-1zM30 30h13v1h-13zM46 30h1v1h-1zM48 30h1v1h-1zM10 31h1v1h-1zM12 31h2v1h-2zM17 31h6v1h-6zM25 31h2v1h-2zM29 31h2v1h-2zM32 31h5v1h-5zM40 31h2v1h-2zM45 31h2v1h-2zM48 31h1v1h-1zM9 32h5v1h-5zM15 32h1v1h-1zM17 32h2v1h-2zM21 32h2v1h-2zM30 32h1v1h-1zM32 32h1v1h-1zM38 32h4v1h-4zM44 32h1v1h-1zM48 32h1v1h-1zM9 33h5v1h-5zM15 33h1v1h-1zM18 33h1v1h-1zM21 33h3v1h-3zM30 33h1v1h-1zM32 33h1v1h-1zM40 33h3v1h-3zM48 33h1v1h-1zM9 34h1v1h-1zM11 34h1v1h-1zM13 34h1v1h-1zM18 34h1v1h-1zM22 34h1v1h-1zM30 34h1v1h-1zM36 34h1v1h-1zM38 34h1v1h-1zM40 34h2v1h-2zM43 34h2v1h-2zM47 34h1v1h-1zM11 35h2v1h-2zM23 35h1v1h-1zM31 35h1v1h-1zM34 35h1v1h-1zM38 35h1v1h-1zM40 35h2v1h-2zM48 35h1v1h-1zM10 36h3v1h-3zM17 36h1v1h-1zM19 36h1v1h-1zM23 36h1v1h-1zM29 36h2v1h-2zM36 36h1v1h-1zM38 36h1v1h-1zM40 36h2v1h-2zM43 36h1v1h-1zM47 36h1v1h-1zM12 37h1v1h-1zM20 37h1v1h-1zM22 37h1v1h-1zM24 37h5v1h-5zM34 37h1v1h-1zM37 37h1v1h-1zM39 37h1v1h-1zM41 37h1v1h-1zM43 37h1v1h-1zM45 37h1v1h-1zM47 37h1v1h-1zM11 38h2v1h-2zM14 38h1v1h-1zM16 38h1v1h-1zM23 38h1v1h-1zM36 38h1v1h-1zM38 38h1v1h-1zM40 38h2v1h-2zM45 38h1v1h-1zM47 38h1v1h-1zM12 39h1v1h-1zM19 39h3v1h-3zM23 39h1v1h-1zM35 39h1v1h-1zM37 39h1v1h-1zM41 39h1v1h-1zM18 40h1v1h-1zM32 40h1v1h-1zM36 40h1v1h-1zM39 40h3v1h-3zM45 40h1v1h-1zM12 41h1v1h-1zM18 41h1v1h-1zM20 41h2v1h-2zM23 41h1v1h-1zM35 41h1v1h-1zM38 41h1v1h-1zM41 41h2v1h-2zM44 41h1v1h-1zM13 42h1v1h-1zM16 42h3v1h-3zM20 42h3v1h-3zM24 42h2v1h-2zM31 42h1v1h-1zM35 42h1v1h-1zM39 42h1v1h-1zM41 42h3v1h-3zM16 43h3v1h-3zM20 43h1v1h-1zM23 43h1v1h-1zM25 43h2v1h-2zM28 43h1v1h-1zM37 43h1v1h-1zM40 43h4v1h-4zM14 44h1v1h-1zM16 44h1v1h-1zM26 44h2v1h-2zM33 44h1v1h-1zM35 44h1v1h-1zM37 44h1v1h-1zM39 44h1v1h-1zM41 44h3v1h-3zM14 45h1v1h-1zM17 45h2v1h-2zM20 45h7v1h-7zM28 45h2v1h-2zM37 45h1v1h-1zM40 45h3v1h-3zM17 46h1v1h-1zM24 46h1v1h-1zM35 46h2v1h-2zM39 46h4v1h-4zM15 47h1v1h-1zM19 47h1v1h-1zM32 47h1v1h-1zM36 47h1v1h-1zM38 47h1v1h-1zM40 47h2v1h-2zM20 48h1v1h-1zM35 48h1v1h-1zM37 48h1v1h-1zM15 49h1v1h-1zM18 49h1v1h-1zM20 49h2v1h-2zM36 49h2v1h-2zM16 50h1v1h-1zM27 50h1v1h-1zM34 50h2v1h-2zM29 51h1v1h-1zM32 51h1v1h-1zM34 51h1v1h-1zM17 52h1v1h-1zM24 52h1v1h-1zM28 52h1v1h-1zM31 52h1v1h-1zM18 53h1v1h-1zM26 53h1v1h-1zM28 53h1v1h-1zM30 53h1v1h-1zM20 54h1v1h-1zM22 54h1v1h-1zM24 54h1v1h-1zM26 54h1v1h-1zM28 54h1v1h-1zM21 55h1v1h-1zM23 55h1v1h-1z" fill="currentColor"/></svg></button></div>
+    <div class="repo-corner" id="repo-corner"><a class="repo-link" href="https://github.com/egor-krasnoperov/design-growth-skills" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>design-growth-skills</a></div>
   </main>
   </div>
   <dialog class="filter-dialog" id="filter-dialog" aria-label="Work format">
     <header class="filter-heading"><h2 id="filter-title">Work format</h2><button id="close-filter" type="button">Close</button></header>
     <div class="option-list" id="filter-options" role="listbox" aria-label="Work format"></div>
   </dialog>
+  <dialog class="filters-panel" id="filters-panel" aria-labelledby="filters-title">
+    <header class="filters-head"><h2 id="filters-title">Filters</h2><button id="filters-close" type="button">Close</button></header>
+    <form class="filters-body" id="filters-form" novalidate>
+      <div class="filter-group" role="group" aria-labelledby="fg-where"><h3 id="fg-where">Where</h3><div class="chips" id="where-chips" hidden></div><input class="field where-input" id="where-input" type="text" placeholder="Region, country or city" autocomplete="off" aria-label="Region, country or city" aria-controls="where-suggest" aria-autocomplete="list"><div class="where-suggest" id="where-suggest" role="listbox" aria-label="Places" hidden></div><div class="pills"><button type="button" class="pill" data-region="EUROPE" aria-pressed="false">Europe</button><button type="button" class="pill" data-region="UK" aria-pressed="false">United Kingdom</button><button type="button" class="pill" data-region="NA" aria-pressed="false">US and Canada</button><button type="button" class="pill" data-region="LATAM" aria-pressed="false">Latin America</button><button type="button" class="pill" data-region="MENA" aria-pressed="false">MENA</button></div></div>
+      <div class="filter-group" role="group" aria-labelledby="fg-format"><h3 id="fg-format">Work format</h3><div class="pills"><button type="button" class="pill" data-group="workModes" data-value="remote" aria-pressed="false">Remote</button><button type="button" class="pill" data-group="workModes" data-value="hybrid" aria-pressed="false">Hybrid</button><button type="button" class="pill" data-group="workModes" data-value="onsite" aria-pressed="false">Onsite</button></div></div>
+      <div class="filter-group" role="group" aria-labelledby="fg-role"><h3 id="fg-role">Role</h3><div class="pills"><button type="button" class="pill" data-group="roles" data-value="product-designer" aria-pressed="false">Product Designer</button><button type="button" class="pill" data-group="roles" data-value="ux-ui-designer" aria-pressed="false">UX/UI Designer</button><button type="button" class="pill" data-group="roles" data-value="design-engineer" aria-pressed="false">Design Engineer</button><button type="button" class="pill" data-group="roles" data-value="ux-researcher" aria-pressed="false">UX Researcher</button><button type="button" class="pill" data-group="roles" data-value="design-manager" aria-pressed="false">Design Manager</button><button type="button" class="pill" data-group="roles" data-value="head-of-design" aria-pressed="false">Head of Design</button><button type="button" class="pill" data-group="roles" data-value="design-director" aria-pressed="false">Design Director</button></div></div>
+      <div class="filter-group" role="group" aria-labelledby="fg-level"><h3 id="fg-level">Level</h3><div class="pills"><button type="button" class="pill" data-group="levels" data-value="middle" aria-pressed="false">Middle</button><button type="button" class="pill" data-group="levels" data-value="senior" aria-pressed="false">Senior</button></div><label class="check"><input type="checkbox" id="unstated-level"><span>Show jobs without a stated level</span></label></div>
+      <div class="filter-group" role="group" aria-labelledby="fg-salary"><h3 id="fg-salary">Salary from</h3><div class="salary-row"><input class="field" id="salary-amount" type="number" min="0" step="1000" inputmode="numeric" placeholder="Per year" aria-label="Salary from, per year"><select class="field" id="salary-currency" aria-label="Currency"><option>EUR</option><option>USD</option><option>GBP</option></select></div><label class="check"><input type="checkbox" id="salary-only"><span>Only jobs with a stated salary</span></label></div>
+      <div class="filter-group" role="group" aria-labelledby="fg-posted"><h3 id="fg-posted">Posted</h3><div class="pills"><button type="button" class="pill" data-group="posted" data-value="any" aria-pressed="false">Any time</button><button type="button" class="pill" data-group="posted" data-value="7" aria-pressed="false">Last 7 days</button><button type="button" class="pill" data-group="posted" data-value="30" aria-pressed="false">Last 30 days</button></div></div>
+    </form>
+    <footer class="filters-foot"><button id="filters-reset" type="button">Reset</button><button id="filters-show" type="button">Show jobs</button></footer>
+  </dialog>
   <dialog class="details-dialog" id="details" aria-labelledby="detail-title">
     <div class="close-anchor"><button class="dialog-icon" id="close-detail" type="button" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
-    <div class="dialog-shell"><aside class="dialog-rail" aria-label="Report actions"><button id="run-detail-match" class="rail-match" type="button"><svg class="rail-icon" viewBox="2 2 20 20" aria-hidden="true"><path d="M8.89583 19.375C7.92361 18.9583 7.07292 18.3854 6.34375 17.6562C5.61458 16.9271 5.04167 16.0764 4.625 15.1042C4.20833 14.1319 4 13.0938 4 11.9896C4 10.8854 4.20833 9.85069 4.625 8.88542C5.04167 7.92014 5.61458 7.07292 6.34375 6.34375C7.07292 5.61458 7.92361 5.04167 8.89583 4.625C9.86806 4.20833 10.9062 4 12.0104 4C13.1146 4 14.1493 4.20833 15.1146 4.625C16.0799 5.04167 16.9271 5.61458 17.6562 6.34375C18.3854 7.07292 18.9583 7.92014 19.375 8.88542C19.7917 9.85069 20 10.8854 20 11.9896C20 13.0938 19.7917 14.1319 19.375 15.1042C18.9583 16.0764 18.3854 16.9271 17.6562 17.6562C16.9271 18.3854 16.0799 18.9583 15.1146 19.375C14.1493 19.7917 13.1146 20 12.0104 20C10.9062 20 9.86806 19.7917 8.89583 19.375ZM16.6042 16.6042C17.8681 15.3403 18.5 13.8056 18.5 12C18.5 10.1944 17.8681 8.65972 16.6042 7.39583C15.3403 6.13194 13.8056 5.5 12 5.5C10.1944 5.5 8.65972 6.13194 7.39583 7.39583C6.13194 8.65972 5.5 10.1944 5.5 12C5.5 13.8056 6.13194 15.3403 7.39583 16.6042C8.65972 17.8681 10.1944 18.5 12 18.5C13.8056 18.5 15.3403 17.8681 16.6042 16.6042ZM8.45833 15.5417C7.48611 14.5694 7 13.3889 7 12C7 10.6111 7.48611 9.43056 8.45833 8.45833C9.43056 7.48611 10.6111 7 12 7C13.3889 7 14.5694 7.48611 15.5417 8.45833C16.5139 9.43056 17 10.6111 17 12C17 13.3889 16.5139 14.5694 15.5417 15.5417C14.5694 16.5139 13.3889 17 12 17C10.6111 17 9.43056 16.5139 8.45833 15.5417ZM14.4792 14.4792C15.1597 13.7986 15.5 12.9722 15.5 12C15.5 11.0278 15.1597 10.2014 14.4792 9.52083C13.7986 8.84028 12.9722 8.5 12 8.5C11.0278 8.5 10.2014 8.84028 9.52083 9.52083C8.84028 10.2014 8.5 11.0278 8.5 12C8.5 12.9722 8.84028 13.7986 9.52083 14.4792C10.2014 15.1597 11.0278 15.5 12 15.5C12.9722 15.5 13.7986 15.1597 14.4792 14.4792ZM10.9375 13.0625C10.6458 12.7708 10.5 12.4167 10.5 12C10.5 11.5833 10.6458 11.2292 10.9375 10.9375C11.2292 10.6458 11.5833 10.5 12 10.5C12.4167 10.5 12.7708 10.6458 13.0625 10.9375C13.3542 11.2292 13.5 11.5833 13.5 12C13.5 12.4167 13.3542 12.7708 13.0625 13.0625C12.7708 13.3542 12.4167 13.5 12 13.5C11.5833 13.5 11.2292 13.3542 10.9375 13.0625Z"/></svg><span>Match</span></button><p id="rail-result" class="rail-result" hidden></p><button class="rail-status" id="status-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-dialog"></button><button class="rail-action" id="download-report" type="button" hidden><svg class="rail-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg><span>Download report</span></button><button class="rail-action copy-request" id="copy-request" type="button" hidden><svg class="rail-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg><span>Tailor my CV</span></button><span id="copy-feedback" class="copy-feedback" role="status" aria-live="polite"></span></aside><div class="dialog-main"><div class="dialog-head"><span id="detail-company"></span></div>
-    <h2 id="detail-title"></h2><p class="dialog-meta" id="detail-meta"></p><p class="published-line" id="published-line"></p>
-    <section id="description-panel"></section><p class="source-line"><span id="source-facts"></span><a id="job-source" target="_blank" rel="noopener noreferrer" hidden>View original job ↗</a><span id="source-missing" hidden>Original job link unavailable</span></p>
+    <div class="dialog-shell"><aside class="dialog-rail" aria-label="Report actions"><p id="rail-result" class="rail-result" hidden></p><button id="run-detail-match" class="rail-match" type="button"><svg class="rail-icon" viewBox="2 2 20 20" aria-hidden="true"><path d="M8.89583 19.375C7.92361 18.9583 7.07292 18.3854 6.34375 17.6562C5.61458 16.9271 5.04167 16.0764 4.625 15.1042C4.20833 14.1319 4 13.0938 4 11.9896C4 10.8854 4.20833 9.85069 4.625 8.88542C5.04167 7.92014 5.61458 7.07292 6.34375 6.34375C7.07292 5.61458 7.92361 5.04167 8.89583 4.625C9.86806 4.20833 10.9062 4 12.0104 4C13.1146 4 14.1493 4.20833 15.1146 4.625C16.0799 5.04167 16.9271 5.61458 17.6562 6.34375C18.3854 7.07292 18.9583 7.92014 19.375 8.88542C19.7917 9.85069 20 10.8854 20 11.9896C20 13.0938 19.7917 14.1319 19.375 15.1042C18.9583 16.0764 18.3854 16.9271 17.6562 17.6562C16.9271 18.3854 16.0799 18.9583 15.1146 19.375C14.1493 19.7917 13.1146 20 12.0104 20C10.9062 20 9.86806 19.7917 8.89583 19.375ZM16.6042 16.6042C17.8681 15.3403 18.5 13.8056 18.5 12C18.5 10.1944 17.8681 8.65972 16.6042 7.39583C15.3403 6.13194 13.8056 5.5 12 5.5C10.1944 5.5 8.65972 6.13194 7.39583 7.39583C6.13194 8.65972 5.5 10.1944 5.5 12C5.5 13.8056 6.13194 15.3403 7.39583 16.6042C8.65972 17.8681 10.1944 18.5 12 18.5C13.8056 18.5 15.3403 17.8681 16.6042 16.6042ZM8.45833 15.5417C7.48611 14.5694 7 13.3889 7 12C7 10.6111 7.48611 9.43056 8.45833 8.45833C9.43056 7.48611 10.6111 7 12 7C13.3889 7 14.5694 7.48611 15.5417 8.45833C16.5139 9.43056 17 10.6111 17 12C17 13.3889 16.5139 14.5694 15.5417 15.5417C14.5694 16.5139 13.3889 17 12 17C10.6111 17 9.43056 16.5139 8.45833 15.5417ZM14.4792 14.4792C15.1597 13.7986 15.5 12.9722 15.5 12C15.5 11.0278 15.1597 10.2014 14.4792 9.52083C13.7986 8.84028 12.9722 8.5 12 8.5C11.0278 8.5 10.2014 8.84028 9.52083 9.52083C8.84028 10.2014 8.5 11.0278 8.5 12C8.5 12.9722 8.84028 13.7986 9.52083 14.4792C10.2014 15.1597 11.0278 15.5 12 15.5C12.9722 15.5 13.7986 15.1597 14.4792 14.4792ZM10.9375 13.0625C10.6458 12.7708 10.5 12.4167 10.5 12C10.5 11.5833 10.6458 11.2292 10.9375 10.9375C11.2292 10.6458 11.5833 10.5 12 10.5C12.4167 10.5 12.7708 10.6458 13.0625 10.9375C13.3542 11.2292 13.5 11.5833 13.5 12C13.5 12.4167 13.3542 12.7708 13.0625 13.0625C12.7708 13.3542 12.4167 13.5 12 13.5C11.5833 13.5 11.2292 13.3542 10.9375 13.0625Z"/></svg><span>Get deep analysis</span></button><button class="rail-status" id="status-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-dialog"></button><button class="rail-action" id="download-report" type="button" hidden><svg class="rail-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg><span>Download report</span></button><button class="rail-action copy-request" id="copy-request" type="button" hidden><svg class="rail-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg><span>Tailor my CV</span></button><span id="copy-feedback" class="copy-feedback" role="status" aria-live="polite"></span></aside><div class="dialog-main"><div class="dialog-head"><span id="detail-company"></span></div>
+    <h2 id="detail-title"></h2><p class="dialog-meta" id="detail-meta"></p><p class="published-line" id="published-line"></p><p class="source-line"><span id="source-facts"></span><a id="job-source" target="_blank" rel="noopener noreferrer" hidden>View original job ↗</a><span id="source-missing" hidden>Original job link unavailable</span></p>
+    <section id="description-panel"></section>
     <section id="match-panel"></section>
     <p class="dialog-note" id="demo-note">Demo vacancies and example results</p>
     <textarea class="agent-request" id="agent-request" aria-label="Request for your agent" hidden readonly></textarea></div></div>
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   <!-- EDIT CONTENT HERE. All companies, vacancies and the match report are fictional demo data. -->
-  <script type="application/json" id="figma-data">{"id":"figma-8335-11-v1","saved":["demo-extra-4","demo-extra-9"],"ui":{"view":"all","format":"all","grade":"all","sort":null,"ascending":false},"jobs":[{"id":"demo-extra-1","company":"Northline (demo)","title":"Product Designer","location":"Berlin","format":"hybrid","grade":"middle","salaryMin":60000,"salaryMax":80000,"publishedAt":"2026-11-24","match":null,"currency":"EUR","foundAt":"2026-11-23","description":"Northline (demo) is a fictional company used to show how the board works. We are looking for a Product Designer to own onboarding and settings in our B2B analytics app. You will work with a product manager and four engineers, run usability tests and maintain components in our design system.\n\nRequirements\n- 3+ years of product design for web apps\n- Interaction design and prototyping in Figma\n- Running usability tests\n- Working with a design system\n- Experience with data-heavy dashboards (nice to have)\n- German (nice to have)","descriptionStatus":"full","sourceName":"Example Jobs (demo)","sourceUrl":"https://example.com/jobs/northline-product-designer","checkedAt":"2026-11-23","listingStatus":"open_confirmed"},{"id":"demo-extra-2","company":"Orbit (demo)","title":"UX/UI Designer","location":"Europe","format":"remote","grade":"middle","salaryMin":63000,"salaryMax":83000,"publishedAt":"2026-11-23","match":null,"currency":"EUR","foundAt":"2026-11-23"},{"id":"demo-extra-3","company":"Studio Six (demo)","title":"Design Engineer","location":"Europe","format":"remote","grade":"middle","salaryMin":66000,"salaryMax":86000,"publishedAt":"2026-11-22","match":null,"currency":"EUR","foundAt":"2026-11-23"},{"id":"demo-extra-4","company":"Fieldwork (demo)","title":"Design Manager","location":"Europe","format":"remote","grade":"leadership","salaryMin":69000,"salaryMax":89000,"publishedAt":"2026-11-21","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-5","company":"Forma (demo)","title":"Head of Design","location":"Berlin","format":"hybrid","grade":"leadership","salaryMin":72000,"salaryMax":92000,"publishedAt":"2026-11-20","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-6","company":"Plain (demo)","title":"Head of Product Design","location":"Europe","format":"remote","grade":"leadership","salaryMin":75000,"salaryMax":95000,"publishedAt":"2026-11-19","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-7","company":"Tandem (demo)","title":"Design Director","location":"Europe","format":"remote","grade":"leadership","salaryMin":78000,"salaryMax":98000,"publishedAt":"2026-11-18","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-8","company":"Canvas (demo)","title":"Product Designer","location":"Europe","format":"remote","grade":"middle","salaryMin":81000,"salaryMax":101000,"publishedAt":"2026-11-17","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-9","company":"Daylight (demo)","title":"UX/UI Designer","location":"Berlin","format":"hybrid","grade":"middle","salaryMin":84000,"salaryMax":104000,"publishedAt":"2026-11-16","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-10","company":"Outline (demo)","title":"Design Engineer","location":"Europe","format":"remote","grade":"senior","salaryMin":87000,"salaryMax":107000,"publishedAt":"2026-11-15","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-11","company":"Signal (demo)","title":"Design Manager","location":"Europe","format":"remote","grade":"leadership","salaryMin":90000,"salaryMax":110000,"publishedAt":"2026-11-14","match":null,"currency":"EUR","foundAt":"2026-11-16"},{"id":"demo-extra-12","company":"Common (demo)","title":"Product Designer","location":"Europe","format":"remote","grade":"senior","salaryMin":93000,"salaryMax":113000,"publishedAt":"2026-11-13","match":null,"currency":"EUR","foundAt":"2026-11-16"}],"updatedAt":"2026-11-23","reports":[{"jobId":"demo-extra-1","createdAt":"2026-11-23","cvLabel":"Demo CV (fictional)","methodVersion":"demo","score":86,"matchLevel":"high","summary":"Strong fit for the core of the role. The demo CV shows onboarding work, prototyping and regular usability testing. The main uncertainty is design system ownership, which the CV mentions only briefly.","requirements":[{"text":"3+ years of product design for web apps","priority":"required","status":"supported","evidence":"Product Designer, 2021 to now, B2B web platform","note":""},{"text":"Interaction design and prototyping in Figma","priority":"required","status":"supported","evidence":"Built clickable Figma prototypes for every onboarding test","note":""},{"text":"Running usability tests","priority":"required","status":"supported","evidence":"Ran 12 moderated usability sessions per quarter","note":""},{"text":"Working with a design system","priority":"required","status":"partly_supported","evidence":"Contributed components to the shared UI kit","note":"Contribution is clear, ownership is not"},{"text":"Experience with data-heavy dashboards","priority":"preferred","status":"not_evidenced","evidence":"","note":"Not mentioned in the CV"},{"text":"German","priority":"preferred","status":"unclear","evidence":"","note":"Languages are not listed"}],"strengths":["Onboarding redesign with a measured result","Regular usability testing","Close work with engineers on a B2B product"],"gaps":["No dashboard or data visualisation examples","Design system ownership is not shown"],"openQuestions":["Did you lead any part of the UI kit, or only contribute to it?","Do you speak German, and at what level?"],"cvImprovements":[{"text":"Add one line on how you maintained or evolved the UI kit","needsConfirmation":true},{"text":"Move the onboarding result to the first line of your current role","needsConfirmation":false}],"coverage":{"descriptionStatus":"full","checkedAt":"2026-11-23","limitations":"Demo description written for this example"}}]}</script>
+  <script type="application/json" id="figma-data">{"id":"figma-8335-11-v1","saved":["demo-extra-4","demo-extra-9"],"ui":{"view":"all","format":"all","grade":"all","sort":null,"ascending":false},"jobs":[{"id":"demo-extra-1","company":"Northline (demo)","title":"Product Designer","location":"Berlin","format":"hybrid","grade":"middle","salaryMin":60000,"salaryMax":80000,"publishedAt":"2026-11-24","match":null,"currency":"EUR","foundAt":"2026-11-23","description":"Northline (demo) is a fictional company used to show how the board works. We are looking for a Product Designer to own onboarding and settings in our B2B analytics app. You will work with a product manager and four engineers, run usability tests and maintain components in our design system.\n\nRequirements\n- 3+ years of product design for web apps\n- Interaction design and prototyping in Figma\n- Running usability tests\n- Working with a design system\n- Experience with data-heavy dashboards (nice to have)\n- German (nice to have)","descriptionStatus":"full","sourceName":"Example Jobs (demo)","sourceUrl":"https://example.com/jobs/northline-product-designer","checkedAt":"2026-11-23","listingStatus":"open_confirmed","role":"product-designer","country":"DE","region":"EUROPE","skills":["figma","prototyping","usability testing","design systems","user research","web"],"domains":["b2b saas"],"yearsMin":3},{"id":"demo-extra-2","company":"Orbit (demo)","title":"UX/UI Designer","location":"Europe","format":"remote","grade":"middle","salaryMin":63000,"salaryMax":83000,"publishedAt":"2026-11-23","match":null,"currency":"EUR","foundAt":"2026-11-23","role":"ux-ui-designer","region":"EUROPE","remoteScope":"region:EUROPE","skills":["figma","ui design","interaction design","prototyping","accessibility","mobile"],"domains":["consumer"],"yearsMin":3},{"id":"demo-extra-3","company":"Studio Six (demo)","title":"Design Engineer","location":"Europe","format":"remote","grade":"middle","salaryMin":66000,"salaryMax":86000,"publishedAt":"2026-11-22","match":null,"currency":"EUR","foundAt":"2026-11-23","role":"design-engineer","region":"EUROPE","remoteScope":"region:EUROPE","skills":["figma","html and css","design systems","prototyping","motion"],"domains":["developer tools"],"yearsMin":4},{"id":"demo-extra-4","company":"Fieldwork (demo)","title":"Design Manager","location":"Europe","format":"remote","grade":"leadership","salaryMin":69000,"salaryMax":89000,"publishedAt":"2026-11-21","match":null,"currency":"EUR","foundAt":"2026-11-16","role":"design-manager","region":"EUROPE","remoteScope":"region:EUROPE","skills":["design systems","user research","mentoring","workshops"],"domains":["b2b saas"],"yearsMin":7},{"id":"demo-extra-5","company":"Forma (demo)","title":"Head of Design","location":"Berlin","format":"hybrid","grade":"leadership","salaryMin":72000,"salaryMax":92000,"publishedAt":"2026-11-20","match":null,"currency":"EUR","foundAt":"2026-11-16","role":"head-of-design","country":"DE","region":"EUROPE","skills":["design systems","mentoring","user research"],"domains":["consumer","e-commerce"],"languages":["german"],"yearsMin":8},{"id":"demo-extra-6","company":"Plain (demo)","title":"Head of Product Design","location":"Europe","format":"remote","grade":"leadership","salaryMin":75000,"salaryMax":95000,"publishedAt":"2026-11-19","match":null,"currency":"EUR","foundAt":"2026-11-16","role":"head-of-design","region":"EUROPE","remoteScope":"region:EUROPE","skills":["figma","design systems","analytics and experiments","mentoring"],"domains":["fintech"],"yearsMin":8},{"id":"demo-extra-7","company":"Tandem (demo)","title":"Design Director","location":"Europe","format":"remote","grade":"leadership","salaryMin":78000,"salaryMax":98000,"publishedAt":"2026-11-18","match":null,"currency":"EUR","foundAt":"2026-11-16","role":"design-director","region":"EUROPE","remoteScope":"region:EUROPE","skills":["mentoring","workshops"],"domains":["marketplace"],"yearsMin":10},{"id":"demo-extra-8","company":"Canvas (demo)","title":"Product Designer","location":"Europe","format":"remote","grade":"middle","salaryMin":81000,"salaryMax":101000,"publishedAt":"2026-11-17","match":null,"currency":"EUR","foundAt":"2026-11-16","role":"product-designer","region":"EUROPE","remoteScope":"region:EUROPE","skills":["figma","prototyping","user research","usability testing","analytics and experiments"],"domains":["fintech"],"yearsMin":4},{"id":"demo-extra-9","company":"Daylight (demo)","title":"UX/UI Designer","location":"Berlin","format":"hybrid","grade":"middle","salaryMin":84000,"salaryMax":104000,"publishedAt":"2026-11-16","match":null,"currency":"EUR","foundAt":"2026-11-16","role":"ux-ui-designer","country":"DE","region":"EUROPE","skills":["figma","ui design","design systems","accessibility"],"domains":["healthcare"],"languages":["german"],"yearsMin":3},{"id":"demo-extra-10","company":"Outline (demo)","title":"Design Engineer","location":"Europe","format":"remote","grade":"senior","salaryMin":87000,"salaryMax":107000,"publishedAt":"2026-11-15","match":null,"currency":"EUR","foundAt":"2026-11-16","role":"design-engineer","region":"EUROPE","remoteScope":"region:EUROPE","skills":["html and css","design systems","figma"]},{"id":"demo-extra-11","company":"Signal (demo)","title":"Design Manager","location":"Europe","format":"remote","grade":"leadership","salaryMin":90000,"salaryMax":110000,"publishedAt":"2026-11-14","match":null,"currency":"EUR","foundAt":"2026-11-16","role":"design-manager","region":"EUROPE","remoteScope":"region:EUROPE","skills":["mentoring","design systems","workshops","user research"],"domains":["b2b saas"],"yearsMin":6},{"id":"demo-extra-12","company":"Common (demo)","title":"Product Designer","location":"Europe","format":"remote","grade":"senior","salaryMin":93000,"salaryMax":113000,"publishedAt":"2026-11-13","match":null,"currency":"EUR","foundAt":"2026-11-16","role":"product-designer","region":"EUROPE","remoteScope":"region:EUROPE","skills":["figma","design systems","prototyping","interaction design","web","ai products"],"domains":["b2b saas"],"yearsMin":5}],"updatedAt":"2026-11-23","reports":[{"jobId":"demo-extra-1","createdAt":"2026-11-23","cvLabel":"Demo CV (fictional)","methodVersion":"demo","score":86,"matchLevel":"high","summary":"Strong fit for the core of the role. The demo CV shows onboarding work, prototyping and regular usability testing. The main uncertainty is design system ownership, which the CV mentions only briefly.","requirements":[{"text":"3+ years of product design for web apps","priority":"required","status":"supported","evidence":"Product Designer, 2021 to now, B2B web platform","note":""},{"text":"Interaction design and prototyping in Figma","priority":"required","status":"supported","evidence":"Built clickable Figma prototypes for every onboarding test","note":""},{"text":"Running usability tests","priority":"required","status":"supported","evidence":"Ran 12 moderated usability sessions per quarter","note":""},{"text":"Working with a design system","priority":"required","status":"partly_supported","evidence":"Contributed components to the shared UI kit","note":"Contribution is clear, ownership is not"},{"text":"Experience with data-heavy dashboards","priority":"preferred","status":"not_evidenced","evidence":"","note":"Not mentioned in the CV"},{"text":"German","priority":"preferred","status":"unclear","evidence":"","note":"Languages are not listed"}],"strengths":["Onboarding redesign with a measured result","Regular usability testing","Close work with engineers on a B2B product"],"gaps":["No dashboard or data visualisation examples","Design system ownership is not shown"],"openQuestions":["Did you lead any part of the UI kit, or only contribute to it?","Do you speak German, and at what level?"],"cvImprovements":[{"text":"Add one line on how you maintained or evolved the UI kit","needsConfirmation":true},{"text":"Move the onboarding result to the first line of your current role","needsConfirmation":false}],"coverage":{"descriptionStatus":"full","checkedAt":"2026-11-23","limitations":"Demo description written for this example"}}],"profile":{"cvLabel":"Demo CV (fictional)","cvDate":"2026-11-23","roles":["product-designer","ux-ui-designer"],"level":"senior","years":6,"skills":["figma","design systems","prototyping","usability testing","user research","interaction design","ui design","web"],"domains":["b2b saas","fintech"],"languages":["english"]}}</script>
   <script>
   (function () {
     'use strict';
@@ -460,6 +562,7 @@
     function normalizeJob(j) {
       var job = Object.assign({}, j); job.id = String(j.id);
       if (!job.format && ['remote','hybrid','onsite'].includes(j.workMode)) job.format = j.workMode;
+      if (!job.format && typeof j.remoteScope === 'string' && j.remoteScope) job.format = 'remote';
       if (!job.grade && levelToGrade[j.level]) job.grade = levelToGrade[j.level];
       if (j.salary && typeof j.salary === 'object') {
         if (job.salaryMin == null) job.salaryMin = j.salary.min;
@@ -467,6 +570,8 @@
         if (!job.currency) job.currency = j.salary.currency;
         if (!job.salaryPeriod) job.salaryPeriod = j.salary.period;
       }
+      if (!job.location && typeof j.place === 'string') job.location = j.place;
+      if (!job.foundAt && j.firstSeen) job.foundAt = j.firstSeen;
       if (job.location === 'not_stated') job.location = '';
       return job;
     }
@@ -482,16 +587,54 @@
     }
     data.jobs = normalizeJobs(data.jobs);
     data.reports = normalizeReports(data.reports);
+    // The personal base: vacancies.json next to the page ({listDate, builtAt, count, jobs}, rows of the daily list).
+    // The stored job documents (ownJobs) add to its rows and win. A downloaded copy carries the base inside (data.base).
+    var ownJobs = data.jobs, base = null, baseRaw = null;
+    function isDemoJob(j) { return /\(demo\)\s*$/.test(j.company || ''); }
+    function cleanBase(v) {
+      if (!v || typeof v !== 'object' || !Array.isArray(v.jobs) || !v.jobs.length) return null;
+      var listDate = dayOf(v.listDate);
+      return {listDate:listDate, builtAt:typeof v.builtAt === 'string' ? v.builtAt : '', jobs:normalizeJobs(v.jobs.map(function (j) {
+        return Object.assign({listingStatus:'in_list', checkedAt:listDate || null, sourceName:'Open job dataset (Stapply)'}, j);
+      }))};
+    }
+    function mergeJobs() {
+      if (!base) { data.jobs = ownJobs; return; }
+      var own = {}, inBase = {};
+      ownJobs.forEach(function (j) { own[j.id] = j; });
+      data.jobs = base.jobs.map(function (j) { inBase[j.id] = 1; return own[j.id] ? Object.assign({}, j, own[j.id]) : j; })
+        .concat(ownJobs.filter(function (j) { return !inBase[j.id]; }));
+    }
+    // The template's demo vacancies never mix with a real base.
+    function takeBase(raw) {
+      var b = cleanBase(raw);
+      if (!b) return false;
+      base = b; baseRaw = raw;
+      if (ownJobs.length && ownJobs.every(isDemoJob)) ownJobs = [];
+      mergeJobs();
+      return true;
+    }
+    if (data.base) takeBase(data.base);
+    var profileIsDemo = !!(data.profile && !base && data.jobs.length && data.jobs.every(isDemoJob));
     if (!Array.isArray(data.saved)) data.saved = [];
     var agentHasCV = false;
     // Greeting, search date and CV line come from the data; setData can change them later.
     function applyHeader() {
       // The host must explicitly provide this status; this standalone page cannot inspect the agent chat.
       agentHasCV = !!(data.agentCV && data.agentCV.status === 'available');
-      $('cv-status-label').textContent = agentHasCV ? (data.agentCV.name || 'Available in agent chat') : 'Add your CV in the agent chat';
-      if (agentHasCV && data.agentCV.name) $('cv-status-label').title = data.agentCV.name; else $('cv-status-label').removeAttribute('title');
-      // An empty profileName uses a neutral heading.
-      var profileName = typeof data.profileName === 'string' ? data.profileName.trim() : '';
+      // The CV line: its short label and date from the profile, otherwise the host's CV status.
+      var p = data.profile && typeof data.profile === 'object' ? data.profile : {};
+      var cvName = typeof p.cvLabel === 'string' && p.cvLabel.trim() ? p.cvLabel.trim() : agentHasCV ? (data.agentCV.name || 'Available in agent chat') : '';
+      var cvDay = dayOf(p.cvDate) ? new Date(dayOf(p.cvDate) + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+      var cvLine = cvName ? cvName + (cvDay ? ' · ' + cvDay : '') : 'Add your CV in the agent chat';
+      $('cv-status-label').textContent = cvLine;
+      // A tap on the CV shows which CV the job match uses; the CV itself stays in the chat.
+      $('cv-status-label').dataset.tip = cvName ? 'Job match uses ' + cvName + ', the CV you sent in the chat' + (cvDay ? ' on ' + cvDay : '') +
+        (p.usesPortfolio === true ? ', and your portfolio. To use another CV or portfolio, send it in the chat.' : '. To use another CV, send it in the chat.') :
+        'Send your CV in the chat to see how well each job matches it.';
+      // The first name for the greeting comes from the profile (displayName); without it the heading is neutral.
+      var profileName = typeof data.profileName === 'string' && data.profileName.trim() ? data.profileName.trim() :
+        typeof p.displayName === 'string' ? p.displayName.trim() : '';
       $('greeting').textContent = profileName ? 'Hello ' + profileName + ',' : 'Your personal job board';
       if (profileName) { $('greeting').appendChild(document.createElement('br')); $('greeting').appendChild(document.createTextNode('this is your personal job board')); }
       // Date of the agent's last search, from updatedAt; hidden when unknown.
@@ -502,7 +645,7 @@
     applyHeader();
     // Tailor my CV (Resume Matcher) is stage 2: the button stays in the code but is not shown in the first version.
     var features = {tailor:false};
-    var defaults = {view:'all',format:'all',grade:'all',sort:'date',ascending:false};
+    var defaults = {view:'all',sort:'match',ascending:false};
     // Application statuses are set only by the person, in the card menu or the vacancy dialog; the agent never sets them.
     // A job is in one pile at most: Saved, one of these statuses, or Hidden. All jobs shows every job that is not hidden.
     var statusConfig = {applied:{label:'Applied'}, progress:{label:'In progress'}, rejected:{label:'Rejected'}};
@@ -543,17 +686,14 @@
         (off ? '<path d="M4.5 4.5l15 15"/>' : '') + '</svg>';
     }
     var filterConfig = {
-      format:{title:'Work format',options:[['all','All formats'],['remote','Remote'],['hybrid','Hybrid'],['onsite','Onsite']]},
-      grade:{title:'Grade',options:[['all','All grades'],['middle','Middle'],['senior','Senior'],['leadership','Leadership']]},
       sort:{title:'Sort',options:[['match-desc','Best match'],['date-desc','Newest'],['date-asc','Oldest'],['salary-desc','Salary: high to low'],['salary-asc','Salary: low to high']]},
       status:{title:'Status',options:[['saved','Saved'],['applied','Applied'],['progress','In progress'],['rejected','Rejected'],['none','No status']]}
     };
     function normalizeUI(value) {
       var ui = Object.assign({},defaults,value || {});
       if (!['all','saved','hidden','applied','progress','rejected'].includes(ui.view)) ui.view = 'all';
-      if (!['all','remote','hybrid','onsite'].includes(ui.format)) ui.format = 'all';
-      if (!['all','middle','senior','leadership'].includes(ui.grade)) ui.grade = 'all';
-      if (!['salary','date','match'].includes(ui.sort)) { ui.sort = 'date'; ui.ascending = false; }
+      delete ui.format; delete ui.grade;
+      if (!['salary','date','match'].includes(ui.sort)) { ui.sort = defaults.sort; ui.ascending = false; }
       ui.ascending = ui.ascending === true && ui.sort !== 'match';
       return ui;
     }
@@ -567,6 +707,8 @@
         state.savedReports = Array.isArray(previous.savedReports) ? previous.savedReports.filter(function (id) { return data.jobs.some(function (j) { return j.id === id; }); }) : state.savedReports;
         state.hidden = Array.isArray(previous.hidden) ? previous.hidden.filter(function (id) { return data.jobs.some(function (j) { return j.id === id; }); }) : state.hidden;
         if (previous.statuses) state.statuses = validStatuses(previous.statuses);
+        if (previous.filters) state.filters = previous.filters;
+        if (previous.profile && typeof previous.profile === 'object') state.profile = previous.profile;
       }
     } catch (_) {}
     state.saved = Array.from(new Set(state.saved.concat(state.savedReports)));
@@ -616,16 +758,26 @@
     $('toast').addEventListener('focusin',function () { clearTimeout(toastTimer); });
     $('toast').addEventListener('mouseleave',function () { if (!$('toast').contains(document.activeElement)) scheduleToast(3000); });
     $('toast').addEventListener('focusout',function (event) { if (!$('toast').contains(event.relatedTarget)) scheduleToast(3000); });
+    function inView(j) {
+      var hidden = state.hidden.includes(j.id);
+      return state.ui.view === 'hidden' ? hidden : statusConfig[state.ui.view] ? !hidden && statusOf(j.id) === state.ui.view :
+        !hidden && (state.ui.view !== 'saved' || state.saved.includes(j.id) || state.savedReports.includes(j.id));
+    }
+    // Best match: analysed vacancies first by their percentage (a short analysis usually reads lower than the quick
+    // estimate, so the two are not mixed), then the others by the quick estimate, then those without a percentage.
+    // Within each group recruiter postings come after employer postings, then the higher percentage, then the newer one.
+    function matchGroup(job) { var r = reportOf(job.id); return r && reportScore(r) != null ? 0 : matchValue(job) != null ? 1 : 2; }
     function visibleJobs() {
-      var jobs = data.jobs.filter(function (j) {
-        var hidden = state.hidden.includes(j.id);
-        var inView = state.ui.view === 'hidden' ? hidden : statusConfig[state.ui.view] ? !hidden && statusOf(j.id) === state.ui.view :
-          !hidden && (state.ui.view !== 'saved' || state.saved.includes(j.id) || state.savedReports.includes(j.id));
-        return inView &&
-          (state.ui.format === 'all' || j.format === state.ui.format) &&
-          (state.ui.grade === 'all' || j.grade === state.ui.grade);
+      var jobs = data.jobs.filter(function (j) { return inView(j) && passesFilters(j); });
+      if (state.ui.sort === 'match') jobs.sort(function (a,b) {
+        var ag = matchGroup(a), bg = matchGroup(b);
+        if (ag !== bg) return ag - bg;
+        if (!!a.recruiter !== !!b.recruiter) return a.recruiter ? 1 : -1;
+        var av = matchValue(a), bv = matchValue(b);
+        if (av != null && bv != null && av !== bv) return bv - av;
+        return (Date.parse(b.publishedAt) || 0) - (Date.parse(a.publishedAt) || 0);
       });
-      if (state.ui.sort) jobs.sort(function (a,b) {
+      else if (state.ui.sort) jobs.sort(function (a,b) {
         var av = sortKey(a), bv = sortKey(b);
         var aMissing = av == null || isNaN(av), bMissing = bv == null || isNaN(bv);
         if (aMissing || bMissing) return aMissing && bMissing ? 0 : aMissing ? 1 : -1;
@@ -639,7 +791,9 @@
     function reportOf(id) { return data.reports[id] || null; }
     // Host mode: once a host has sent real vacancies, demo matches are neither run nor shown.
     var hostData = false;
-    function demoShown(id) { return !hostData && state.demoMatches.includes(id); }
+    // The built-in demo data: every company is marked "(demo)". Real vacancies never get the demo Match or demo notes.
+    function isDemoData() { return !hostData && data.jobs.length > 0 && data.jobs.every(function (j) { return /\(demo\)\s*$/.test(j.company || ''); }); }
+    function demoShown(id) { return isDemoData() && state.demoMatches.includes(id); }
     function reportScore(r) {
       var n = Number(r && r.score);
       return r && r.score != null && r.score !== '' && isFinite(n) && r.matchLevel !== 'insufficient_data' ? Math.round(n) : null;
@@ -649,10 +803,95 @@
       if (r.matchLevel === 'insufficient_data' || (!matchLevels[r.matchLevel] && score == null)) return 'Not enough data';
       return (matchLevels[r.matchLevel] || 'Match') + (score != null ? ' · ' + score + '%' : '');
     }
-    // Best match uses the match percentage; vacancies without a percentage go to the end.
+    // Job match. Until a deep analysis exists, it is the quick estimate from Job Finder (jobs-feed.md, quick_match),
+    // so the board and the chat give the same number: common skills 0.5, other skills and domains 1, a required language 3,
+    // years 2 (half when 1–2 years short), the level 2 (half when the title says Staff, Principal, Lead, Expert, Founding,
+    // Junior, Jr, Associate, Entry or Graduate; always full for Design Manager, Head of Design and Design Director).
+    // Fewer than four requirements: not enough data. With a profile on the board the estimate is recalculated, so edits count.
+    var commonSkills = ['figma','prototyping','end-to-end','ui design','interaction design','web'];
+    var stepWords = /\b(staff|principal|lead|expert|founding|junior|jr|associate|entry|graduate)\b/i;
+    var roleNames = {'product-designer':'Product Designer','ux-ui-designer':'UX/UI Designer','design-engineer':'Design Engineer',
+      'ux-researcher':'UX Researcher','design-manager':'Design Manager','head-of-design':'Head of Design','design-director':'Design Director'};
+    var leadershipRoles = ['design-manager','head-of-design','design-director'];
+    var roleAliases = {'head-of-product-design':'head-of-design','ux-designer':'ux-ui-designer','ui-designer':'ux-ui-designer','ux-ui':'ux-ui-designer'};
+    function roleOf(job) {
+      var r = String(job.role || job.roleFamily || '').toLowerCase();
+      r = roleAliases[r] || r;
+      if (roleNames[r]) return r;
+      var t = String(job.title || '').toLowerCase();
+      return /director/.test(t) ? 'design-director' : /\bhead\b/.test(t) ? 'head-of-design' : /manager/.test(t) ? 'design-manager' :
+        /engineer|developer/.test(t) ? 'design-engineer' : /research/.test(t) ? 'ux-researcher' : /\bux\b|\bui\b|user experience|interface/.test(t) ? 'ux-ui-designer' :
+        /designer/.test(t) ? 'product-designer' : '';
+    }
+    function lowerList(value) {
+      return Array.isArray(value) ? value.filter(function (x) { return typeof x === 'string' && x.trim(); }).map(function (x) { return x.trim().toLowerCase(); }) : [];
+    }
+    function known(value) { return value != null && value !== '' && isFinite(Number(value)); }
+    // The estimate the chat stored with the vacancy, used when the board has no profile to recalculate it.
+    function storedQuick(job) {
+      var q = job.quickMatch;
+      if (!q || typeof q !== 'object' || !known(q.score)) return null;
+      return {score:Math.round(Number(q.score)), enough:!q.lowData, matched:lowerList(q.matched).map(tagLabel).concat(lowerList(q.partial).map(function (t) { return tagLabel(t) + ' (partly)'; })),
+        missing:lowerList(q.missing).map(tagLabel)};
+    }
+    var quickCache = new WeakMap();
+    function quickMatch(job) {
+      if (!quickCache.has(job)) quickCache.set(job, computeQuick(job));
+      return quickCache.get(job);
+    }
+    function computeQuick(job) {
+      var p = data.profile;
+      var tagged = ['skills','domains','languages','yearsMin'].some(function (k) { return job[k] != null; });
+      if (!p || typeof p !== 'object' || !tagged) return storedQuick(job);
+      var have = {skills:lowerList(p.skills), domains:lowerList(p.domains), languages:lowerList(p.languages)}, items = [];
+      lowerList(job.skills).forEach(function (s) { var w = commonSkills.includes(s) ? .5 : 1; items.push({tag:s, w:w, got:have.skills.includes(s) ? w : 0}); });
+      lowerList(job.domains).forEach(function (s) { items.push({tag:s, w:1, got:have.domains.includes(s) ? 1 : 0}); });
+      lowerList(job.languages).forEach(function (s) { items.push({tag:s, label:tagLabel(s) + ' (required)', w:3, got:have.languages.includes(s) ? 3 : 0}); });
+      if (known(job.yearsMin) && known(p.years)) {
+        var gap = Number(job.yearsMin) - Number(p.years);
+        items.push({label:Number(job.yearsMin) + '+ years', w:2, got:gap <= 0 ? 2 : gap <= 2 ? 1 : 0});
+      }
+      var requirements = items.length, step = !leadershipRoles.includes(roleOf(job)) && stepWords.test(job.title || '');
+      var total = 2, got = step ? 1 : 2;
+      items.forEach(function (i) { total += i.w; got += i.got; });
+      var name = function (i) { return i.label || tagLabel(i.tag); };
+      return {score:Math.round(100 * got / total), enough:requirements >= 4,
+        matched:items.filter(function (i) { return i.got >= i.w; }).map(name).concat(items.filter(function (i) { return i.got > 0 && i.got < i.w; }).map(function (i) { return name(i) + ' (partly)'; })),
+        missing:items.filter(function (i) { return !i.got; }).map(name)};
+    }
+    // Keywords are stored in lower case; shown with a capital letter and the usual spelling of abbreviations.
+    function tagLabel(tag) {
+      var t = String(tag || '').replace(/\bui\b/g,'UI').replace(/\bux\b/g,'UX').replace(/\bhtml\b/g,'HTML').replace(/\bcss\b/g,'CSS')
+        .replace(/\bai\b/g,'AI').replace(/\bb2b\b/g,'B2B').replace(/\bb2c\b/g,'B2C').replace(/\bsaas\b/g,'SaaS').replace(/\bapis?\b/g,function (m) { return m.toUpperCase(); });
+      return t.charAt(0).toUpperCase() + t.slice(1);
+    }
+    function quickLabel(q) { return q.enough ? 'Job match ≈ ' + q.score + '%' : 'Job match · not enough data'; }
+    // A finished deep analysis: "Job match 86%", without the ≈ of the quick estimate.
+    function deepLabel(r) { var score = reportScore(r); return score != null ? 'Job match ' + score + '%' : 'Job match · not enough data'; }
+    // What a card shows at the bottom: one Job match label, from the deep analysis when there is a report, otherwise the estimate.
+    function tone(score) { return score == null ? 'none' : score >= 80 ? 'high' : score >= 60 ? 'mid' : 'low'; }
+    // Every match label has the same short tooltip; the job window says whether it is the quick estimate or the deep analysis.
+    // With a portfolio in the profile (usesPortfolio), the tooltip names it too; "and" starts the second line.
+    function matchTip() { return data.profile && data.profile.usesPortfolio === true ? 'How well your CV\nand portfolio fit this job' : 'How well your CV\nfits this job'; }
+    function cardMatch(job) {
+      var report = reportOf(job.id);
+      if (report) {
+        var score = reportScore(report);
+        return {text:score != null ? score + '%' : '—', tone:tone(score), tip:matchTip()};
+      }
+      if (matching.has(job.id)) return {text:'Analysing…', tip:''};
+      if (known(job.match)) return {text:Math.round(Number(job.match)) + '%', tone:tone(Math.round(Number(job.match))), tip:matchTip()};
+      if (demoShown(job.id)) return {text:'Demo match', tip:''};
+      var q = quickMatch(job);
+      return q ? {text:q.enough ? '≈' + q.score + '%' : '—', tone:tone(q.enough ? q.score : null), tip:matchTip()} : null;
+    }
+    // Best match uses the Match percentage, otherwise the quick match; vacancies without either go to the end.
     function matchValue(job) {
       if (reportOf(job.id)) return reportScore(reportOf(job.id));
-      var n = Number(job.match); return job.match != null && job.match !== '' && isFinite(n) ? n : null;
+      var n = Number(job.match);
+      if (job.match != null && job.match !== '' && isFinite(n)) return n;
+      var q = quickMatch(job);
+      return q && q.enough ? q.score : null;
     }
     function sortKey(job) { return state.ui.sort === 'salary' ? salaryValue(job) : state.ui.sort === 'match' ? matchValue(job) : Date.parse(job.publishedAt); }
     function dayOf(value) { return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value) ? value.slice(0,10) : ''; }
@@ -702,13 +941,15 @@
       var min = amount(job.salaryMin), max = amount(job.salaryMax), sign = currencyPrefix(job.currency);
       var per = job.salaryPeriod === 'month' ? '/mo' : job.salaryPeriod === 'hour' ? '/h' : '';
       if (min == null && max == null) return '';
-      var k = (min == null || min >= 1000) && (max == null || max >= 1000), unit = function (n) { return k ? n / 1000 : n; };
+      var k = (min == null || min >= 1000) && (max == null || max >= 1000);
+      var unit = function (n) { return !k ? n : n < 10000 ? Math.round(n / 100) / 10 : Math.round(n / 1000); };
       if (min == null || max == null) return sign + unit(min != null ? min : max) + (k ? 'k' : '') + per;
       return sign + unit(min) + '–' + unit(max) + (k ? 'k' : '') + per;
     }
     function formatName(value) { return typeof value === 'string' && value ? value.charAt(0).toUpperCase() + value.slice(1) : ''; }
     function metaLine(job) {
-      var place = [typeof job.location === 'string' ? job.location.trim() : '', formatName(job.format)].filter(Boolean).join(', ');
+      // An unknown work format is said, not left out: "London, format not stated · €80–100k".
+      var place = [typeof job.location === 'string' ? job.location.trim() : '', job.format ? formatName(job.format) : 'format not stated'].filter(Boolean).join(', ');
       return [place, salaryLabel(job)].filter(Boolean).join(' · ');
     }
     function jobName(job) { return [job.title, job.company].filter(Boolean).join(' at '); }
@@ -716,7 +957,7 @@
     function renderJobs() {
       var jobs = visibleJobs();
       $('jobs').innerHTML = jobs.map(function (j) {
-        var saved = state.saved.includes(j.id), report = reportOf(j.id);
+        var saved = state.saved.includes(j.id);
         return '<article class="job" data-id="' + escapeHTML(j.id) + '"><div class="job-header"><span class="company">' +
           (isNew(j) ? '<span class="new-dot" aria-hidden="true"></span><span class="sr-only">New: </span>' : '') + escapeHTML(j.company) +
           '</span>' + (publishedLabel(j.publishedAt) ? '<span class="card-date">' + escapeHTML(publishedLabel(j.publishedAt)) + '</span>' : '') +
@@ -728,10 +969,13 @@
           '<div class="job-main"><h2 class="job-title"><button type="button" class="title-button" data-open="' + escapeHTML(j.id) +
           '">' + escapeHTML(glue(j.title)) + '</button></h2><p class="job-meta">' + escapeHTML(glue(metaLine(j))) +
           '</p></div><div class="card-bottom">' +
-          '<span class="match-status">' + (report ? escapeHTML(reportLabel(report)) : matching.has(j.id) ? 'Matching…' : j.match ? 'Match ' + escapeHTML(j.match) + '%' :
-          demoShown(j.id) ? 'Demo match' : '') + '</span></div></article>';
+          (function (m) { return '<span class="match-status"' + (m && m.tone ? ' data-tone="' + m.tone + '"' : '') + (m && m.tip ? ' data-tip="' + escapeHTML(m.tip) + '"' : '') + '>' +
+            (m && m.tone ? '<span class="sr-only">Job match </span>' : '') + (m ? escapeHTML(m.text) : '') + '</span>'; })(cardMatch(j)) +
+          '</div></article>';
       }).join('');
-      $('result-count').textContent = jobs.length + (jobs.length === 1 ? ' job' : ' jobs');
+      var inViewCount = base ? data.jobs.filter(inView).length : jobs.length;
+      $('result-count').textContent = base && jobs.length !== inViewCount ? jobs.length + ' of ' + inViewCount + ' jobs' : jobs.length + (jobs.length === 1 ? ' job' : ' jobs');
+      renderBaseInfo();
       $('empty').hidden = jobs.length > 0;
       // An empty section says how jobs get there; otherwise the filters are the reason.
       var view = state.ui.view, emptyPile = view !== 'all' && !pileCount(view);
@@ -741,7 +985,8 @@
         rejected:['No rejected jobs yet','Choose Rejected in the ⋯ menu of any vacancy to keep it here.'],
         hidden:['No hidden jobs','Choose Hide in the ⋯ menu of any vacancy to move it here.']}[view];
       $('empty-title').textContent = emptyPile ? pileText[0] : 'No jobs match these filters';
-      $('empty-copy').textContent = emptyPile ? pileText[1] : 'Try a different format or grade.';
+      $('empty-copy').textContent = emptyPile ? pileText[1] : 'Try other filters, or search the daily list with these.';
+      $('empty-search').hidden = emptyPile;
       $('empty-action').textContent = emptyPile ? 'Browse all jobs' : 'Clear filters';
     }
     function renderControls() {
@@ -751,24 +996,30 @@
         $(v + '-count').textContent = pileCount(v);
         if (state.ui.view === v) button.setAttribute('aria-current','page'); else button.removeAttribute('aria-current');
       });
-      ['format','grade'].forEach(function (key) {
-        var label = filterConfig[key].options.find(function (o) { return o[0] === state.ui[key]; })[1];
-        $(key + '-label').textContent = label;
-        $(key + '-trigger').setAttribute('aria-label',filterConfig[key].title + ': ' + label);
-        $(key + '-trigger').dataset.filtered = String(state.ui[key] !== 'all');
-        $(key + '-clear').hidden = state.ui[key] === 'all';
-      });
+      renderFilterControls();
       var sort = sortValue(), selected = filterConfig.sort.options.find(function (o) { return o[0] === sort; });
       $('sort-label').textContent = sort === 'none' ? 'Sort' : selected[1];
       $('sort-trigger').setAttribute('aria-label','Sort: ' + selected[1]);
       $('sort-trigger').dataset.filtered = String(sort !== defaults.sort + '-desc');
     }
+    // With a base, the toolbar says the list date and how many vacancies are analysed, and offers 20 more.
+    function renderBaseInfo() {
+      $('base-info').hidden = !base;
+      if (!base) return;
+      $('last-updated').hidden = true;
+      var analysed = data.jobs.filter(function (j) { return !!reportOf(j.id); }).length;
+      $('base-list').textContent = base.listDate ? 'list of ' + new Date(base.listDate + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+      $('base-list').hidden = !base.listDate;
+      $('base-analysed').textContent = analysed + ' analysed';
+      $('analyse-more').hidden = !data.jobs.some(function (j) { return !reportOf(j.id) && j.descriptionStatus !== 'unreadable' && j.listingStatus !== 'closed'; });
+    }
     // The demo notes show only with the built-in demo data: every company is marked "(demo)". Real vacancies never carry them.
     function renderDemoNotes() {
-      var demo = !hostData && data.jobs.length > 0 && data.jobs.every(function (j) { return /\(demo\)\s*$/.test(j.company || ''); });
+      var demo = isDemoData();
       $('demo-footer').hidden = !demo; $('demo-note').hidden = !demo;
     }
-    function render() { renderControls(); renderJobs(); renderDemoNotes(); persist(); }
+    // The profile block changes the height of the navigation, so the portrait checks again whether it still fits.
+    function render() { renderControls(); renderJobs(); renderDemoNotes(); persist(); placeCorner(); }
     function toggleSaved(id) {
       var job = data.jobs.find(function (j) { return j.id === id; });
       if (!job) return;
@@ -890,10 +1141,12 @@
       var source = ''; try { var parsed = new URL(active.employerUrl || active.url || active.sourceUrl || ''); if (['http:','https:'].includes(parsed.protocol)) source = parsed.href; } catch (_) {}
       $('job-source').hidden = !source; $('source-missing').hidden = !!source; if (source) $('job-source').href = source; else $('job-source').removeAttribute('href');
       // Where the vacancy was found, when the listing was checked and whether it is still open.
-      var listing = {open_confirmed:'Open', unverified:'Not verified', closed:'Closed'}[active.listingStatus];
-      var facts = [active.sourceName ? 'Found on ' + active.sourceName : '', dayOf(active.checkedAt) ? 'checked ' + new Date(dayOf(active.checkedAt) + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '', listing || ''].filter(Boolean);
+      // A vacancy from the daily list that Claude has not read live is "in the list on" its date; "not in the latest list" after Refresh.
+      var listing = {open_confirmed:'Open', unverified:'Not verified', closed:'Closed', not_in_list:'not in the latest list'}[active.listingStatus];
+      var checked = dayOf(active.checkedAt) ? (active.listingStatus === 'in_list' ? 'in the list on ' : 'checked ') + new Date(dayOf(active.checkedAt) + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+      var facts = [active.sourceName ? 'Found on ' + active.sourceName : '', checked, listing || ''].filter(Boolean);
+      if (facts.length) facts[0] = facts[0].charAt(0).toUpperCase() + facts[0].slice(1);
       $('source-facts').textContent = facts.length ? facts.join(' · ') + ' · ' : '';
-      $('description-panel').innerHTML = '<h3>Job description</h3><p>' + (active.description ? escapeHTML(glue(active.description)).replace(/\n/g,'<br>') : 'Full job description is not available.') + '</p>';
       renderMatchPanel();
       updateDetailStatus();
       $('agent-request').hidden = true; $('copy-feedback').textContent = ''; delete $('copy-feedback').dataset.host;
@@ -986,7 +1239,7 @@
       var more = event.target.closest('[data-more]');
       if (more && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) { event.preventDefault(); openFilter('card',true,event.key === 'ArrowUp',more,more.dataset.more); }
     });
-    ['format','grade','sort'].forEach(function (key) {
+    ['sort'].forEach(function (key) {
       $(key + '-trigger').addEventListener('keydown',function (event) {
         if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); openFilter(key,true,event.key === 'ArrowUp'); }
       });
@@ -1044,13 +1297,7 @@
       $(key + '-jobs').onclick = function (event) { state.ui.view = key; render(); if (event.detail !== 0) revealResults(); };
     });
     $('status-trigger').onclick = function (event) { if (active) openFilter('status',event.detail === 0,false); };
-    function resetFilters(event) { state.ui = Object.assign({},defaults,{view:state.ui.view}); render(); if (event && event.detail !== 0) revealResults(); }
-    // The cross next to a set work format or grade clears that filter only.
-    ['format','grade'].forEach(function (key) {
-      $(key + '-clear').onclick = function (event) {
-        state.ui[key] = 'all'; render(); if (event.detail !== 0) revealResults(); else $(key + '-trigger').focus();
-      };
-    });
+    function resetFilters(event) { F = cleanFilters(null); filtersChanged(); if (event && event.detail !== 0) revealResults(); }
     $('empty-action').onclick = function (event) {
       if (state.ui.view !== 'all' && !pileCount(state.ui.view)) state.ui.view = 'all';
       resetFilters(event);
@@ -1081,12 +1328,23 @@
     document.addEventListener('pointerdown',hideTip);
     document.documentElement.addEventListener('mouseleave',hideTip);
     addEventListener('scroll',hideTip,{passive:true});
-    function showRefreshInfo() { notify('This is your saved demo collection. Ask your agent to run a new search.'); }
+    // Refresh without a host: the demo says it is a demo; a saved copy with real vacancies says where to refresh.
+    function showRefreshInfo() {
+      notify(isDemoData() ? 'This is your saved demo collection. Ask your agent to run a new search.' :
+        'This is a saved copy of your board. To get new vacancies, open your board in Claude and press Refresh there.');
+    }
     function requestRefresh() {
-      if (runAction('refresh')) return;
+      if (runAction('refresh', null, {filters:publicFilters()})) return;
       if (hostData) copyRequest('Refresh my Personal Job Board search with my saved preferences.', null); else showRefreshInfo();
     }
     $('refresh').onclick = requestRefresh;
+    // Analyse 20 more: the host hands {action: "analyze", count: 20} to the chat, the same way as Refresh.
+    $('analyse-more').onclick = function () {
+      if (runAction('analyze', null, {count:20})) return;
+      if (hostData) copyRequest('Analyse the next 20 vacancies on my Personal Job Board with a short analysis.', null,
+        "Couldn't reach the chat. Ask Claude to analyse the next 20 vacancies on your board.");
+      else notify('This is a saved copy of your board. To analyse more vacancies, open your board in Claude.');
+    };
     $('sticky-refresh').onclick = requestRefresh;
     // Keyboard closing is instant; pointer closing fades out quickly with an ease-out curve.
     function closeDetails(instant) {
@@ -1102,30 +1360,88 @@
     $('details').addEventListener('scroll',function () { var d = $('details'), scrolled = String(d.scrollTop > 4); if (d.dataset.scrolled !== scrolled) d.dataset.scrolled = scrolled; },{passive:true});
     function renderMatchPanel() {
       if (!active) return;
-      var report = reportOf(active.id), result = report || active.match || demoShown(active.id);
-      $('match-panel').innerHTML = report ? reportHTML(report) : '<h3>' + (active.match ? 'Match ' + escapeHTML(active.match) + '%' : result ? 'Demo match' : 'Match report') + '</h3>' +
-        (matching.has(active.id) ? '<p>Matching…</p>' : result ? '<p>Demo only — no CV analysis has been performed.</p><p>Matches: not assessed.<br>Gaps: not assessed.<br>To clarify: CV and full vacancy description are needed.</p>' : '<p>Compare this job with your CV.</p>');
-      $('run-detail-match').hidden = !!result;
+      var report = reportOf(active.id), result = report || active.match || demoShown(active.id), quick = !result && !matching.has(active.id) && quickMatch(active);
+      // Only vacancies read live have a summary. Without a report the window shows About this job, the facts of the daily list.
+      var about = report ? '' : aboutHTML(active, quick);
+      $('description-panel').innerHTML = (active.description ? '<h3>Job description</h3><p>' + escapeHTML(glue(active.description)).replace(/\n/g,'<br>') + '</p>' : '') +
+        (about || (!active.description && active.descriptionStatus === 'unreadable' ? '<p class="dialog-unreadable">Can\'t read the posting here. Open the original.</p>' : ''));
+      $('description-panel').hidden = !$('description-panel').innerHTML;
+      $('match-panel').innerHTML = report ? reportHTML(report) : quick && about ? '' : '<h3>' + (active.match ? 'Job match ' + escapeHTML(active.match) + '%' : result ? 'Demo match' : 'Job match') + '</h3>' +
+        (matching.has(active.id) ? '<p>Analysing…</p>' : result ? '<p>Demo only — no CV analysis has been performed.</p><p>Matches: not assessed.<br>Gaps: not assessed.<br>To clarify: CV and full vacancy description are needed.</p>' : '<p>Compare this job with your CV.</p>');
+      // A short analysis keeps the button for the deep one.
+      $('run-detail-match').hidden = !!result && !(report && report.depth === 'short');
       $('run-detail-match').disabled = matching.has(active.id);
-      $('run-detail-match').querySelector('span').textContent = matching.has(active.id) ? 'Matching…' : 'Match';
-      $('rail-result').hidden = !result; $('rail-result').textContent = report ? reportLabel(report) : active.match ? 'Match ' + active.match + '%' : 'Demo match';
+      $('run-detail-match').querySelector('span').textContent = matching.has(active.id) ? 'Analysing…' : 'Get deep analysis';
+      $('match-panel').hidden = !$('match-panel').innerHTML;
+      $('rail-result').hidden = !result && !quick;
+      $('rail-result').textContent = report ? deepLabel(report) : active.match ? 'Job match ≈ ' + active.match + '%' : result ? 'Demo match' : quick ? quickLabel(quick) : '';
       $('download-report').hidden = !result;
       $('copy-request').hidden = !result || !features.tailor;
       // Once the report has arrived, the note about the request sent to the chat has done its job.
       if (result && $('copy-feedback').dataset.host === 'true') { $('copy-feedback').textContent = ''; delete $('copy-feedback').dataset.host; }
     }
+    // About this job: what the daily list knows about the vacancy, one fact per row. Place, format, salary and date are
+    // already under the title. Requirements carry a mark against the profile: from the profile on the board, otherwise
+    // from the estimate the chat stored with the vacancy. Matching ones first. Without a profile there are no marks.
+    var markText = {supported:'In your profile', partly_supported:'Partly', not_evidenced:'Not in your profile'};
+    function markOf(job) {
+      var p = data.profile && typeof data.profile === 'object' ? data.profile : null;
+      if (p) {
+        var have = {skills:lowerList(p.skills), domains:lowerList(p.domains), languages:lowerList(p.languages)};
+        return {tag:function (kind, tag) { return have[kind].includes(tag) ? 'supported' : 'not_evidenced'; },
+          years:function (min) { if (!known(p.years)) return ''; var gap = min - Number(p.years); return gap <= 0 ? 'supported' : gap <= 2 ? 'partly_supported' : 'not_evidenced'; }};
+      }
+      var q = job.quickMatch && typeof job.quickMatch === 'object' ? job.quickMatch : null;
+      if (!q) return null;
+      var got = lowerList(q.matched), part = lowerList(q.partial);
+      return {tag:function (kind, tag) { return got.includes(tag) ? 'supported' : part.includes(tag) ? 'partly_supported' : 'not_evidenced'; }, years:function () { return ''; }};
+    }
+    function aboutHTML(job, quick) {
+      var mark = markOf(job), used = {}, rows = [];
+      var item = function (text, status) {
+        if (status) used[status] = true;
+        return '<li' + (status ? ' data-status="' + status + '">' + requirementIcons[status] + '<span class="sr-only">' + markText[status] + ' </span>' : '>') +
+          '<span>' + escapeHTML(glue(text)) + '</span></li>';
+      };
+      var tags = function (kind, list) {
+        var marked = lowerList(list).map(function (t) { return {t:t, s:mark ? mark.tag(kind, t) : ''}; });
+        var order = {supported:0, partly_supported:1, not_evidenced:2, '':3};
+        marked.sort(function (a, b) { return order[a.s] - order[b.s]; });
+        return marked.length ? '<ul class="about-tags">' + marked.map(function (m) { return item(tagLabel(m.t), m.s); }).join('') + '</ul>' : '';
+      };
+      var row = function (label, value) { if (value) rows.push('<tr><th scope="row">' + label + '</th><td>' + value + '</td></tr>'); };
+      var role = roleOf(job), level = String(job.level || '').toLowerCase();
+      row('Role', escapeHTML([roleNames[role] || '', !leadershipRoles.includes(role) && levelNames[level] ? levelNames[level] : ''].filter(Boolean).join(' · ')));
+      // Where a remote job can be done from: worldwide, a region or one country.
+      var scope = typeof job.remoteScope === 'string' ? job.remoteScope : '';
+      row('Remote from', escapeHTML(scope === 'worldwide' ? 'Anywhere' : scope.indexOf('country:') === 0 ? countryName(scope.slice(8).toUpperCase()) :
+        scope.indexOf('region:') === 0 ? regionNames[scope.slice(7).toUpperCase()] || '' : ''));
+      if (known(job.yearsMin) && Number(job.yearsMin) > 0) row('Experience', '<ul class="about-tags">' + item(Number(job.yearsMin) + '+ years', mark ? mark.years(Number(job.yearsMin)) : '') + '</ul>');
+      row('Languages', tags('languages', job.languages));
+      row('Skills', tags('skills', job.skills));
+      row('Areas', tags('domains', job.domains));
+      if (!rows.length) return '';
+      var note = mark ? 'Facts from the posting, compared with your profile. Job match here is an estimate.' + (quick && !quick.enough ? ' Fewer than four requirements were found.' : '') : '';
+      if (job.descriptionStatus === 'unreadable' && !job.description) note += (note ? ' ' : '') + 'Can\'t read the full posting here. Open the original.';
+      var legend = Object.keys(markText).filter(function (k) { return used[k]; }).map(function (k) { return '<span>' + requirementIcons[k] + markText[k] + '</span>'; }).join('');
+      return '<div class="about-job"><h3>About this job</h3>' + (note ? '<p class="about-note">' + note + '</p>' : '') +
+        '<table class="about-table"><tbody>' + rows.join('') + '</tbody></table>' + (legend ? '<p class="about-legend" aria-hidden="true">' + legend + '</p>' : '') + '</div>';
+    }
     // The report in the dialog: level and percentage, the AI note, which CV and when, the summary,
     // then requirements with their status and CV evidence, strengths, gaps, questions, CV improvements and coverage.
     function reportHTML(r) {
       var esc = function (value) { return escapeHTML(glue(value)); }, list = function (items) { return Array.isArray(items) ? items.filter(Boolean) : []; };
-      var html = '<h3>' + esc(reportLabel(r)) + '</h3>' +
+      var html = '<h3>' + esc(deepLabel(r)) + '</h3>' +
         '<p class="report-note">AI estimate of how well your CV fits this job description. A guide, not a prediction of an interview invitation.</p>' +
         (reportMeta(r) ? '<p class="report-note">' + esc(reportMeta(r)) + '</p>' : '') + (r.summary ? '<p>' + esc(r.summary) + '</p>' : '');
-      if (list(r.requirements).length) html += '<h4>Requirements</h4><ul class="report-reqs">' + list(r.requirements).map(function (q) {
-        return '<li><span class="req-status">' + (requirementStatus[q.status] || 'Unclear') + '</span><div><p>' + esc(q.text) +
-          (requirementPriority[q.priority] ? ' <span class="req-priority">' + requirementPriority[q.priority] + '</span>' : '') + '</p>' +
-          (q.evidence ? '<p class="req-detail">“' + esc(q.evidence) + '”</p>' : '') + (q.note ? '<p class="req-detail">' + esc(q.note) + '</p>' : '') + '</div></li>';
-      }).join('') + '</ul>';
+      if (list(r.requirements).length) html += '<table class="report-table"><thead><tr><th scope="col">Requirement</th>' +
+        '<th scope="col">In your CV</th><th scope="col">Status</th></tr></thead><tbody>' + list(r.requirements).map(function (q) {
+        var status = requirementStatus[q.status] ? q.status : 'unclear';
+        return '<tr><td><p>' + esc(q.text) + '</p>' + (requirementPriority[q.priority] ? '<p class="req-detail">' + requirementPriority[q.priority] + '</p>' : '') + '</td>' +
+          '<td data-label="In your CV">' + (q.evidence ? '<p>' + esc(q.evidence) + '</p>' : '') + (q.note ? '<p class="req-detail">' + esc(q.note) + '</p>' : '') +
+          (!q.evidence && !q.note ? '<p class="req-detail">—</p>' : '') + '</td>' +
+          '<td><span class="req-status" data-status="' + status + '">' + requirementIcons[status] + '<span>' + requirementStatus[status] + '</span></span></td></tr>';
+      }).join('') + '</tbody></table>';
       [['Strengths', r.strengths], ['Gaps', r.gaps], ['Questions for you', r.openQuestions]].forEach(function (part) {
         if (list(part[1]).length) html += '<h4>' + part[0] + '</h4><ul class="report-list">' + list(part[1]).map(function (t) { return '<li>' + esc(t && typeof t === 'object' ? t.text : t) + '</li>'; }).join('') + '</ul>';
       });
@@ -1136,6 +1452,12 @@
       return html;
     }
     var requirementStatus = {supported:'Supported', partly_supported:'Partly', not_evidenced:'Not evidenced', unclear:'Unclear'};
+    // Status icons: a green check (the green of the Job match label), a half circle, an empty circle, a dashed circle.
+    var requirementIcons = {
+      supported:'<svg viewBox="0 0 16 16" aria-hidden="true"><rect width="16" height="16" rx="4" fill="#BCFBA4"/><path d="M4.5 8.3l2.3 2.3 4.7-4.9" fill="none" stroke="#1C6304" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      partly_supported:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 0 0 12.5z" fill="currentColor"/></svg>',
+      not_evidenced:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
+      unclear:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2.2 2.2"/></svg>'};
     var requirementPriority = {required:'Required', preferred:'Preferred'};
     function shortDay(value) { return dayOf(value) ? new Date(dayOf(value) + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : ''; }
     function coverageText(c) {
@@ -1149,7 +1471,7 @@
     // Markdown version of a Job Matcher report, for Download report.
     function reportMarkdown(r) {
       var list = function (items) { return (Array.isArray(items) ? items : []).map(function (t) { return '- ' + (t && typeof t === 'object' ? t.text : t); }); };
-      var out = ['## Match report', '', '**' + reportLabel(r) + '**', '',
+      var out = ['## Deep analysis report', '', '**' + deepLabel(r) + (matchLevels[r.matchLevel] && r.matchLevel !== 'insufficient_data' ? ' (' + matchLevels[r.matchLevel] + ')' : '') + '**', '',
         'AI estimate of how well your CV fits this job description. A guide, not a prediction of an interview invitation.', ''];
       var meta = reportMeta(r);
       if (meta) out.push(meta, '');
@@ -1183,16 +1505,16 @@
     // when the chat cannot be reached, the request is copied for the person to paste. Without a host the built-in demo runs.
     function requestMatch(id) {
       if (runAction('match', id)) return;
-      if (!hostData) return runDemoMatch(id);
+      if (isDemoData()) return runDemoMatch(id);
       var job = data.jobs.find(function (j) { return j.id === id; });
       if (!job) return;
-      copyRequest('Match request from Personal Job Board. Vacancy "' + (job.title || 'Untitled') + '"' + (job.company ? ' at ' + job.company : '') +
+      copyRequest('Deep analysis request from Personal Job Board. Vacancy "' + (job.title || 'Untitled') + '"' + (job.company ? ' at ' + job.company : '') +
         ', id ' + job.id + '. Compare it with my CV and save the report to the board.', job.id);
     }
     // Copies within the same click. If the browser refuses, a Match request is shown selected in the vacancy dialog.
-    function copyRequest(text, jobId) {
+    function copyRequest(text, jobId, fallback) {
       function shown() {
-        if (jobId == null) return notify("Couldn't reach the chat. Ask Claude to refresh your Personal Job Board search with your saved preferences.");
+        if (jobId == null) return notify(fallback || "Couldn't reach the chat. Ask Claude to refresh your Personal Job Board search with your saved preferences.");
         if (!active || active.id !== jobId || !$('details').open) openDetails(jobId, true);
         $('agent-request').value = text; $('agent-request').hidden = false; $('agent-request').focus(); $('agent-request').select();
         $('copy-feedback').textContent = "Couldn't reach the chat. Copy this request into your chat with Claude.";
@@ -1208,7 +1530,7 @@
     $('download-report').onclick = function () {
       if (!active) return;
       var source = $('job-source').hidden ? null : $('job-source').href, report = reportOf(active.id);
-      var label = active.match ? 'Match ' + active.match + '%' : 'Demo match';
+      var label = active.match ? 'Job match ' + active.match + '%' : 'Demo match';
       var lines = ['# ' + active.title, '', '**Company:** ' + active.company, '**Conditions:** ' + $('detail-meta').textContent,
         '**Published:** ' + (active.publishedAt || 'Not provided'), '**Source:** ' + (source ? '[View original job](<' + source + '>)' : 'Not provided'), ''];
       lines = lines.concat(report ? reportMarkdown(report) : ['## Match report', '', '**' + label + '**', '', 'Demo only — no CV analysis has been performed.', '',
@@ -1236,63 +1558,23 @@
       try { await navigator.clipboard.writeText(request); $('copy-feedback').textContent = agentHasCV ? 'Copied. Paste it into your agent chat.' : 'Copied. Paste it into your agent chat and add your CV if needed.'; }
       catch (_) { $('agent-request').value = request; $('agent-request').hidden = false; $('agent-request').focus(); $('agent-request').select(); $('copy-feedback').textContent = 'Select and copy the request.'; }
     };
-    // Egor's portrait. The first click (tap, Enter) shows the greeting, each next click the next line; the last line then stays.
-    // The bubble stays open until a click elsewhere, Escape or moving focus away.
-    // The order starts over when the page is reloaded.
-    var egorLines = [
-      "Hi! I'm Egor. I hope this board helps you find a job faster. I'd also recommend the <a href=\"https://github.com/egor-krasnoperov/design-growth-skills\" target=\"_blank\" rel=\"noopener noreferrer\">other skills on GitHub</a>.",
-      "Got a rejection? Ask for feedback. It might help with the next one.",
-      "Kerning your CV for the fifth time? It's fine. Send it.",
-      "If a job post lists 15 tools, they probably use three. Apply anyway.",
-      "Somewhere, a hiring manager is looking at a portfolio with lorem ipsum in it. Yours is already better.",
-      "Small request. Please don't send your CV in dark mode.",
-      "Hearing nothing back? Try the Resume Checker or Portfolio Checker from my skills. They might show what's holding you back.",
-      "You've clicked me eight times now. That's more engagement than most job posts get.",
-      "Ghosted after the final round? That says more about their process than about your work.",
-      "Nobody matches 100% of a job description. Not even the person who wrote it.",
-      "Take a break if you need one. The board will still be here tomorrow.",
-      "You'll get there. Small steps count too.",
-      "You've reached the end. I'm out of jokes, so back to the job search."
-    ];
-    var egorStep = 0, egorTimer = null;
-    function showEgor(pointer) {
-      clearTimeout(egorTimer);
-      var bubble = $('egor-bubble'), wasHidden = bubble.hidden;
-      bubble.innerHTML = egorLines[egorStep]; bubble.hidden = false;
-      $('egor-face').setAttribute('aria-expanded','true');
-      if (pointer) softly(bubble, wasHidden ? [{opacity:0,transform:'translateY(4px)'},{opacity:1,transform:'none'}] : [{opacity:.4},{opacity:1}], 180);
-    }
-    function hideEgor() { clearTimeout(egorTimer); $('egor-bubble').hidden = true; $('egor-face').setAttribute('aria-expanded','false'); }
-    $('egor-face').onclick = function (event) {
-      if (!$('egor-bubble').hidden) egorStep = Math.min(egorStep + 1, egorLines.length - 1);
-      showEgor(event.detail !== 0);
-      // A pointer click makes the portrait spring: a quick squash, a small overshoot, then rest.
-      if (event.detail !== 0 && this.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        this.animate([{transform:'scale(1)'},{transform:'scale(1.1,.86)',offset:.22},{transform:'scale(.95,1.08)',offset:.5},{transform:'scale(1.02,.98)',offset:.75},{transform:'scale(1)'}],
-          {duration:460,easing:'ease-out'});
-      }
-    };
-    $('egor').addEventListener('focusout',function (event) { if (!$('egor').contains(event.relatedTarget)) hideEgor(); });
-    $('egor').addEventListener('keydown',function (event) { if (event.key === 'Escape' && !$('egor-bubble').hidden) { hideEgor(); $('egor-face').focus(); } });
-    document.addEventListener('pointerdown',function (event) { if (!$('egor').contains(event.target)) hideEgor(); });
-    // On desktop the portrait sits under the navigation; it steps aside when the window is too short for both.
-    function placeEgor() {
-      var egor = $('egor'); egor.style.visibility = '';
+    // On desktop the repository link sits under the navigation; it steps aside when the window is too short for both.
+    function placeCorner() {
+      var corner = $('repo-corner'); corner.style.visibility = '';
       if (!matchMedia('(min-width:761px)').matches) return;
-      if (egor.getBoundingClientRect().top < document.querySelector('.side-nav').getBoundingClientRect().bottom + 24) { egor.style.visibility = 'hidden'; hideEgor(); }
+      if (corner.getBoundingClientRect().top < document.querySelector('.side-nav').getBoundingClientRect().bottom + 24) corner.style.visibility = 'hidden';
     }
-    addEventListener('resize',placeEgor);
+    addEventListener('resize',placeCorner);
     $('download').onclick = function () {
       var clone = document.documentElement.cloneNode(true);
-      var snap = Object.assign({},data,{id:data.id + '-' + Date.now(),saved:state.saved.slice(),viewed:state.viewed.slice(),demoMatches:state.demoMatches.slice(),savedReports:state.savedReports.slice(),hidden:state.hidden.slice(),statuses:JSON.parse(JSON.stringify(state.statuses)),ui:Object.assign({},state.ui)});
+      var snap = Object.assign({},data,{id:data.id + '-' + Date.now(),saved:state.saved.slice(),viewed:state.viewed.slice(),demoMatches:state.demoMatches.slice(),savedReports:state.savedReports.slice(),hidden:state.hidden.slice(),statuses:JSON.parse(JSON.stringify(state.statuses)),ui:Object.assign({},state.ui),filters:publicFilters()},base ? {jobs:ownJobs, base:baseRaw} : {});
       clone.querySelector('#figma-data').textContent = JSON.stringify(snap).replace(/</g,String.fromCharCode(92) + 'u003c');
       clone.querySelector('#jobs').innerHTML = '';
       clone.querySelectorAll('dialog').forEach(function (dialog) { dialog.removeAttribute('open'); });
       clone.querySelector('#filter-options').innerHTML = '';
       clone.querySelectorAll('.filter-trigger').forEach(function (trigger) { trigger.setAttribute('aria-expanded','false'); });
       clone.querySelector('#toast').hidden = true; clone.querySelector('#toast').textContent = '';
-      clone.querySelector('#egor-bubble').hidden = true; clone.querySelector('#egor-bubble').textContent = '';
-      clone.querySelector('#egor-face').setAttribute('aria-expanded','false'); clone.querySelector('#egor').removeAttribute('style');
+      clone.querySelector('#repo-corner').removeAttribute('style');
       saveTextFile('personal-job-board.html', '<!doctype html>\n' + clone.outerHTML, 'text/html;charset=utf-8');
     };
     // Downloads go through the host when it provides setSaveFile (a plain download link can be blocked inside an artifact).
@@ -1305,7 +1587,7 @@
 
     // Connection points for a host, for example the Claude artifact layer. Without a host the board works on its own,
     // with the embedded data and browser storage. The host never needs to touch the page markup.
-    var stateListeners = [], actionListeners = [], saveFile = null, lastEmitted = '', quietState = false;
+    var stateListeners = [], actionListeners = [], profileListeners = [], saveFile = null, lastEmitted = '', quietState = false;
     function publicState() {
       return {saved:state.saved.slice(), viewed:state.viewed.slice(), hidden:state.hidden.slice(), statuses:JSON.parse(JSON.stringify(state.statuses))};
     }
@@ -1318,9 +1600,9 @@
       stateListeners.forEach(function (fn) { try { fn(JSON.parse(key)); } catch (e) { console.error(e); } });
     }
     // Asks the host first; true from any listener means the host handled the action.
-    function runAction(type, jobId) {
+    function runAction(type, jobId, extra) {
       var job = jobId != null ? data.jobs.find(function (j) { return j.id === jobId; }) : null, handled = false;
-      var action = job ? {type:type, jobId:job.id, title:job.title || '', company:job.company || ''} : {type:type};
+      var action = Object.assign(job ? {type:type, jobId:job.id, title:job.title || '', company:job.company || ''} : {type:type}, extra || {});
       actionListeners.forEach(function (fn) { try { if (fn(Object.assign({}, action)) === true) handled = true; } catch (e) { console.error(e); } });
       return handled;
     }
@@ -1335,11 +1617,13 @@
       // Replace vacancies and reports (and optionally profileName, updatedAt, agentCV), then redraw.
       setData: function (next) {
         next = next || {};
-        if ('jobs' in next) { data.jobs = normalizeJobs(next.jobs); hostData = true; }
+        if ('jobs' in next) { ownJobs = normalizeJobs(next.jobs); mergeJobs(); hostData = true; if (!('profile' in next) && profileIsDemo) { data.profile = null; profileIsDemo = false; } }
         if ('reports' in next) data.reports = normalizeReports(next.reports);
-        ['profileName','updatedAt','agentCV'].forEach(function (key) { if (key in next) data[key] = next[key]; });
+        ['profileName','updatedAt','agentCV','profile','search'].forEach(function (key) { if (key in next) data[key] = next[key]; });
+        if ('profile' in next) { profileIsDemo = false; delete state.profile; var fromProfile = filtersFromProfile(data.profile); if (fromProfile) F = fromProfile; }
         Object.keys(data.reports).forEach(function (id) { matching.delete(id); });
-        applyHeader(); refreshOpenDialog(); render(); alignSidebarToJobs(); placeEgor();
+        quickCache = new WeakMap();
+        applyHeader(); refreshOpenDialog(); render(); alignSidebarToJobs(); placeCorner();
       },
       // Put in the person's saved choices without sending them back through onStateChange.
       setState: function (next) {
@@ -1366,164 +1650,598 @@
       },
       // fn(filename, text, mimeType) for Download HTML and Download report; return false to fall back to a normal download.
       setSaveFile: function (fn) { saveFile = typeof fn === 'function' ? fn : null; },
+      // fn(profile) after the person edits the profile chips or the filters (the search conditions are part of the profile).
+      onProfileChange: function (fn) {
+        if (typeof fn !== 'function') return function () {};
+        profileListeners.push(fn);
+        return function () { profileListeners = profileListeners.filter(function (f) { return f !== fn; }); };
+      },
       // A short message from the host in the board's own toast, for example after Match was handed to the chat.
       notify: function (text) { if (typeof text === 'string' && text.trim()) notify(text.trim().slice(0, 200)); }
     };
+    // ---------------------------------------------------------------- The logo
+    // A pointer click throws the bookmark's square pixel sparks around the head (none from the keyboard or with reduced motion);
+    // every 6th or 7th click the head says "Ouch!" for a moment.
+    var logoClicks = 0, ouchAt = 6 + Math.round(Math.random()), ouchTimer = null;
+    $('logo').onclick = function (event) {
+      var head = this.querySelector('svg');
+      if (event.detail !== 0 && head.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        // The same burst as saving a bookmark (see burst): a small pop and eight sparks that fade out, set farther out for the bigger head.
+        head.animate([{transform:'scale(1)'},{transform:'scale(1.25)',offset:.35},{transform:'scale(1)'}],{duration:380,easing:'cubic-bezier(.22,1,.36,1)'});
+        for (var i = 0; i < 8; i++) {
+          var angle = (i + .5) / 8 * Math.PI * 2, near = 22, far = i % 2 ? 41 : 35, spark = document.createElement('span');
+          spark.className = 'spark'; this.appendChild(spark);
+          spark.animate([
+            {opacity:1,transform:'translate(' + Math.round(Math.cos(angle) * near) + 'px,' + Math.round(Math.sin(angle) * near) + 'px)'},
+            {opacity:0,transform:'translate(' + Math.round(Math.cos(angle) * far) + 'px,' + Math.round(Math.sin(angle) * far) + 'px)'}
+          ],{duration:420,delay:60,easing:'cubic-bezier(.22,1,.36,1)'}).onfinish = function () { this.effect.target.remove(); };
+        }
+      }
+      if (++logoClicks >= ouchAt) {
+        logoClicks = 0; ouchAt = 6 + Math.round(Math.random());
+        clearTimeout(ouchTimer); $('ouch').hidden = false;
+        ouchTimer = setTimeout(function () { $('ouch').hidden = true; }, 1200);
+      }
+    };
+
+    // ---------------------------------------------------------------- Your CV and the profile
+    var crossIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8l8 8M16 8l-8 8"/></svg>';
+    var levelNames = {junior:'Junior', middle:'Middle', senior:'Senior', lead:'Lead', leadership:'Leadership'};
+    if (state.profile) data.profile = state.profile;
+    // The profile is not edited on the board; the filters (search conditions) are saved in it and sent to the host.
+    function profileChanged(drawn) {
+      if (data.profile) state.profile = data.profile;
+      if (!drawn) renderJobs();
+      persist(); refreshOpenDialog(); placeCorner();
+      var copy = data.profile ? JSON.parse(JSON.stringify(data.profile)) : null;
+      profileListeners.forEach(function (fn) { try { fn(copy); } catch (e) { console.error(e); } });
+    }
+    $('cv-status-label').onclick = function () { if (tipTarget === this && !tip.hidden) hideTip(); else showTip(this, 0); };
+    $('cv-status-label').addEventListener('keydown',function (event) { if (event.key === 'Escape') hideTip(); });
+
+    // ---------------------------------------------------------------- Filters (variant A)
+    // Places: a region, a country or a city. A place also shows remote jobs open to it (its country, its region or the world).
+    var regionNames = {EUROPE:'Europe', UK:'United Kingdom', NA:'US and Canada', LATAM:'Latin America', MENA:'MENA'};
+    var countries = {EUROPE:{AM:'Armenia',AT:'Austria',BE:'Belgium',BG:'Bulgaria',CH:'Switzerland',CY:'Cyprus',CZ:'Czechia',DE:'Germany',DK:'Denmark',
+        EE:'Estonia',ES:'Spain',FI:'Finland',FR:'France',GE:'Georgia',GR:'Greece',HR:'Croatia',HU:'Hungary',IE:'Ireland',IS:'Iceland',IT:'Italy',
+        LT:'Lithuania',LU:'Luxembourg',LV:'Latvia',MK:'North Macedonia',MT:'Malta',NL:'Netherlands',NO:'Norway',PL:'Poland',PT:'Portugal',
+        RO:'Romania',RS:'Serbia',SE:'Sweden',SI:'Slovenia',SK:'Slovakia',UA:'Ukraine'},
+      UK:{GB:'United Kingdom'}, NA:{US:'United States',CA:'Canada'},
+      LATAM:{AR:'Argentina',BR:'Brazil',CL:'Chile',CO:'Colombia',CR:'Costa Rica',EC:'Ecuador',MX:'Mexico',PA:'Panama',PE:'Peru',UY:'Uruguay'},
+      MENA:{AE:'United Arab Emirates',BH:'Bahrain',DZ:'Algeria',EG:'Egypt',IL:'Israel',JO:'Jordan',KW:'Kuwait',LB:'Lebanon',MA:'Morocco',OM:'Oman',
+        QA:'Qatar',SA:'Saudi Arabia',TN:'Tunisia',TR:'Turkey'}};
+    function regionOfCountry(code) { return Object.keys(countries).find(function (r) { return countries[r][code]; }) || ''; }
+    function countryName(code) { var r = regionOfCountry(code); return r ? countries[r][code] : code; }
+    function findCountry(name) {
+      var n = String(name || '').trim().toLowerCase(), hit = '';
+      Object.keys(countries).forEach(function (r) { Object.keys(countries[r]).forEach(function (c) { if (c.toLowerCase() === n || countries[r][c].toLowerCase() === n) hit = c; }); });
+      return hit;
+    }
+    function cleanPlace(v) {
+      if (typeof v === 'string') {
+        var t = v.trim(), region = Object.keys(regionNames).find(function (r) { return r.toLowerCase() === t.toLowerCase() || regionNames[r].toLowerCase() === t.toLowerCase(); });
+        if (region) return {type:'region', region:region, label:regionNames[region]};
+        var country = findCountry(t);
+        return country ? {type:'country', country:country, label:countryName(country)} : t ? {type:'city', city:t, label:t} : null;
+      }
+      if (!v || typeof v !== 'object') return null;
+      if (v.type === 'region' && regionNames[v.region]) return {type:'region', region:v.region, label:regionNames[v.region]};
+      if (v.type === 'country' && typeof v.country === 'string') return {type:'country', country:v.country.toUpperCase(), label:countryName(v.country.toUpperCase())};
+      if (v.type === 'city' && typeof v.city === 'string' && v.city.trim()) return {type:'city', city:v.city.trim(), country:typeof v.country === 'string' ? v.country.toUpperCase() : '', label:v.city.trim()};
+      return null;
+    }
+    function placeKey(p) { return p.type + ':' + (p.region || p.country || '') + ':' + (p.city || '').toLowerCase(); }
+    function cleanFilters(v) {
+      v = v && typeof v === 'object' ? v : {};
+      var pick = function (list, allowed) { return Array.from(new Set(lowerList(list).map(function (x) { return roleAliases[x] || x; }))).filter(function (x) { return allowed.includes(x); }); };
+      var places = [], seen = {};
+      (Array.isArray(v.places) ? v.places : []).map(cleanPlace).forEach(function (p) { if (p && !seen[placeKey(p)]) { seen[placeKey(p)] = 1; places.push(p); } });
+      var salary = v.salary && typeof v.salary === 'object' ? v.salary : {};
+      return {places:places, workModes:pick(v.workModes, ['remote','hybrid','onsite']), roles:pick(v.roles, Object.keys(roleNames)),
+        levels:pick(v.levels, ['middle','senior']), unstatedLevel:v.unstatedLevel !== false,
+        salary:{amount:known(salary.amount) && Number(salary.amount) > 0 ? Math.round(Number(salary.amount)) : null,
+          currency:typeof salary.currency === 'string' && /^[A-Za-z]{3}$/.test(salary.currency) ? salary.currency.toUpperCase() : 'EUR', onlyStated:salary.onlyStated === true},
+        posted:['7','30'].includes(String(v.posted)) ? String(v.posted) : 'any'};
+    }
+    // The search conditions in the profile (Job Finder's names), and back.
+    function filtersFromProfile(p) {
+      if (!p || typeof p !== 'object' || !['locations','workModes','targetRoles','levels','minSalary'].some(function (k) { return k in p; })) return null;
+      return cleanFilters({places:p.locations, workModes:p.workModes, roles:p.targetRoles, levels:p.levels, unstatedLevel:p.includeUnstatedLevel,
+        salary:p.minSalary, posted:typeof F === 'object' && F ? F.posted : 'any'});
+    }
+    function publicFilters() { return JSON.parse(JSON.stringify(F)); }
+    var F = cleanFilters(state.filters || data.filters || filtersFromProfile(data.profile));
+    function setCount() {
+      return (F.places.length ? 1 : 0) + (F.workModes.length ? 1 : 0) + (F.roles.length ? 1 : 0) + (F.levels.length || !F.unstatedLevel ? 1 : 0) +
+        (F.salary.amount || F.salary.onlyStated ? 1 : 0) + (F.posted !== 'any' ? 1 : 0);
+    }
+    function moneyLabel(n, currency) { return currencyPrefix(currency) + (n >= 1000 ? Math.round(n / 1000) + 'k' : n); }
+    function chipsOfFilters() {
+      var c = [];
+      F.places.forEach(function (p, i) { c.push({label:p.label, remove:function () { F.places.splice(i, 1); }}); });
+      F.workModes.forEach(function (m) { c.push({label:formatName(m), remove:function () { F.workModes = F.workModes.filter(function (x) { return x !== m; }); }}); });
+      F.roles.forEach(function (r) { c.push({label:roleNames[r], remove:function () { F.roles = F.roles.filter(function (x) { return x !== r; }); }}); });
+      F.levels.forEach(function (l) { c.push({label:levelNames[l], remove:function () { F.levels = F.levels.filter(function (x) { return x !== l; }); }}); });
+      if (!F.unstatedLevel) c.push({label:'Level stated', remove:function () { F.unstatedLevel = true; }});
+      if (F.salary.amount) c.push({label:'From ' + moneyLabel(F.salary.amount, F.salary.currency), remove:function () { F.salary.amount = null; }});
+      if (F.salary.onlyStated) c.push({label:'Salary stated', remove:function () { F.salary.onlyStated = false; }});
+      if (F.posted !== 'any') c.push({label:'Last ' + F.posted + ' days', remove:function () { F.posted = 'any'; }});
+      return c;
+    }
+    function renderFilterControls() {
+      var n = setCount();
+      $('filters-label').textContent = n ? 'Filters · ' + n : 'Filters';
+      $('filters-trigger').dataset.filtered = String(n > 0);
+      $('filters-trigger').setAttribute('aria-label', n ? 'Filters, ' + n + ' set' : 'Filters');
+      var chips = chipsOfFilters();
+      $('active-filters').hidden = !chips.length;
+      $('active-filters').innerHTML = chips.map(function (c, i) {
+        return '<li class="chip"><span>' + escapeHTML(c.label) + '</span><button type="button" data-filter-chip="' + i + '" aria-label="Remove filter ' + escapeHTML(c.label) + '">' + crossIcon + '</button></li>';
+      }).join('');
+    }
+    // Does a vacancy pass the filters? Unknown values pass only where the panel says so (jobs without a stated level).
+    function placeMatches(job, place) {
+      var scope = typeof job.remoteScope === 'string' ? job.remoteScope : '', country = typeof job.country === 'string' ? job.country.toUpperCase() : '';
+      var region = typeof job.region === 'string' ? job.region.toUpperCase() : regionOfCountry(country);
+      var text = String(job.location || '').toLowerCase();
+      if (scope === 'worldwide') return true;
+      if (place.type === 'region') return region === place.region || scope === 'region:' + place.region ||
+        (!region && !scope && text.indexOf(place.label.toLowerCase()) >= 0);
+      var placeCountry = place.country || '', placeRegion = regionOfCountry(placeCountry);
+      var remoteHere = !!placeCountry && (scope === 'country:' + placeCountry || (!!placeRegion && scope === 'region:' + placeRegion));
+      if (place.type === 'country') return country === placeCountry || remoteHere || (!country && !scope && text.indexOf(place.label.toLowerCase()) >= 0);
+      return text.indexOf(place.city.toLowerCase()) >= 0 || remoteHere;
+    }
+    function annual(n, period) { return period === 'month' ? n * 12 : period === 'hour' ? n * 2080 : n; }
+    function passesFilters(job) {
+      if (F.places.length && !F.places.some(function (p) { return placeMatches(job, p); })) return false;
+      // A job with no stated work format is never hidden by this filter; its card says "format not stated".
+      if (F.workModes.length && job.format && !F.workModes.includes(job.format)) return false;
+      var role = roleOf(job);
+      if (F.roles.length && !F.roles.includes(role)) return false;
+      if (F.levels.length || !F.unstatedLevel) {
+        // Leadership roles carry their level in the role itself.
+        var level = String(job.level || job.grade || '').toLowerCase();
+        level = level === 'lead' ? 'senior' : level;
+        if (!leadershipRoles.includes(role)) {
+          if (!['junior','middle','senior','leadership'].includes(level)) { if (!F.unstatedLevel) return false; }
+          else if (F.levels.length && !F.levels.includes(level)) return false;
+        }
+      }
+      var min = known(job.salaryMin) ? Number(job.salaryMin) : null, max = known(job.salaryMax) ? Number(job.salaryMax) : null;
+      var stated = min != null || max != null;
+      if (F.salary.onlyStated && !stated) return false;
+      if (F.salary.amount && stated && String(job.currency || '').toUpperCase() === F.salary.currency &&
+        annual(max != null ? max : min, job.salaryPeriod) < F.salary.amount) return false;
+      if (F.posted !== 'any') {
+        var day = dayOf(job.publishedAt) || dayOf(job.foundAt);
+        if (!day || (Date.now() - Date.parse(day + 'T00:00:00')) / 864e5 > Number(F.posted)) return false;
+      }
+      return true;
+    }
+    // The search conditions are saved in the profile (and in this browser), so Refresh searches with them.
+    function filtersChanged(keepPanel) {
+      if (data.profile && typeof data.profile === 'object') {
+        var p = data.profile;
+        p.locations = F.places.map(function (x) { return Object.assign({}, x); }); p.workModes = F.workModes.slice(); p.targetRoles = F.roles.slice();
+        p.levels = F.levels.slice(); p.includeUnstatedLevel = F.unstatedLevel; p.minSalary = F.salary.amount || F.salary.onlyStated ? Object.assign({}, F.salary) : null;
+      }
+      state.filters = publicFilters();
+      render();
+      if ($('filters-panel').open && keepPanel !== false) syncPanel();
+      if (data.profile) profileChanged(true);
+    }
+    $('active-filters').addEventListener('click',function (event) {
+      var b = event.target.closest('[data-filter-chip]');
+      if (!b) return;
+      var i = Number(b.dataset.filterChip), chips = chipsOfFilters();
+      if (chips[i]) chips[i].remove();
+      filtersChanged();
+      var rest = $('active-filters').querySelectorAll('[data-filter-chip]');
+      (rest[Math.min(i, rest.length - 1)] || $('filters-trigger')).focus();
+    });
+    // The panel: every change applies at once; Show N jobs closes it.
+    var panelTrigger = null;
+    function syncPanel() {
+      var form = $('filters-form');
+      form.querySelectorAll('.pill[data-group]').forEach(function (b) {
+        var g = b.dataset.group;
+        b.setAttribute('aria-pressed', String(g === 'posted' ? F.posted === b.dataset.value : F[g].includes(b.dataset.value)));
+      });
+      $('unstated-level').checked = F.unstatedLevel;
+      $('salary-only').checked = F.salary.onlyStated;
+      if (document.activeElement !== $('salary-amount')) $('salary-amount').value = F.salary.amount || '';
+      var currencies = ['EUR','USD','GBP'].concat(data.jobs.map(function (j) { return String(j.currency || '').toUpperCase(); }))
+        .filter(function (c, i, all) { return /^[A-Z]{3}$/.test(c) && all.indexOf(c) === i; });
+      if (currencies.indexOf(F.salary.currency) < 0) currencies.push(F.salary.currency);
+      $('salary-currency').innerHTML = currencies.map(function (c) { return '<option' + (c === F.salary.currency ? ' selected' : '') + '>' + c + '</option>'; }).join('');
+      document.querySelectorAll('.pill[data-region]').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(F.places.some(function (p) { return p.type === 'region' && p.region === b.dataset.region; })));
+      });
+      var cityChips = F.places.filter(function (p) { return p.type !== 'region'; });
+      $('where-chips').hidden = !cityChips.length;
+      $('where-chips').innerHTML = cityChips.map(function (p) {
+        return '<span class="chip"><span>' + escapeHTML(p.label) + '</span><button type="button" data-place="' + escapeHTML(placeKey(p)) + '" aria-label="Remove ' + escapeHTML(p.label) + '">' + crossIcon + '</button></span>';
+      }).join('');
+      var n = visibleJobs().length;
+      $('filters-show').textContent = 'Show ' + n + (n === 1 ? ' job' : ' jobs');
+    }
+    function positionPanel() {
+      var panel = $('filters-panel');
+      if (!panel.open) return;
+      if (matchMedia('(max-width:640px)').matches || !panelTrigger) { panel.style.left = ''; panel.style.top = ''; panel.style.maxHeight = ''; return; }
+      var rect = panelTrigger.getBoundingClientRect(), width = Math.min(360, innerWidth - 24);
+      panel.style.left = Math.max(12, Math.min(rect.left, innerWidth - width - 12)) + 'px';
+      var top = rect.bottom + 8;
+      if (top > innerHeight - 320) top = Math.max(12, innerHeight - 12 - Math.min(panel.scrollHeight, innerHeight - 24));
+      panel.style.top = top + 'px';
+      panel.style.maxHeight = (innerHeight - top - 12) + 'px';
+    }
+    function openPanel(trigger, keyboard) {
+      panelTrigger = trigger || $('filters-trigger');
+      syncPanel();
+      $('filters-panel').showModal(); $('filters-trigger').setAttribute('aria-expanded','true'); positionPanel();
+      $('filters-form').scrollTop = 0;
+      // From the keyboard the place field gets focus; a tap does not open the phone keyboard.
+      if (keyboard) $('where-input').focus({preventScroll:true});
+      if (!keyboard && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
+        var sheet = matchMedia('(max-width:640px)').matches;
+        $('filters-panel').animate([{opacity:.4, transform:sheet ? 'translateY(16px)' : 'translateY(-3px)'},{opacity:1, transform:'none'}],{duration:200, easing:'cubic-bezier(.22,1,.36,1)'});
+      }
+    }
+    function closePanel() {
+      if ($('filters-panel').open) $('filters-panel').close();
+    }
+    $('filters-panel').addEventListener('close',function () {
+      $('filters-trigger').setAttribute('aria-expanded','false');
+      $('where-suggest').hidden = true; $('where-input').value = '';
+      if (panelTrigger) panelTrigger.focus({preventScroll:true});
+    });
+    $('filters-panel').addEventListener('click',function (event) { if (event.target === this) closePanel(); });
+    $('filters-trigger').onclick = function (event) { openPanel($('filters-trigger'), event.detail === 0); };
+    $('filters-close').onclick = closePanel;
+    $('filters-show').onclick = function () { closePanel(); revealResults(); };
+    $('filters-reset').onclick = function () { F = cleanFilters({posted:'any'}); filtersChanged(); };
+    $('filters-form').addEventListener('submit',function (event) { event.preventDefault(); });
+    $('filters-form').addEventListener('change',function (event) {
+      var t = event.target;
+      if (t.id === 'unstated-level') F.unstatedLevel = t.checked;
+      else if (t.id === 'salary-only') F.salary.onlyStated = t.checked;
+      else if (t.id === 'salary-currency') F.salary.currency = t.value;
+      else if (t.id === 'salary-amount') F.salary.amount = known(t.value) && Number(t.value) > 0 ? Math.round(Number(t.value)) : null;
+      else return;
+      filtersChanged();
+    });
+    $('salary-amount').addEventListener('input',function () {
+      F.salary.amount = known(this.value) && Number(this.value) > 0 ? Math.round(Number(this.value)) : null; filtersChanged();
+    });
+    // Pills: work format, role and level can be several; Posted is one of three.
+    $('filters-form').addEventListener('click',function (event) {
+      var b = event.target.closest('.pill[data-group]');
+      if (!b) return;
+      var g = b.dataset.group, v = b.dataset.value;
+      if (g === 'posted') F.posted = v;
+      else F[g] = F[g].includes(v) ? F[g].filter(function (x) { return x !== v; }) : F[g].concat(v);
+      filtersChanged();
+    });
+    document.querySelectorAll('.pill[data-region]').forEach(function (b) {
+      b.onclick = function () {
+        var on = F.places.some(function (p) { return p.type === 'region' && p.region === b.dataset.region; });
+        F.places = on ? F.places.filter(function (p) { return !(p.type === 'region' && p.region === b.dataset.region); }) : F.places.concat(cleanPlace({type:'region', region:b.dataset.region}));
+        filtersChanged();
+      };
+    });
+    $('where-chips').addEventListener('click',function (event) {
+      var b = event.target.closest('[data-place]');
+      if (!b) return;
+      F.places = F.places.filter(function (p) { return placeKey(p) !== b.dataset.place; });
+      filtersChanged(); $('where-input').focus();
+    });
+    // Suggestions while typing: regions, countries, and the cities named in the vacancies on the board.
+    function whereOptions(text) {
+      var t = text.trim().toLowerCase(), out = [];
+      if (!t) return out;
+      Object.keys(regionNames).forEach(function (r) { if (regionNames[r].toLowerCase().indexOf(t) >= 0) out.push({type:'region', region:r, label:regionNames[r]}); });
+      Object.keys(countries).forEach(function (r) { Object.keys(countries[r]).forEach(function (c) { if (countries[r][c].toLowerCase().indexOf(t) === 0) out.push({type:'country', country:c, label:countries[r][c]}); }); });
+      var cities = {};
+      data.jobs.forEach(function (j) {
+        var first = String(j.location || '').split(/[,;|·]/)[0].replace(/[\u{1F1E6}-\u{1F1FF}]/gu,'').trim();
+        if (first && first.toLowerCase().indexOf(t) === 0 && !findCountry(first) && !/remote|europe|worldwide|anywhere/i.test(first)) cities[first] = j.country ? String(j.country).toUpperCase() : '';
+      });
+      Object.keys(cities).sort().forEach(function (c) { out.push({type:'city', city:c, country:cities[c], label:c}); });
+      // A place that is not in the lists can still be typed in full and added as a city.
+      if (!out.length) out.push({type:'city', city:text.trim(), country:'', label:text.trim()});
+      return out.slice(0, 8);
+    }
+    var whereList = [];
+    function renderWhere() {
+      whereList = whereOptions($('where-input').value);
+      $('where-suggest').hidden = !whereList.length;
+      $('where-suggest').innerHTML = whereList.map(function (o, i) {
+        return '<button type="button" class="filter-option" role="option" data-where="' + i + '" tabindex="-1"><span>' + escapeHTML(o.label) +
+          '</span><span class="where-kind">' + (o.type === 'region' ? 'Region' : o.type === 'country' ? 'Country' : 'City') + '</span></button>';
+      }).join('');
+    }
+    function addPlace(o) {
+      var p = cleanPlace(o);
+      if (p && !F.places.some(function (x) { return placeKey(x) === placeKey(p); })) F.places = F.places.concat(p);
+      $('where-input').value = ''; renderWhere(); filtersChanged(); $('where-input').focus();
+    }
+    $('where-input').addEventListener('input',renderWhere);
+    $('where-input').addEventListener('keydown',function (event) {
+      if (event.key === 'Enter') { event.preventDefault(); if (whereList.length) addPlace(whereList[0]); }
+      else if (event.key === 'ArrowDown' && whereList.length) { event.preventDefault(); $('where-suggest').querySelector('[data-where]').focus(); }
+    });
+    $('where-suggest').addEventListener('click',function (event) {
+      var b = event.target.closest('[data-where]'); if (b) addPlace(whereList[Number(b.dataset.where)]);
+    });
+    $('where-suggest').addEventListener('keydown',function (event) {
+      var items = Array.from(this.querySelectorAll('[data-where]')), i = items.indexOf(document.activeElement);
+      if (event.key === 'ArrowDown') { event.preventDefault(); (items[i + 1] || items[0]).focus(); }
+      else if (event.key === 'ArrowUp') { event.preventDefault(); if (i <= 0) $('where-input').focus(); else items[i - 1].focus(); }
+    });
+    addEventListener('resize',positionPanel);
+    // Nothing left after filtering: ask Claude to search the daily list with these filters (the same way as Refresh).
+    $('empty-search').onclick = function () { filtersChanged(); requestRefresh(); };
+
+    // The base file next to the page, read on load. A missing file or a failed read leaves the board as it is.
+    try {
+      fetch('vacancies.json', {cache:'no-store'}).then(function (r) { return r.ok ? r.json() : null; }).then(function (raw) {
+        if (!raw || !takeBase(raw)) return;
+        if (profileIsDemo) { data.profile = null; profileIsDemo = false; }
+        quickCache = new WeakMap(); applyHeader(); render(); refreshOpenDialog(); alignSidebarToJobs(); placeCorner();
+      }).catch(function () {});
+    } catch (_) {}
+
     render();
-    placeEgor();
+    placeCorner();
     window.dispatchEvent(new CustomEvent('personaljobboard:ready'));
   }());
   </script>
   <!-- Claude connector. Source: experiments/claude-artifact/claude-connector.js (edit there, then copy here).
        It runs only inside a Claude artifact; outside Claude it does nothing and the board keeps its embedded data. -->
   <script>
-/* Personal Job Board — connector to the Claude artifact runtime.
-   Runs only when the board is opened as a Claude artifact (window.claude.use exists).
-   Outside Claude the board keeps its embedded data and browser storage, unchanged.
-   Board contract: window.PersonalJobBoard = { setData, setState, getState, onStateChange, onAction, setSaveFile },
-   announced with the window event 'personaljobboard:ready'.
-   Data contract with the agent: job-search-working-notes/drafts/personal-job-board/board-integration.md */
-(function () {
-  'use strict';
-  var claude = window.claude;
-  if (!claude || typeof claude.use !== 'function') return;
+    /* Personal Job Board — connector to the Claude artifact runtime.
+       Runs only when the board is opened as a Claude artifact (window.claude.use exists).
+       Outside Claude the board keeps its embedded data and browser storage, unchanged.
+       Board contract: window.PersonalJobBoard = { setData, setState, getState, onStateChange, onAction, setSaveFile, onProfileChange, notify },
+       announced with the window event 'personaljobboard:ready'.
+       Data contract with the agent: job-search-working-notes/drafts/personal-job-board/board-integration.md */
+    (function () {
+      'use strict';
+      var claude = window.claude;
+      if (!claude || typeof claude.use !== 'function') return;
 
-  function str(v) { return typeof v === 'string' && v.trim() ? v.trim() : null; }
-  function day(v) { return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v) ? v.slice(0, 10) : null; }
-  function ids(v) { return Array.isArray(v) ? v.filter(function (x) { return typeof x === 'string'; }) : []; }
+      function str(v) { return typeof v === 'string' && v.trim() ? v.trim() : null; }
+      function day(v) { return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v) ? v.slice(0, 10) : null; }
+      function ids(v) { return Array.isArray(v) ? v.filter(function (x) { return typeof x === 'string'; }) : []; }
+      function plain(v) { return JSON.parse(JSON.stringify(v)); }
+      // The same text for the same data, whatever order the store keeps the fields in.
+      function sameKey(v) {
+        if (Array.isArray(v)) return '[' + v.map(sameKey).join(',') + ']';
+        if (v && typeof v === 'object') return '{' + Object.keys(v).sort().map(function (k) { return JSON.stringify(k) + ':' + sameKey(v[k]); }).join(',') + '}';
+        return JSON.stringify(v === undefined ? null : v);
+      }
 
-  // The user's own choices, in the shape both the board and the stored document use.
-  function toBoardState(doc) {
-    var statuses = {};
-    var raw = doc && doc.statuses && typeof doc.statuses === 'object' ? doc.statuses : {};
-    Object.keys(raw).forEach(function (id) {
-      var s = raw[id];
-      if (s && typeof s.status === 'string') statuses[id] = { status: s.status, at: day(s.at) };
-    });
-    return { saved: ids(doc && doc.saved), viewed: ids(doc && doc.viewed), hidden: ids(doc && doc.hidden), statuses: statuses };
-  }
+      // The user's own choices, in the shape both the board and the stored document use.
+      function toBoardState(doc) {
+        var statuses = {};
+        var raw = doc && doc.statuses && typeof doc.statuses === 'object' ? doc.statuses : {};
+        Object.keys(raw).forEach(function (id) {
+          var s = raw[id];
+          if (s && typeof s.status === 'string') statuses[id] = { status: s.status, at: day(s.at) };
+        });
+        return { saved: ids(doc && doc.saved), viewed: ids(doc && doc.viewed), hidden: ids(doc && doc.hidden), statuses: statuses };
+      }
 
-  if (window.PersonalJobBoard) connect(window.PersonalJobBoard);
-  else window.addEventListener('personaljobboard:ready', function () {
-    if (window.PersonalJobBoard) connect(window.PersonalJobBoard);
-  }, { once: true });
+      // One write at a time per document: while a write is on its way, only the latest data waits for the next one.
+      function writer(write) {
+        var busy = false, waiting = null;
+        function flush() {
+          busy = true;
+          var data = waiting; waiting = null;
+          Promise.resolve().then(function () { return write(data); }).catch(function () {}).then(function () {
+            busy = false;
+            if (waiting) flush();
+          });
+        }
+        return {
+          put: function (data) { waiting = data; if (!busy) flush(); },
+          busy: function () { return busy || !!waiting; }
+        };
+      }
 
-  function connect(board) {
-    Promise.all(['db', 'user', 'room', 'downloads'].map(function (name) {
-      return Promise.resolve(claude.use(name)).catch(function () { return null; });
-    })).then(function (caps) {
-      var db = caps[0], user = caps[1], room = caps[2], downloads = caps[3];
-      if (!db || !user) return; // No storage in this view: the board stays as it is.
-      return user.id().then(function (uid) {
-        if (uid) start(board, db.collection('data/users/' + uid), room, downloads);
-      });
-    }).catch(function () { /* Keep the standalone board working. */ });
-  }
+      // The search conditions in the profile, in Job Finder's names. The board edits only these; the rest of the profile is the agent's.
+      var searchFields = ['locations', 'workModes', 'targetRoles', 'levels', 'includeUnstatedLevel', 'minSalary'];
+      function searchPart(profile) {
+        var part = {};
+        searchFields.forEach(function (k) { part[k] = k in profile ? profile[k] : null; });
+        return part;
+      }
 
-  function start(board, collection, room, downloads) {
-    var lastWritten = '';
-    var writeTimer = null;
-    var sendState = 'unavailable';
-    var jobsById = {};
+      if (window.PersonalJobBoard) connect(window.PersonalJobBoard);
+      else window.addEventListener('personaljobboard:ready', function () {
+        if (window.PersonalJobBoard) connect(window.PersonalJobBoard);
+      }, { once: true });
 
-    // Reading: one subscription to the user's private area. The board reads the
-    // Job Finder format itself (workMode, level, salary, links) and checks link protocols.
-    collection.onSnapshot(function (snap) {
-      var jobs = [], reports = {}, profile = {}, search = {}, stateDoc = null;
-      snap.docs.forEach(function (d) {
-        var v = d.data() || {};
-        if (d.id === 'profile') profile = v;
-        else if (d.id === 'search') search = v;
-        else if (d.id === 'state') stateDoc = v;
-        else if (d.id.indexOf('job-') === 0) jobs.push(Object.assign({}, v, { id: d.id.slice(4) }));
-        else if (d.id.indexOf('report-') === 0) reports[d.id.slice(7)] = v;
-      });
-      jobsById = {};
-      jobs.forEach(function (j) { jobsById[j.id] = j; });
-      board.setData({
-        jobs: jobs,
-        reports: reports,
-        profileName: str(profile.displayName),
-        updatedAt: day(search.searchedAt),
-        agentCV: str(profile.cvLabel) ? { status: 'available', name: profile.cvLabel } : null
-      });
-      // A new board has no stored choices yet: clear the template's example choices
-      // (and anything left in this browser) instead of saving them as the person's own.
-      var incoming = JSON.stringify(toBoardState(stateDoc || {}));
-      if (incoming !== lastWritten) { lastWritten = incoming; board.setState(JSON.parse(incoming)); }
-    }, function () { /* Storage error: the board keeps what it shows. */ });
+      function connect(board) {
+        Promise.all(['db', 'user', 'room', 'downloads'].map(function (name) {
+          return Promise.resolve(claude.use(name)).catch(function () { return null; });
+        })).then(function (caps) {
+          var db = caps[0], user = caps[1], room = caps[2], downloads = caps[3];
+          if (!db || !user) return; // No storage in this view: the board stays as it is.
+          return user.id().then(function (uid) {
+            if (uid) start(board, db.collection('data/users/' + uid), room, downloads);
+          });
+        }).catch(function () { /* Keep the standalone board working. */ });
+      }
 
-    // Writing: only the user's own choices, batched.
-    board.onStateChange(function (state) {
-      var next = toBoardState(state);
-      lastWritten = JSON.stringify(next);
-      clearTimeout(writeTimer);
-      writeTimer = setTimeout(function () {
-        collection.doc('state').set(Object.assign({ updatedAt: new Date().toISOString() }, next)).catch(function () {});
-      }, 400);
-    });
+      function start(board, collection, room, downloads) {
+        var lastWritten = '';
+        var writeTimer = null;
+        var lastProfile = '';
+        var profileTimer = null;
+        var profileExists = false;
+        var sendState = 'unavailable';
+        var jobsById = {};
 
-    // Sending to the chat: the answer must be known before the click.
-    function checkSend() {
-      if (!room || typeof room.canSendToClaudeSession !== 'function') return;
-      room.canSendToClaudeSession().then(function (v) { sendState = String(v); }).catch(function () { sendState = 'unavailable'; });
-    }
-    checkSend();
-    setInterval(checkSend, 15000);
-    document.addEventListener('visibilitychange', function () { if (!document.hidden) checkSend(); });
-    window.addEventListener('focus', checkSend);
+        var stateWriter = writer(function (next) {
+          return collection.doc('state').set(Object.assign({ updatedAt: new Date().toISOString() }, next));
+        });
+        // The board saves the search conditions (its filters) into the profile. Only they are merged into the stored profile,
+        // so a newer CV label or skills from the agent are never overwritten; a board without a stored profile creates it.
+        var profileWriter = writer(function (profile) {
+          var ref = collection.doc('profile');
+          if (!profileExists || typeof ref.update !== 'function') return ref.set(profile);
+          return ref.update(profile).catch(function (error) {
+            if (error && error.code === 'invalid_argument') return ref.set(profile);
+            throw error;
+          });
+        });
+        function profilePending() { return !!profileTimer || profileWriter.busy(); }
 
-    // How a request reaches the chat. "send": Claude's own window asks the person to send it now, and Claude starts at once.
-    // "stage": the request waits in the message field as an attachment until the person sends it.
-    // Beside the chat a send is preferred, because an attachment alone is easy to miss. If this browser refuses a send once,
-    // later clicks stage instead. On the board's own page a staged send opens the board's chat with the request waiting there.
-    var sendRefused = false;
-    function deliverMode() {
-      if (sendState === 'available') return sendRefused ? 'stage' : 'send';
-      if (sendState === 'available_if_summoned') return sendRefused ? null : 'send';
-      if (sendState === 'available_if_opened') return 'stage';
-      return null;
-    }
-    function say(text) { if (typeof board.notify === 'function') board.notify(text); }
-    var labels = { match: 'Match', tailor: 'Tailor CV', refresh: 'Refresh search' };
+        // Reading: one subscription to the user's private area. The board reads the
+        // Job Finder format itself (workMode, level, salary, links, quick match fields) and checks link protocols.
+        collection.onSnapshot(function (snap) {
+          var jobs = [], reports = {}, profile = null, search = null, stateDoc = null;
+          snap.docs.forEach(function (d) {
+            var v = d.data() || {};
+            if (d.id === 'profile') profile = v;
+            else if (d.id === 'search') search = v;
+            else if (d.id === 'state') stateDoc = v;
+            else if (d.id.indexOf('job-') === 0) jobs.push(Object.assign({}, v, { id: d.id.slice(4) }));
+            else if (d.id.indexOf('report-') === 0) reports[d.id.slice(7)] = v;
+          });
+          profileExists = !!profile;
+          jobsById = {};
+          jobs.forEach(function (j) { jobsById[j.id] = j; });
+          var next = {
+            jobs: jobs,
+            reports: reports,
+            search: search,
+            profileName: str(profile && profile.displayName),
+            updatedAt: day(search && search.searchedAt),
+            agentCV: str(profile && profile.cvLabel) ? { status: 'available', name: profile.cvLabel } : null
+          };
+          // The profile goes to the board only when it changed. The board resets its filters from a profile it is given,
+          // so its own unsaved edits (and the echo of its own write) must not come back to it.
+          if (profile && !profilePending()) {
+            var key = sameKey(profile);
+            if (key !== lastProfile) { lastProfile = key; next.profile = plain(profile); }
+          }
+          board.setData(next);
+          // A new board has no stored choices yet: clear the template's example choices
+          // (and anything left in this browser) instead of saving them as the person's own.
+          var incoming = JSON.stringify(toBoardState(stateDoc || {}));
+          if (incoming !== lastWritten) { lastWritten = incoming; board.setState(JSON.parse(incoming)); }
+        }, function () { /* Storage error: the board keeps what it shows. */ });
 
-    board.onAction(function (action) {
-      if (!action || ['match', 'tailor', 'refresh'].indexOf(action.type) < 0) return false;
-      var deliver = room ? deliverMode() : null;
-      if (!deliver) { checkSend(); return false; }
-      var job = action.jobId ? jobsById[String(action.jobId)] : null;
-      var payload = { action: action.type };
-      if (action.jobId) payload.jobId = String(action.jobId);
-      var title = str(action.title) || (job && str(job.title));
-      var company = str(action.company) || (job && str(job.company));
-      if (title) payload.title = title.slice(0, 200);
-      if (company) payload.company = company.slice(0, 200);
-      // A short name the platform shows next to the request, for example "Match · Product Designer".
-      payload.label = (labels[action.type] + (title ? ' · ' + title : '')).slice(0, 120);
-      var name = action.type === 'refresh' ? 'Refresh' : labels[action.type];
-      var result = action.type === 'refresh' ? 'new vacancies will appear here.' : 'the report will appear here.';
-      // Called synchronously inside the click: nothing is awaited before it.
-      room.sendToClaudeSession(payload, { deliver: deliver }).then(function () {
-        // A send waits for the person's answer in Claude's own "send a message?" window, so the message says what to press.
-        say(deliver === 'send'
-          ? 'Press Send in Claude\'s window to start ' + name + '. ' + result.charAt(0).toUpperCase() + result.slice(1)
-          : 'The ' + name + ' request is in your chat. Press Send there, ' + result);
-      }, function (error) {
-        if (deliver === 'send' && error && error.code === 'claude_unavailable') sendRefused = true;
-        say("Couldn't reach the chat. Press " + name + ' again.');
+        // Writing: only the user's own choices, batched.
+        board.onStateChange(function (state) {
+          var next = toBoardState(state);
+          lastWritten = JSON.stringify(next);
+          clearTimeout(writeTimer);
+          writeTimer = setTimeout(function () { stateWriter.put(next); }, 400);
+        });
+
+        // Writing the search conditions: one write per pause, because typing a salary changes them on every key.
+        if (typeof board.onProfileChange === 'function') {
+          board.onProfileChange(function (profile) {
+            if (!profile || typeof profile !== 'object') return;
+            var copy = plain(profile);
+            lastProfile = sameKey(copy);
+            clearTimeout(profileTimer);
+            profileTimer = setTimeout(function () { profileTimer = null; profileWriter.put(searchPart(copy)); }, 600);
+          });
+        }
+
+        // Sending to the chat: the answer must be known before the click.
+        function checkSend() {
+          if (!room || typeof room.canSendToClaudeSession !== 'function') return;
+          room.canSendToClaudeSession().then(function (v) { sendState = String(v); }).catch(function () { sendState = 'unavailable'; });
+        }
         checkSend();
-      });
-      return true;
-    });
+        setInterval(checkSend, 15000);
+        document.addEventListener('visibilitychange', function () { if (!document.hidden) checkSend(); });
+        window.addEventListener('focus', checkSend);
 
-    // Files: the artifact saves through the platform when it can; otherwise the board downloads itself.
-    board.setSaveFile(function (filename, text) {
-      if (!downloads || typeof downloads.save !== 'function') return false;
-      downloads.save({ filename: filename, data: text }).catch(function () {});
-      return true;
-    });
-  }
-})();
+        // How a request reaches the chat. "send": Claude's own window asks the person to send it now, and Claude starts at once.
+        // "stage": the request waits in the message field as an attachment until the person sends it.
+        // Beside the chat a send is preferred, because an attachment alone is easy to miss. If this browser refuses a send once,
+        // later clicks stage instead. On the board's own page a staged send opens the board's chat with the request waiting there.
+        var sendRefused = false;
+        function deliverMode() {
+          if (sendState === 'available') return sendRefused ? 'stage' : 'send';
+          if (sendState === 'available_if_summoned') return sendRefused ? null : 'send';
+          if (sendState === 'available_if_opened') return 'stage';
+          return null;
+        }
+        function say(text) { if (typeof board.notify === 'function') board.notify(text); }
+        // The words the board uses: the button "Get deep analysis" runs Job Matcher (action "match"), Refresh runs Job Finder,
+        // and "Analyse 20 more" asks Job Finder for short analyses of the next vacancies (action "analyze").
+        var kinds = {
+          match: { label: 'Deep analysis', what: 'the deep analysis', button: 'Get deep analysis', result: 'The result will appear here.' },
+          refresh: { label: 'Refresh search', what: 'the search', button: 'Refresh', result: 'New vacancies will appear here.' },
+          tailor: { label: 'Tailor CV', what: 'CV tailoring', button: 'Tailor my CV', result: 'The result will appear here.' },
+          analyze: { label: 'Analyse more', what: 'the short analysis', button: 'Analyse more', result: 'The analyses will appear on the cards.' }
+        };
+        // How many vacancies "Analyse more" asks for: a whole number from 1 to 100, 20 when the board sends none.
+        function countOf(v) {
+          var n = Math.floor(Number(v));
+          return n >= 1 ? Math.min(n, 100) : 20;
+        }
+        // The search conditions travel with Refresh, kept small: a request to the chat holds at most 4 KiB.
+        function filtersOf(f) {
+          if (!f || typeof f !== 'object') return null;
+          var copy = plain(f);
+          if (JSON.stringify(copy).length > 2500 && Array.isArray(copy.places)) copy.places = copy.places.slice(0, 10);
+          return JSON.stringify(copy).length > 2500 ? null : copy;
+        }
+
+        board.onAction(function (action) {
+          if (!action || !kinds[action.type]) return false;
+          var deliver = room ? deliverMode() : null;
+          if (!deliver) { checkSend(); return false; }
+          var kind = kinds[action.type];
+          if (action.type === 'analyze') {
+            var count = countOf(action.count);
+            var named = 'Analyse ' + count + ' more';
+            kind = Object.assign({}, kind, { label: named, button: named });
+          }
+          var job = action.jobId ? jobsById[String(action.jobId)] : null;
+          var payload = { action: action.type };
+          if (action.jobId) payload.jobId = String(action.jobId);
+          var title = str(action.title) || (job && str(job.title));
+          var company = str(action.company) || (job && str(job.company));
+          if (title) payload.title = title.slice(0, 200);
+          if (company) payload.company = company.slice(0, 200);
+          var filters = action.type === 'refresh' ? filtersOf(action.filters) : null;
+          if (filters) payload.filters = filters;
+          if (action.type === 'analyze') payload.count = count;
+          // A short name the platform shows next to the request, for example "Deep analysis · Product Designer" or "Analyse 20 more".
+          payload.label = (kind.label + (title ? ' · ' + title : '')).slice(0, 120);
+          // Called synchronously inside the click: nothing is awaited before it.
+          room.sendToClaudeSession(payload, { deliver: deliver }).then(function () {
+            // A send waits for the person's answer in Claude's own "send a message?" window, so the message says what to press.
+            say(deliver === 'send'
+              ? 'Press Send in Claude\'s window to start ' + kind.what + '. ' + kind.result
+              : 'The request is in your chat. Press Send there to start ' + kind.what + '. ' + kind.result);
+          }, function (error) {
+            if (deliver === 'send' && error && error.code === 'claude_unavailable') sendRefused = true;
+            say("Couldn't reach the chat. Press " + kind.button + ' again.');
+            checkSend();
+          });
+          return true;
+        });
+
+        // Files: the artifact saves through the platform when it can; otherwise the board downloads itself.
+        board.setSaveFile(function (filename, text) {
+          if (!downloads || typeof downloads.save !== 'function') return false;
+          downloads.save({ filename: filename, data: text }).catch(function () {});
+          return true;
+        });
+      }
+    })();
   </script>
 </body>
 </html>
