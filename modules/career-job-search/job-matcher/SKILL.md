@@ -69,7 +69,7 @@ Always say what the number means: the share of the vacancy's requirements suppor
 
 Job Finder asks for a short analysis of the best vacancies when it builds the board. It follows the rules above on a smaller scale.
 
-- Read the posting live, as described above. If it can't be read, write no short analysis.
+- Read the posting live, as described above. If it can't be read, or it doesn't fit the user's place or working hours as described in [../job-finder/SKILL.md](../job-finder/SKILL.md#live-check-rules), write no short analysis.
 - Take up to 8 requirements that matter most, each with its priority, its status and a few words of evidence from the CV or the portfolio. No long quotes and no CV improvements; those belong to the deep analysis.
 - Calculate the percentage and the level with the same formula.
 - Add one or two strengths, one or two gaps and one thing to check, such as the place, the working hours or a condition the posting states. Put the most important one first in each list and keep each to one short line.
