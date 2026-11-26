@@ -1,7 +1,7 @@
 """Daily list of digital design vacancies for Job Finder.
 
 Reads the open job dataset by Stapply (https://github.com/kalil0321/ats-scrapers, data under CC0 1.0),
-keeps digital design roles, adds the place, work mode, level and requirement tags for the quick match,
+keeps digital design and UX research roles, adds the place, work mode, level and requirement tags for the quick match,
 and writes small JSON files by region and country. Posting texts are read only to find tags; they are
 never written out. Every vacancy links to the employer's own posting.
 
@@ -25,7 +25,7 @@ EXCL_TITLE = re.compile(
     r"furniture|retail design|store design|silicon|\bsoc\b|fpga|layout|solutions? design|network design|database design|test design|offer design|clinical|trial design|"
     r"pricing|data ?cent|architect|security design|optical|photonic|antenna|thermal|rtl|vehicle|automotive|process design|tool design|pipeline|bridge|road|water|drainage|"
     r"geotech|hydraul|substation|protection|cable|fib(er|re)|telecom|wireless|instrumentation|public realm|\bbim\b|mep\b|cdm|façade|facade|bathroom|"
-    r"content design|ux writ|research|intern\b|internship|working student|apprentice|trainee|\[test|test ns|banco de talent|talent (pool|community|network)|"
+    r"content design|ux writ|research|intern\b|internship|working student|werkstudent|praktik|^stage\b|stagiaire|\bco-?op\b|apprentice|trainee|\[test|test ns|banco de talent|talent (pool|community|network)|"
     r"general application|open application|expression of interest|spontaneous|freelance pool|ai trainer|tutor|annotat|lettering|tattoo|nail|hair|makeup|cake|wedding|event|"
     r"electric|high voltage|\bav designer|audio|creative designer|communication designer|multimedia|social media|media designer|marketing designer|presentation|"
     r"web ?site designer|webdesigner|web designer|framer website|concept design|accessor|sport concept|eyewear|composite|urban|traffic|building|construction|cnc|"
@@ -41,6 +41,13 @@ DIGITAL = re.compile(r"figma|\bsketch\b|user research|usability|wireframe|protot
 PHYSICAL = re.compile(r"revit|autocad|\bbim\b|construction site|civil engineer|solidworks|catia|\bcreo\b|ansys|altium|\bfea\b|gd&t|asme|piping|hvac|"
                       r"architectural design|interior design|landscape|tekla|garment|textile|apparel|footwear|fashion design|merchandis|packaging design|"
                       r"mechanical engineering|electrical engineering|schematic|enclosure|injection mold|tolerance analysis|cnc|machining|sheet metal")
+# UX research titles; research is otherwise left out because it usually means science.
+RESEARCH = re.compile(r"\b(ux|user experience) research|\b(user|design|product design) researcher|researcher[ ,–-]+(ux|user experience)\b|"
+                      r"\b(user|design) research (lead|manager|director|analyst|consultant|expert|partner|specialist|scientist|team|program|operations|ops)|"
+                      r"(head|director|manager|lead|vp),? (of )?(user |design )research|\b(user|design) research$")
+# A design research posting talks about users and product work; this keeps out science titles such as "design research" in biology.
+RESEARCH_DESC = re.compile(r"\b(usability|user experience|ux|user research|interviews|qualitative|quantitative|surveys?|insights|participants|user needs|"
+                           r"customer needs|product teams?|design teams?|product managers?|designers|prototypes?|journey maps?|personas?)\b")
 # Sites that repost other companies' vacancies; recruiters on Manatal are left out by platform.
 REPOSTERS = {'jobgether', 'urban ridge supplies', 'hirehire'}
 RECRUITER = re.compile(r"recruit|staffing|talents?\b|headhunt|appointments|\bsearch\b|personalberatung|rekrytering|\bva\b|virtual assist", re.I)
@@ -48,8 +55,15 @@ RECRUITER = re.compile(r"recruit|staffing|talents?\b|headhunt|appointments|\bsea
 
 def is_design_role(title, company, ats, desc):
     t, d = low(title), low(desc)
-    if EXCL_TITLE.search(t) or not company or low(company) in REPOSTERS or ats == 'manatal':
+    research = bool(RESEARCH.search(t))
+    if EXCL_TITLE.search(RESEARCH.sub(' ', t) if research else t) or not company or low(company) in REPOSTERS or ats == 'manatal':
         return False
+    if research:
+        if len(set(PHYSICAL.findall(d))) >= 2:
+            return False
+        if re.search(r'\bux\b|user experience|user research', t):
+            return True
+        return len(set(RESEARCH_DESC.findall(d))) >= 2  # "design research" also names science and hardware work
     if CLEAR.search(t):
         if re.search(r'\bux\b|\bui\b|user experience|user interface|interaction', t):
             return True
@@ -66,6 +80,7 @@ def role_of(title):
     if 'head of' in t: return 'head-of-design'
     if re.search(r'director|\bvp\b|vice president', t): return 'design-director'
     if 'manager' in t: return 'design-manager'
+    if RESEARCH.search(t): return 'ux-researcher'
     if re.search(r'design engineer|design technologist', t): return 'design-engineer'
     if re.search(r'\bux\b|\bui\b|user experience|user interface|interaction|web design|digital design|experience design|service design', t) and 'product' not in t:
         return 'ux-ui-designer'
@@ -174,6 +189,11 @@ SKILLS = {
     'workshops': r'workshops?|facilitat', 'motion': r'motion design|animation', 'ai products': r'\bllms?\b|generative ai|\bgenai\b|ai[- ]native|ai agents?|machine learning',
     'mentoring': r'mentor', 'end-to-end': r'end[- ]to[- ]end',
 }
+# Extra requirement tags for UX research vacancies only, so that designers' quick match does not change.
+RESEARCH_SKILLS = {
+    'qualitative research': r'qualitative|ethnograph|diary stud|contextual inquiry|in-depth interviews',
+    'quantitative research': r'quantitative|surveys?\b|statistic|\bsql\b',
+}
 DOMAINS = {
     'fintech': r'fintech|banking|payments?\b|financial services|lending|neobank', 'e-commerce': r'e-?commerce|checkout|online retail',
     'consumer': r'\bb2c\b|consumer', 'b2b saas': r'\bb2b\b|saas|enterprise software', 'healthcare': r'health ?care|medical|clinical|patients?',
@@ -186,9 +206,10 @@ LANGS = ['german', 'french', 'spanish', 'portuguese', 'dutch', 'italian', 'polis
 YEARS = re.compile(r'(\d{1,2})\s*\+?\s*(?:-|–|to)?\s*(?:\d{1,2}\s*)?\+?\s*years?', re.I)
 
 
-def tags_of(desc):
+def tags_of(desc, role=None):
     d = low(desc)
-    out = {'skills': sorted(k for k, p in SKILLS.items() if re.search(p, d)),
+    skills = dict(SKILLS, **RESEARCH_SKILLS) if role == 'ux-researcher' else SKILLS
+    out = {'skills': sorted(k for k, p in skills.items() if re.search(p, d)),
            'domains': sorted(k for k, p in DOMAINS.items() if re.search(p, d))}
     langs = []
     for lang in LANGS:
@@ -212,7 +233,8 @@ def download(path):
         SELECT url, apply_url, title, company, ats_type, location, country_iso, is_remote, workplace_type,
                salary_min, salary_max, salary_currency, salary_period, posted_at, description
         FROM '{DATASET}'
-        WHERE regexp_matches(lower(title), 'design') AND coalesce(is_stale, false) = false
+        WHERE regexp_matches(lower(title), 'design|ux research|user research|user experience research|research(er)?[ ,–-]+(ux|user experience)')
+          AND coalesce(is_stale, false) = false
     ) TO '{path}' (FORMAT parquet)""")
 
 
@@ -256,7 +278,7 @@ def build(candidates, out_dir, seen_path=None):
             salary = {'min': int(r['salary_min']), 'max': int(r['salary_max'] or r['salary_min']), 'currency': r['salary_currency'],
                       'period': {'yearly': 'year', 'annual': 'year', 'monthly': 'month', 'hourly': 'hour'}.get(low(r['salary_period']), low(r['salary_period']) or 'year')}
         published = str(r['posted_at'])[:10] if r['posted_at'] else None
-        tags = tags_of(r['description'])
+        tags = tags_of(r['description'], role)
         job = {'id': jid, 'title': r['title'].strip(), 'company': r['company'].strip(), 'place': clean_place(r['location'], cc, mode),
                'country': cc, 'region': region, 'workMode': mode, 'remoteScope': ('country:' + scope) if scope and len(scope) == 2 else
                (('region:' + scope) if scope in ('EUROPE', 'LATAM', 'NA') else scope), 'role': role, 'level': level_of(r['title'], role),

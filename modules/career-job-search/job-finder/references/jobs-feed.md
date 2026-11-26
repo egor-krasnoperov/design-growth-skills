@@ -1,6 +1,6 @@
 # Daily jobs list
 
-A list of open digital design vacancies, rebuilt every morning from the open job dataset by [Stapply](https://github.com/kalil0321/ats-scrapers) (data under CC0 1.0) by the program in [`../../jobs-feed`](../../jobs-feed). Each vacancy belongs to its employer. The list keeps only short facts, requirement keywords and the link to the employer's posting, never the posting text.
+A list of open digital design and UX research vacancies, rebuilt every morning from the open job dataset by [Stapply](https://github.com/kalil0321/ats-scrapers) (data under CC0 1.0) by the program in [`../../jobs-feed`](../../jobs-feed). Each vacancy belongs to its employer. The list keeps only short facts, requirement keywords and the link to the employer's posting, never the posting text.
 
 ## Reading the list
 
@@ -27,6 +27,17 @@ Folders are `na` (US and Canada), `latam`, `europe`, `uk`, `mena`, `worldwide` a
 
 For a large country, read only the files of the selected roles. Read one file at a time. In a chat without a work environment, read at most about four files (up to 600 vacancies), starting with the first part of each selected role and the remote files. Say which files were not read. With a work environment that has internet access, download all the needed files there and select and rank them in code.
 
+## The personal base
+
+With a work environment that can run code, Job Finder keeps a wider set of vacancies than the user's own conditions, so that the board's filters can widen the view without a new search.
+
+- **Roles.** The selected roles. **Levels.** The selected levels and vacancies without a stated level.
+- **Places.** The user's places in every work format, remote vacancies open to their region or worldwide, and the countries they would relocate to. Leave out remote vacancies limited to other countries.
+- **Size.** Up to about 600 vacancies. If more fit, keep those that fit the user's own conditions first, then the others, newest first.
+- **Fields.** Keep every field of the list unchanged.
+
+Save it as `vacancies.json` in the format described in [../../personal-job-board/board-integration.md](../../personal-job-board/board-integration.md#personal-base-file).
+
 ## Fields of a vacancy
 
 Empty fields are left out.
@@ -40,7 +51,7 @@ Empty fields are left out.
 | `region` | `NA`, `UK`, `EUROPE`, `LATAM`, `MENA`, `WORLDWIDE`, `OTHER` or `NOT_STATED` |
 | `workMode` | `remote`, `hybrid` or `onsite`. Missing for about half of the vacancies; then the format is not stated |
 | `remoteScope` | Only for remote vacancies: `country:XX`, `region:EUROPE` (also `LATAM`, `NA`) or `worldwide` |
-| `role` | `product-designer`, `ux-ui-designer`, `design-engineer`, `design-manager`, `head-of-design`, `design-director` |
+| `role` | `product-designer`, `ux-ui-designer`, `design-engineer`, `ux-researcher`, `design-manager`, `head-of-design`, `design-director`. UX research leadership titles, such as UX Research Manager or Head of UX Research, go to the leadership roles |
 | `level` | `junior`, `middle`, `senior` or `leadership`, from the title. Missing when the title states no level |
 | `salary` | `{min, max, currency, period}`, one stated range, when the platform gives one |
 | `publishedAt` | Date from the job platform |
@@ -56,9 +67,9 @@ The keywords are found by simple rules in the posting text. They miss things and
 
 ## The profile
 
-Write the profile from the CV with the same keyword names, so it can be compared with the vacancies. Add a keyword only when the CV shows it.
+Write the profile from the CV, and from the portfolio or website when the user gave one, with the same keyword names, so it can be compared with the vacancies. Add a keyword only when the CV or the portfolio shows it.
 
-- **skills** — `figma`, `design systems`, `prototyping`, `usability testing`, `user research`, `interaction design`, `ui design`, `mobile`, `web`, `analytics and experiments`, `html and css`, `accessibility`, `workshops`, `motion`, `ai products`, `mentoring`, `end-to-end`.
+- **skills** — `figma`, `design systems`, `prototyping`, `usability testing`, `user research`, `interaction design`, `ui design`, `mobile`, `web`, `analytics and experiments`, `html and css`, `accessibility`, `workshops`, `motion`, `ai products`, `mentoring`, `end-to-end`. UX research vacancies can also have `qualitative research` and `quantitative research`.
 - **domains** — `fintech`, `e-commerce`, `consumer`, `b2b saas`, `healthcare`, `developer tools`, `security`, `marketplace`, `travel`, `data products`, `crypto`, `education`, `gaming`.
 - **languages** — the languages the person speaks at a working level, in English and lower case, for example `portuguese`. Required languages in the list come from `german`, `french`, `spanish`, `portuguese`, `dutch`, `italian`, `polish`, `arabic`, `hebrew`, `swedish`, `danish`, `norwegian`, `finnish`, `czech`, `japanese`, `mandarin`.
 - **years** — years of experience in design roles, from the dates in the CV.

@@ -1,6 +1,6 @@
 # Design jobs list
 
-A daily list of open digital design vacancies for [Job Finder](https://github.com/egor-krasnoperov/design-growth-skills/tree/main/modules/career-job-search). It is rebuilt every morning by a GitHub Action, and this branch keeps the last three days.
+A daily list of open digital design and UX research vacancies for [Job Finder](https://github.com/egor-krasnoperov/design-growth-skills/tree/main/modules/career-job-search). It is rebuilt every morning by a GitHub Action, and this branch keeps the last three days.
 
 Start with `latest.json`. It names the folder of the latest day, and that folder's `index.json` lists every file with its region, country and number of vacancies, and explains each field.
 

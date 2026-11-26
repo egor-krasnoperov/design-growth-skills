@@ -278,12 +278,19 @@
     #match-panel h4 { margin: 24px 0 8px; font-size: 14px; line-height: 20px; font-weight: 600; }
     #match-panel .report-note { margin: 0 0 4px; color: var(--muted); font-size: 14px; line-height: 20px; }
     #match-panel .report-note + p:not(.report-note) { margin-top: 16px; }
-    .report-reqs, .report-list { max-width: 34em; margin: 0; padding: 0; list-style: none; }
-    .report-reqs li { display: grid; grid-template-columns: 104px minmax(0,1fr); gap: 12px; padding: 6px 0; }
-    .req-status { color: var(--muted); font-size: 14px; line-height: 24px; }
-    #match-panel .report-reqs p { margin: 0; }
+    .report-list { max-width: 34em; margin: 0; padding: 0; list-style: none; }
+    /* Requirements as a table: the requirement, what the CV shows, the status with a small icon; thin lines between rows */
+    .report-table { width: 100%; margin: 24px 0 0; border-collapse: collapse; table-layout: fixed; }
+    .report-table th { padding: 0 16px 8px 0; border-bottom: 1px solid #e6e6e6; color: var(--ink); font-size: 14px; line-height: 20px; font-weight: 600; text-align: left; }
+    .report-table td { padding: 12px 16px 12px 0; border-bottom: 1px solid #eeeeee; vertical-align: top; font-size: 16px; line-height: 24px; overflow-wrap: anywhere; }
+    .report-table th:nth-child(3), .report-table td:nth-child(3) { width: 140px; padding-right: 0; }
+    #match-panel .report-table p { max-width: none; margin: 0; }
+    .req-status { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-size: 16px; line-height: 24px; white-space: nowrap; }
+    .req-status svg { flex: none; width: 16px; height: 16px; }
+    .req-status[data-status="not_evidenced"], .req-status[data-status="unclear"] { color: var(--muted); }
     .req-priority { color: var(--muted); font-size: 14px; }
-    #match-panel .req-detail { margin-top: 2px; color: var(--muted); font-size: 14px; line-height: 20px; }
+    /* Grey text in the table (Required or Preferred, the note) has the same size as the rest, only the colour differs */
+    #match-panel .req-detail { margin-top: 2px; color: var(--muted); font-size: 16px; line-height: 24px; }
     .report-list li { position: relative; padding-left: 16px; font-size: 16px; line-height: 24px; }
     .report-list li::before { content: "–"; position: absolute; left: 0; color: var(--muted); }
     .report-list li + li { margin-top: 4px; }
@@ -402,8 +409,13 @@
       .filter-heading button { min-height: 44px; padding: 8px 0 8px 12px; color: var(--muted); font-size: 14px; }
       .filter-option { min-height: 52px; padding: 14px 16px; border-radius: 12px; font-size: 16px; }
       .details-dialog { width: 100%; height: auto; max-height: calc(100dvh - 16px); margin: auto 0 0; border-radius: 24px 24px 0 0; }
-      .report-reqs li { grid-template-columns: minmax(0,1fr); gap: 2px; }
-      .req-status { line-height: 20px; }
+      /* On phones each requirement is a block: the status first, then the requirement, then what the CV shows */
+      .report-table, .report-table tbody { display: block; }
+      .report-table thead { display: none; }
+      .report-table tr { display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid #eeeeee; }
+      .report-table td, .report-table td:nth-child(3) { display: block; width: auto; padding: 0; border: 0; }
+      .report-table td:nth-child(3) { order: -1; }
+      .report-table td[data-label]::before { content: attr(data-label); display: block; color: var(--muted); font-size: 16px; line-height: 24px; }
       .dialog-shell { display: flex; flex-direction: column; gap: 16px; padding: 24px 24px 48px; }
       .dialog-rail { position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 52px; }
       .dialog-rail .rail-match { margin: 0; }
@@ -492,7 +504,7 @@
     <form class="filters-body" id="filters-form" novalidate>
       <div class="filter-group" role="group" aria-labelledby="fg-where"><h3 id="fg-where">Where</h3><div class="chips" id="where-chips" hidden></div><input class="field where-input" id="where-input" type="text" placeholder="Region, country or city" autocomplete="off" aria-label="Region, country or city" aria-controls="where-suggest" aria-autocomplete="list"><div class="where-suggest" id="where-suggest" role="listbox" aria-label="Places" hidden></div><div class="pills"><button type="button" class="pill" data-region="EUROPE" aria-pressed="false">Europe</button><button type="button" class="pill" data-region="UK" aria-pressed="false">United Kingdom</button><button type="button" class="pill" data-region="NA" aria-pressed="false">US and Canada</button><button type="button" class="pill" data-region="LATAM" aria-pressed="false">Latin America</button><button type="button" class="pill" data-region="MENA" aria-pressed="false">MENA</button></div></div>
       <div class="filter-group" role="group" aria-labelledby="fg-format"><h3 id="fg-format">Work format</h3><div class="pills"><button type="button" class="pill" data-group="workModes" data-value="remote" aria-pressed="false">Remote</button><button type="button" class="pill" data-group="workModes" data-value="hybrid" aria-pressed="false">Hybrid</button><button type="button" class="pill" data-group="workModes" data-value="onsite" aria-pressed="false">Onsite</button></div></div>
-      <div class="filter-group" role="group" aria-labelledby="fg-role"><h3 id="fg-role">Role</h3><div class="pills"><button type="button" class="pill" data-group="roles" data-value="product-designer" aria-pressed="false">Product Designer</button><button type="button" class="pill" data-group="roles" data-value="ux-ui-designer" aria-pressed="false">UX/UI Designer</button><button type="button" class="pill" data-group="roles" data-value="design-engineer" aria-pressed="false">Design Engineer</button><button type="button" class="pill" data-group="roles" data-value="design-manager" aria-pressed="false">Design Manager</button><button type="button" class="pill" data-group="roles" data-value="head-of-design" aria-pressed="false">Head of Design</button><button type="button" class="pill" data-group="roles" data-value="design-director" aria-pressed="false">Design Director</button></div></div>
+      <div class="filter-group" role="group" aria-labelledby="fg-role"><h3 id="fg-role">Role</h3><div class="pills"><button type="button" class="pill" data-group="roles" data-value="product-designer" aria-pressed="false">Product Designer</button><button type="button" class="pill" data-group="roles" data-value="ux-ui-designer" aria-pressed="false">UX/UI Designer</button><button type="button" class="pill" data-group="roles" data-value="design-engineer" aria-pressed="false">Design Engineer</button><button type="button" class="pill" data-group="roles" data-value="ux-researcher" aria-pressed="false">UX Researcher</button><button type="button" class="pill" data-group="roles" data-value="design-manager" aria-pressed="false">Design Manager</button><button type="button" class="pill" data-group="roles" data-value="head-of-design" aria-pressed="false">Head of Design</button><button type="button" class="pill" data-group="roles" data-value="design-director" aria-pressed="false">Design Director</button></div></div>
       <div class="filter-group" role="group" aria-labelledby="fg-level"><h3 id="fg-level">Level</h3><div class="pills"><button type="button" class="pill" data-group="levels" data-value="middle" aria-pressed="false">Middle</button><button type="button" class="pill" data-group="levels" data-value="senior" aria-pressed="false">Senior</button></div><label class="check"><input type="checkbox" id="unstated-level"><span>Show jobs without a stated level</span></label></div>
       <div class="filter-group" role="group" aria-labelledby="fg-salary"><h3 id="fg-salary">Salary from</h3><div class="salary-row"><input class="field" id="salary-amount" type="number" min="0" step="1000" inputmode="numeric" placeholder="Per year" aria-label="Salary from, per year"><select class="field" id="salary-currency" aria-label="Currency"><option>EUR</option><option>USD</option><option>GBP</option></select></div><label class="check"><input type="checkbox" id="salary-only"><span>Only jobs with a stated salary</span></label></div>
       <div class="filter-group" role="group" aria-labelledby="fg-posted"><h3 id="fg-posted">Posted</h3><div class="pills"><button type="button" class="pill" data-group="posted" data-value="any" aria-pressed="false">Any time</button><button type="button" class="pill" data-group="posted" data-value="7" aria-pressed="false">Last 7 days</button><button type="button" class="pill" data-group="posted" data-value="30" aria-pressed="false">Last 30 days</button></div></div>
@@ -562,7 +574,8 @@
       var cvLine = cvName ? cvName + (cvDay ? ' · ' + cvDay : '') : 'Add your CV in the agent chat';
       $('cv-status-label').textContent = cvLine;
       // A tap on the CV shows which CV the job match uses; the CV itself stays in the chat.
-      $('cv-status-label').dataset.tip = cvName ? 'Job match uses ' + cvName + ', the CV you sent in the chat' + (cvDay ? ' on ' + cvDay : '') + '. To use another CV, send it in the chat.' :
+      $('cv-status-label').dataset.tip = cvName ? 'Job match uses ' + cvName + ', the CV you sent in the chat' + (cvDay ? ' on ' + cvDay : '') +
+        (p.usesPortfolio === true ? ', and your portfolio. To use another CV or portfolio, send it in the chat.' : '. To use another CV, send it in the chat.') :
         'Send your CV in the chat to see how well each job matches it.';
       // The first name for the greeting comes from the profile (displayName); without it the heading is neutral.
       var profileName = typeof data.profileName === 'string' && data.profileName.trim() ? data.profileName.trim() :
@@ -739,7 +752,7 @@
     var commonSkills = ['figma','prototyping','end-to-end','ui design','interaction design','web'];
     var stepWords = /\b(staff|principal|lead|expert|founding|junior|jr|associate|entry|graduate)\b/i;
     var roleNames = {'product-designer':'Product Designer','ux-ui-designer':'UX/UI Designer','design-engineer':'Design Engineer',
-      'design-manager':'Design Manager','head-of-design':'Head of Design','design-director':'Design Director'};
+      'ux-researcher':'UX Researcher','design-manager':'Design Manager','head-of-design':'Head of Design','design-director':'Design Director'};
     var leadershipRoles = ['design-manager','head-of-design','design-director'];
     var roleAliases = {'head-of-product-design':'head-of-design','ux-designer':'ux-ui-designer','ui-designer':'ux-ui-designer','ux-ui':'ux-ui-designer'};
     function roleOf(job) {
@@ -748,7 +761,7 @@
       if (roleNames[r]) return r;
       var t = String(job.title || '').toLowerCase();
       return /director/.test(t) ? 'design-director' : /\bhead\b/.test(t) ? 'head-of-design' : /manager/.test(t) ? 'design-manager' :
-        /engineer|developer/.test(t) ? 'design-engineer' : /\bux\b|\bui\b|user experience|interface/.test(t) ? 'ux-ui-designer' :
+        /engineer|developer/.test(t) ? 'design-engineer' : /research/.test(t) ? 'ux-researcher' : /\bux\b|\bui\b|user experience|interface/.test(t) ? 'ux-ui-designer' :
         /designer/.test(t) ? 'product-designer' : '';
     }
     function lowerList(value) {
@@ -794,18 +807,19 @@
     // What a card shows at the bottom: one Job match label, from the deep analysis when there is a report, otherwise the estimate.
     function tone(score) { return score == null ? 'none' : score >= 80 ? 'high' : score >= 60 ? 'mid' : 'low'; }
     // Every match label has the same short tooltip; the job window says whether it is the quick estimate or the deep analysis.
-    var matchTip = 'How well your CV\nfits this job';
+    // With a portfolio in the profile (usesPortfolio), the tooltip names it too; "and" starts the second line.
+    function matchTip() { return data.profile && data.profile.usesPortfolio === true ? 'How well your CV\nand portfolio fit this job' : 'How well your CV\nfits this job'; }
     function cardMatch(job) {
       var report = reportOf(job.id);
       if (report) {
         var score = reportScore(report);
-        return {text:score != null ? score + '%' : '—', tone:tone(score), tip:matchTip};
+        return {text:score != null ? score + '%' : '—', tone:tone(score), tip:matchTip()};
       }
       if (matching.has(job.id)) return {text:'Analysing…', tip:''};
-      if (known(job.match)) return {text:Math.round(Number(job.match)) + '%', tone:tone(Math.round(Number(job.match))), tip:matchTip};
+      if (known(job.match)) return {text:Math.round(Number(job.match)) + '%', tone:tone(Math.round(Number(job.match))), tip:matchTip()};
       if (demoShown(job.id)) return {text:'Demo match', tip:''};
       var q = quickMatch(job);
-      return q ? {text:q.enough ? q.score + '%' : '—', tone:tone(q.enough ? q.score : null), tip:matchTip} : null;
+      return q ? {text:q.enough ? q.score + '%' : '—', tone:tone(q.enough ? q.score : null), tip:matchTip()} : null;
     }
     // Best match uses the Match percentage, otherwise the quick match; vacancies without either go to the end.
     function matchValue(job) {
@@ -1240,7 +1254,11 @@
     document.addEventListener('pointerdown',hideTip);
     document.documentElement.addEventListener('mouseleave',hideTip);
     addEventListener('scroll',hideTip,{passive:true});
-    function showRefreshInfo() { notify('This is your saved demo collection. Ask your agent to run a new search.'); }
+    // Refresh without a host: the demo says it is a demo; a saved copy with real vacancies says where to refresh.
+    function showRefreshInfo() {
+      notify(isDemoData() ? 'This is your saved demo collection. Ask your agent to run a new search.' :
+        'This is a saved copy of your board. To get new vacancies, open your board in Claude and press Refresh there.');
+    }
     function requestRefresh() {
       if (runAction('refresh', null, {filters:publicFilters()})) return;
       if (hostData) copyRequest('Refresh my Personal Job Board search with my saved preferences.', null); else showRefreshInfo();
@@ -1287,11 +1305,14 @@
       var html = '<h3>' + esc(deepLabel(r)) + '</h3>' +
         '<p class="report-note">AI estimate of how well your CV fits this job description. A guide, not a prediction of an interview invitation.</p>' +
         (reportMeta(r) ? '<p class="report-note">' + esc(reportMeta(r)) + '</p>' : '') + (r.summary ? '<p>' + esc(r.summary) + '</p>' : '');
-      if (list(r.requirements).length) html += '<h4>Requirements</h4><ul class="report-reqs">' + list(r.requirements).map(function (q) {
-        return '<li><span class="req-status">' + (requirementStatus[q.status] || 'Unclear') + '</span><div><p>' + esc(q.text) +
-          (requirementPriority[q.priority] ? ' <span class="req-priority">' + requirementPriority[q.priority] + '</span>' : '') + '</p>' +
-          (q.evidence ? '<p class="req-detail">“' + esc(q.evidence) + '”</p>' : '') + (q.note ? '<p class="req-detail">' + esc(q.note) + '</p>' : '') + '</div></li>';
-      }).join('') + '</ul>';
+      if (list(r.requirements).length) html += '<table class="report-table"><thead><tr><th scope="col">Requirement</th>' +
+        '<th scope="col">In your CV</th><th scope="col">Status</th></tr></thead><tbody>' + list(r.requirements).map(function (q) {
+        var status = requirementStatus[q.status] ? q.status : 'unclear';
+        return '<tr><td><p>' + esc(q.text) + '</p>' + (requirementPriority[q.priority] ? '<p class="req-detail">' + requirementPriority[q.priority] + '</p>' : '') + '</td>' +
+          '<td data-label="In your CV">' + (q.evidence ? '<p>' + esc(q.evidence) + '</p>' : '') + (q.note ? '<p class="req-detail">' + esc(q.note) + '</p>' : '') +
+          (!q.evidence && !q.note ? '<p class="req-detail">—</p>' : '') + '</td>' +
+          '<td><span class="req-status" data-status="' + status + '">' + requirementIcons[status] + '<span>' + requirementStatus[status] + '</span></span></td></tr>';
+      }).join('') + '</tbody></table>';
       [['Strengths', r.strengths], ['Gaps', r.gaps], ['Questions for you', r.openQuestions]].forEach(function (part) {
         if (list(part[1]).length) html += '<h4>' + part[0] + '</h4><ul class="report-list">' + list(part[1]).map(function (t) { return '<li>' + esc(t && typeof t === 'object' ? t.text : t) + '</li>'; }).join('') + '</ul>';
       });
@@ -1302,6 +1323,12 @@
       return html;
     }
     var requirementStatus = {supported:'Supported', partly_supported:'Partly', not_evidenced:'Not evidenced', unclear:'Unclear'};
+    // Status icons: a green check (the green of the Job match label), a half circle, an empty circle, a dashed circle.
+    var requirementIcons = {
+      supported:'<svg viewBox="0 0 16 16" aria-hidden="true"><rect width="16" height="16" rx="4" fill="#BCFBA4"/><path d="M4.5 8.3l2.3 2.3 4.7-4.9" fill="none" stroke="#1C6304" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      partly_supported:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 0 0 12.5z" fill="currentColor"/></svg>',
+      not_evidenced:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
+      unclear:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2.2 2.2"/></svg>'};
     var requirementPriority = {required:'Required', preferred:'Preferred'};
     function shortDay(value) { return dayOf(value) ? new Date(dayOf(value) + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : ''; }
     function coverageText(c) {
@@ -1352,7 +1379,7 @@
       if (isDemoData()) return runDemoMatch(id);
       var job = data.jobs.find(function (j) { return j.id === id; });
       if (!job) return;
-      copyRequest('Match request from Personal Job Board. Vacancy "' + (job.title || 'Untitled') + '"' + (job.company ? ' at ' + job.company : '') +
+      copyRequest('Deep analysis request from Personal Job Board. Vacancy "' + (job.title || 'Untitled') + '"' + (job.company ? ' at ' + job.company : '') +
         ', id ' + job.id + '. Compare it with my CV and save the report to the board.', job.id);
     }
     // Copies within the same click. If the browser refuses, a Match request is shown selected in the vacancy dialog.
