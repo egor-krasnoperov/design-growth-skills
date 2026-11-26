@@ -118,7 +118,7 @@ Job match shows how much of the vacancy's requirements your CV and portfolio sup
 The quick estimate only sees the keywords in the list. The full posting has more requirements, and your CV may not show some of them. In a test run the quick estimate gave 77% on average and the analysis of the same vacancies 59%. The second number is more accurate, because it takes the whole posting into account.
 
 **Why can't some vacancies be read?**
-Some sites don't let assistants read their pages. At the moment Claude can't read postings on Workable, Workday and Gem, and the board marks them. Sometimes it can't read Ashby postings either, for companies with a very long list of vacancies. All of these keep the quick estimate. Open the original link and read the vacancy there.
+Some sites don't let assistants read their pages. At the moment Claude can't read postings on Workable, Workday, Gem and Welcome to the Jungle, and the board marks them. Sometimes it can't read Ashby postings either, for companies with a very long list of vacancies. All of these keep the quick estimate. Open the original link and read the vacancy there.
 
 **Why did a vacancy turn out to be closed?**
 The list is built in the morning, and a company can close a vacancy at any time. Analysed vacancies were checked when they were analysed, the others weren't. A deep analysis opens the vacancy again and tells you if it has closed. After Refresh, analysed vacancies that have left the list are marked "not in the latest list". You can remove a closed vacancy with Hide in the ⋯ menu.
