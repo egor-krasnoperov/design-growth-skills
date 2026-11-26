@@ -25,10 +25,12 @@ Tailoring your CV for a vacancy and exporting it as a PDF is coming next.
 2. Send the link to this repository or to the [Job Finder](job-finder/SKILL.md) skill and attach your CV. If you have a portfolio or website, add its link too.
 3. Answer a few short questions about the roles, level, places and work format you want, and about your Claude plan.
 4. Check the profile Claude shows you and reply yes.
-5. Wait about 20 minutes. Claude puts together your base, creates the board and analyses the 20 best vacancies. The board fills up as it goes.
+5. Wait 20 to 30 minutes. Claude puts together your base, creates the board and analyses the 20 best vacancies. The board fills up as it goes.
 6. For a deep analysis, open a vacancy and press Get deep analysis. Claude asks in its own window whether the board may send it a message. Press Send.
 
 There is nothing to install. In ChatGPT and other assistants you can send the same link and get the vacancies in the chat.
+
+The [Job Finder guide](job-finder/GUIDE.md) walks you through the first run step by step, shows how the board works and answers common questions.
 
 ## How Job Finder works
 
@@ -65,7 +67,7 @@ Job Finder, Job Matcher and Personal Job Board were built and tested in Claude f
 - With two fictional profiles, a Senior Product Designer in Lisbon and one in London, the selection and the Job match were checked on that list. 115 vacancies fitted the Lisbon profile and 255 the London one.
 - In the earlier version, which searched the web, every vacancy link on the board opened a live posting in the last two runs (16 of 16 and 14 of 14), and the deep analysis percentages matched the formula.
 - On 26 November 2026 the whole flow ran in Claude on the Max 5x plan with a fictional Product Designer in Lisbon. From confirming the profile to a ready board took about 3.5 minutes, and to 20 analysed vacancies about 19 minutes. It used about 9% of the Max 5x five-hour limit. On Pro that is roughly half of the five-hour limit, by calculation rather than measurement.
-- The short analysis gave 59% on average, and the quick estimate for the same vacancies 77%. For half of the analysed vacancies the live posting didn't fit the place or US working hours. So Claude now skips such vacancies. This rule hasn't been tested in a run yet.
+- The short analysis gave 59% on average, and the quick estimate for the same vacancies 77%. For half of the analysed vacancies the live posting didn't fit the place or US working hours. So Claude now skips such vacancies. A later run on the same day confirmed the rule. Claude skipped 10 such vacancies, the board's filters hid 8 of them, and only fitting vacancies were at the top. With the skipping, 20 analysed vacancies took about 26 minutes and about 8% of the Max 5x five-hour limit.
 
 ## Known limits
 
@@ -74,12 +76,12 @@ Job Finder, Job Matcher and Personal Job Board were built and tested in Claude f
 - Job match is a rough estimate from keywords. The deep analysis reads the whole posting.
 - Vacancies that weren't checked live may have closed since the list was built. The board shows the date of the list for them.
 - Some career sites don't let assistants read them, so not every vacancy can be checked live.
-- Claude can't read postings on Workable, Workday and Gem at the moment. The board marks them, and they only have the quick estimate.
+- Claude can't read postings on Workable, Workday and Gem at the moment. The board marks them, and they only have the quick estimate. Sometimes it can't read Ashby postings either, for companies with a very long list of vacancies. These keep the quick estimate and the date of the list.
 - Some remote vacancies in the list are marked as worldwide but are open to one country or region only. Claude sees this only for the vacancies it reads.
 - The board shows a summary of a posting, not the full text.
 - Free and Pro plans, the Claude desktop and mobile apps, ChatGPT and other assistants, UX research roles, roles beyond Product, UX and UI design, and regions beyond Lisbon and London haven't been tested yet.
 
-If something doesn't work as described, I'd like to hear about it.
+If something doesn't work as described, I'd like to hear about it in [GitHub Issues](https://github.com/egor-krasnoperov/design-growth-skills/issues).
 
 ## How to use
 

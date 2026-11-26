@@ -41,7 +41,7 @@ Keep it true for the current assistant. If it can't create a board, replace the 
 > 1. You send your CV and, if you have one, a link to your portfolio or website.
 > 2. I ask a few short questions about what you're looking for. Your answers decide which vacancies go into your base.
 > 3. I write a short profile and show it to you. The search starts once you confirm it.
-> 4. I put together the base, create the board and analyse the 20 best vacancies. This takes about 20 minutes, and the board fills up as I go.
+> 4. I put together the base, create the board and analyse the 20 best vacancies. This takes 20 to 30 minutes, and the board fills up as I go.
 > 5. If you want a detailed analysis, open a vacancy on the board and press **Get deep analysis**. The report appears in the chat and on the board.
 > 6. You apply yourself. Every few days press **Refresh**, and new vacancies are added to your base.
 >

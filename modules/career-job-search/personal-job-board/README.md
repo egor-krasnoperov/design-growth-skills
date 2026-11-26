@@ -9,7 +9,7 @@ Personal Job Board is a private page where you review vacancies, save the intere
 1. Share this repository or the [Job Finder](../job-finder/SKILL.md) skill with Claude and add your CV and, if you have one, a link to your portfolio or website.
 2. Answer a few short questions about the work you're looking for.
 3. Check the profile Claude shows you and reply yes.
-4. Claude puts together your personal base of vacancies from the daily list, creates the board in your chat and analyses the 20 best vacancies on the employers' live pages. This takes about 20 minutes, and the board fills up as it goes.
+4. Claude puts together your personal base of vacancies from the daily list, creates the board in your chat and analyses the 20 best vacancies on the employers' live pages. This takes 20 to 30 minutes, and the board fills up as it goes.
 
 The board is created for you personally. Nobody else sees it or its data unless you share it.
 
