@@ -1,0 +1,1290 @@
+{
+ "date": "2026-11-28",
+ "generatedAt": "2026-11-28T07:53:08+00:00",
+ "sourceSnapshot": "2026-11-27T14:30:03.844045+00:00",
+ "jobs": 5643,
+ "source": "Open job dataset by Stapply (https://github.com/kalil0321/ats-scrapers), data under CC0 1.0. Each vacancy belongs to its employer; open the url for the posting.",
+ "byRegion": {
+  "NA": 2331,
+  "EUROPE": 1011,
+  "OTHER": 993,
+  "NOT_STATED": 472,
+  "UK": 373,
+  "LATAM": 259,
+  "MENA": 120,
+  "WORLDWIDE": 84
+ },
+ "fields": {
+  "id": "stable id from the posting url",
+  "place": "city and country as far as known",
+  "country": "ISO code",
+  "region": "NA, UK, EUROPE, LATAM, MENA, WORLDWIDE, OTHER or NOT_STATED",
+  "workMode": "remote, hybrid or onsite",
+  "remoteScope": "where a remote job can be done: country:XX, region:XX or worldwide",
+  "role": "role family",
+  "level": "junior, middle, senior or leadership",
+  "salary": "one stated range",
+  "publishedAt": "date from the job platform",
+  "firstSeen": "first day this list had the vacancy",
+  "skills, domains, languages, yearsMin": "requirement keywords found in the posting, for the quick match; languages are the ones marked as required",
+  "recruiter": "true when the poster looks like a recruitment agency"
+ },
+ "files": [
+  {
+   "path": "europe/AM.json",
+   "region": "EUROPE",
+   "country": "AM",
+   "remote": false,
+   "role": null,
+   "rows": 3
+  },
+  {
+   "path": "europe/AT.json",
+   "region": "EUROPE",
+   "country": "AT",
+   "remote": false,
+   "role": null,
+   "rows": 18
+  },
+  {
+   "path": "europe/BE.json",
+   "region": "EUROPE",
+   "country": "BE",
+   "remote": false,
+   "role": null,
+   "rows": 29
+  },
+  {
+   "path": "europe/BG.json",
+   "region": "EUROPE",
+   "country": "BG",
+   "remote": false,
+   "role": null,
+   "rows": 4
+  },
+  {
+   "path": "europe/CH.json",
+   "region": "EUROPE",
+   "country": "CH",
+   "remote": false,
+   "role": null,
+   "rows": 20
+  },
+  {
+   "path": "europe/CY.json",
+   "region": "EUROPE",
+   "country": "CY",
+   "remote": false,
+   "role": null,
+   "rows": 7
+  },
+  {
+   "path": "europe/CZ.json",
+   "region": "EUROPE",
+   "country": "CZ",
+   "remote": false,
+   "role": null,
+   "rows": 20
+  },
+  {
+   "path": "europe/DE-design-director.json",
+   "region": "EUROPE",
+   "country": "DE",
+   "remote": false,
+   "role": "design-director",
+   "rows": 4
+  },
+  {
+   "path": "europe/DE-design-engineer.json",
+   "region": "EUROPE",
+   "country": "DE",
+   "remote": false,
+   "role": "design-engineer",
+   "rows": 12
+  },
+  {
+   "path": "europe/DE-design-manager.json",
+   "region": "EUROPE",
+   "country": "DE",
+   "remote": false,
+   "role": "design-manager",
+   "rows": 2
+  },
+  {
+   "path": "europe/DE-head-of-design.json",
+   "region": "EUROPE",
+   "country": "DE",
+   "remote": false,
+   "role": "head-of-design",
+   "rows": 2
+  },
+  {
+   "path": "europe/DE-product-designer.json",
+   "region": "EUROPE",
+   "country": "DE",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 95
+  },
+  {
+   "path": "europe/DE-ux-researcher.json",
+   "region": "EUROPE",
+   "country": "DE",
+   "remote": false,
+   "role": "ux-researcher",
+   "rows": 8
+  },
+  {
+   "path": "europe/DE-ux-ui-designer.json",
+   "region": "EUROPE",
+   "country": "DE",
+   "remote": false,
+   "role": "ux-ui-designer",
+   "rows": 99
+  },
+  {
+   "path": "europe/DK.json",
+   "region": "EUROPE",
+   "country": "DK",
+   "remote": false,
+   "role": null,
+   "rows": 12
+  },
+  {
+   "path": "europe/EE.json",
+   "region": "EUROPE",
+   "country": "EE",
+   "remote": false,
+   "role": null,
+   "rows": 5
+  },
+  {
+   "path": "europe/ES.json",
+   "region": "EUROPE",
+   "country": "ES",
+   "remote": false,
+   "role": null,
+   "rows": 70
+  },
+  {
+   "path": "europe/FI.json",
+   "region": "EUROPE",
+   "country": "FI",
+   "remote": false,
+   "role": null,
+   "rows": 8
+  },
+  {
+   "path": "europe/FR-design-director.json",
+   "region": "EUROPE",
+   "country": "FR",
+   "remote": false,
+   "role": "design-director",
+   "rows": 1
+  },
+  {
+   "path": "europe/FR-design-manager.json",
+   "region": "EUROPE",
+   "country": "FR",
+   "remote": false,
+   "role": "design-manager",
+   "rows": 6
+  },
+  {
+   "path": "europe/FR-head-of-design.json",
+   "region": "EUROPE",
+   "country": "FR",
+   "remote": false,
+   "role": "head-of-design",
+   "rows": 2
+  },
+  {
+   "path": "europe/FR-product-designer.json",
+   "region": "EUROPE",
+   "country": "FR",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 113
+  },
+  {
+   "path": "europe/FR-ux-researcher.json",
+   "region": "EUROPE",
+   "country": "FR",
+   "remote": false,
+   "role": "ux-researcher",
+   "rows": 6
+  },
+  {
+   "path": "europe/FR-ux-ui-designer.json",
+   "region": "EUROPE",
+   "country": "FR",
+   "remote": false,
+   "role": "ux-ui-designer",
+   "rows": 46
+  },
+  {
+   "path": "europe/GE.json",
+   "region": "EUROPE",
+   "country": "GE",
+   "remote": false,
+   "role": null,
+   "rows": 2
+  },
+  {
+   "path": "europe/GR.json",
+   "region": "EUROPE",
+   "country": "GR",
+   "remote": false,
+   "role": null,
+   "rows": 17
+  },
+  {
+   "path": "europe/HR.json",
+   "region": "EUROPE",
+   "country": "HR",
+   "remote": false,
+   "role": null,
+   "rows": 2
+  },
+  {
+   "path": "europe/HU.json",
+   "region": "EUROPE",
+   "country": "HU",
+   "remote": false,
+   "role": null,
+   "rows": 8
+  },
+  {
+   "path": "europe/IE.json",
+   "region": "EUROPE",
+   "country": "IE",
+   "remote": false,
+   "role": null,
+   "rows": 25
+  },
+  {
+   "path": "europe/IT.json",
+   "region": "EUROPE",
+   "country": "IT",
+   "remote": false,
+   "role": null,
+   "rows": 14
+  },
+  {
+   "path": "europe/LT.json",
+   "region": "EUROPE",
+   "country": "LT",
+   "remote": false,
+   "role": null,
+   "rows": 12
+  },
+  {
+   "path": "europe/LU.json",
+   "region": "EUROPE",
+   "country": "LU",
+   "remote": false,
+   "role": null,
+   "rows": 3
+  },
+  {
+   "path": "europe/LV.json",
+   "region": "EUROPE",
+   "country": "LV",
+   "remote": false,
+   "role": null,
+   "rows": 5
+  },
+  {
+   "path": "europe/MK.json",
+   "region": "EUROPE",
+   "country": "MK",
+   "remote": false,
+   "role": null,
+   "rows": 2
+  },
+  {
+   "path": "europe/MT.json",
+   "region": "EUROPE",
+   "country": "MT",
+   "remote": false,
+   "role": null,
+   "rows": 5
+  },
+  {
+   "path": "europe/NL.json",
+   "region": "EUROPE",
+   "country": "NL",
+   "remote": false,
+   "role": null,
+   "rows": 61
+  },
+  {
+   "path": "europe/NO.json",
+   "region": "EUROPE",
+   "country": "NO",
+   "remote": false,
+   "role": null,
+   "rows": 24
+  },
+  {
+   "path": "europe/PL.json",
+   "region": "EUROPE",
+   "country": "PL",
+   "remote": false,
+   "role": null,
+   "rows": 47
+  },
+  {
+   "path": "europe/PT.json",
+   "region": "EUROPE",
+   "country": "PT",
+   "remote": false,
+   "role": null,
+   "rows": 35
+  },
+  {
+   "path": "europe/RO.json",
+   "region": "EUROPE",
+   "country": "RO",
+   "remote": false,
+   "role": null,
+   "rows": 12
+  },
+  {
+   "path": "europe/RS.json",
+   "region": "EUROPE",
+   "country": "RS",
+   "remote": false,
+   "role": null,
+   "rows": 15
+  },
+  {
+   "path": "europe/SE.json",
+   "region": "EUROPE",
+   "country": "SE",
+   "remote": false,
+   "role": null,
+   "rows": 79
+  },
+  {
+   "path": "europe/SK.json",
+   "region": "EUROPE",
+   "country": "SK",
+   "remote": false,
+   "role": null,
+   "rows": 3
+  },
+  {
+   "path": "europe/UA.json",
+   "region": "EUROPE",
+   "country": "UA",
+   "remote": false,
+   "role": null,
+   "rows": 18
+  },
+  {
+   "path": "europe/remote.json",
+   "region": "EUROPE",
+   "country": null,
+   "remote": true,
+   "role": null,
+   "rows": 30
+  },
+  {
+   "path": "latam/AR.json",
+   "region": "LATAM",
+   "country": "AR",
+   "remote": false,
+   "role": null,
+   "rows": 32
+  },
+  {
+   "path": "latam/BR.json",
+   "region": "LATAM",
+   "country": "BR",
+   "remote": false,
+   "role": null,
+   "rows": 80
+  },
+  {
+   "path": "latam/CL.json",
+   "region": "LATAM",
+   "country": "CL",
+   "remote": false,
+   "role": null,
+   "rows": 19
+  },
+  {
+   "path": "latam/CO.json",
+   "region": "LATAM",
+   "country": "CO",
+   "remote": false,
+   "role": null,
+   "rows": 22
+  },
+  {
+   "path": "latam/CR.json",
+   "region": "LATAM",
+   "country": "CR",
+   "remote": false,
+   "role": null,
+   "rows": 4
+  },
+  {
+   "path": "latam/EC.json",
+   "region": "LATAM",
+   "country": "EC",
+   "remote": false,
+   "role": null,
+   "rows": 2
+  },
+  {
+   "path": "latam/HN.json",
+   "region": "LATAM",
+   "country": "HN",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "latam/JM.json",
+   "region": "LATAM",
+   "country": "JM",
+   "remote": false,
+   "role": null,
+   "rows": 4
+  },
+  {
+   "path": "latam/MX.json",
+   "region": "LATAM",
+   "country": "MX",
+   "remote": false,
+   "role": null,
+   "rows": 40
+  },
+  {
+   "path": "latam/NI.json",
+   "region": "LATAM",
+   "country": "NI",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "latam/PA.json",
+   "region": "LATAM",
+   "country": "PA",
+   "remote": false,
+   "role": null,
+   "rows": 2
+  },
+  {
+   "path": "latam/PE.json",
+   "region": "LATAM",
+   "country": "PE",
+   "remote": false,
+   "role": null,
+   "rows": 9
+  },
+  {
+   "path": "latam/SV.json",
+   "region": "LATAM",
+   "country": "SV",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "latam/UY.json",
+   "region": "LATAM",
+   "country": "UY",
+   "remote": false,
+   "role": null,
+   "rows": 6
+  },
+  {
+   "path": "latam/remote.json",
+   "region": "LATAM",
+   "country": null,
+   "remote": true,
+   "role": null,
+   "rows": 36
+  },
+  {
+   "path": "mena/AE.json",
+   "region": "MENA",
+   "country": "AE",
+   "remote": false,
+   "role": null,
+   "rows": 21
+  },
+  {
+   "path": "mena/DZ.json",
+   "region": "MENA",
+   "country": "DZ",
+   "remote": false,
+   "role": null,
+   "rows": 3
+  },
+  {
+   "path": "mena/EG.json",
+   "region": "MENA",
+   "country": "EG",
+   "remote": false,
+   "role": null,
+   "rows": 26
+  },
+  {
+   "path": "mena/IL.json",
+   "region": "MENA",
+   "country": "IL",
+   "remote": false,
+   "role": null,
+   "rows": 24
+  },
+  {
+   "path": "mena/JO.json",
+   "region": "MENA",
+   "country": "JO",
+   "remote": false,
+   "role": null,
+   "rows": 3
+  },
+  {
+   "path": "mena/LB.json",
+   "region": "MENA",
+   "country": "LB",
+   "remote": false,
+   "role": null,
+   "rows": 2
+  },
+  {
+   "path": "mena/MA.json",
+   "region": "MENA",
+   "country": "MA",
+   "remote": false,
+   "role": null,
+   "rows": 8
+  },
+  {
+   "path": "mena/QA.json",
+   "region": "MENA",
+   "country": "QA",
+   "remote": false,
+   "role": null,
+   "rows": 2
+  },
+  {
+   "path": "mena/SA.json",
+   "region": "MENA",
+   "country": "SA",
+   "remote": false,
+   "role": null,
+   "rows": 17
+  },
+  {
+   "path": "mena/TN.json",
+   "region": "MENA",
+   "country": "TN",
+   "remote": false,
+   "role": null,
+   "rows": 2
+  },
+  {
+   "path": "mena/TR.json",
+   "region": "MENA",
+   "country": "TR",
+   "remote": false,
+   "role": null,
+   "rows": 12
+  },
+  {
+   "path": "na/CA-design-director.json",
+   "region": "NA",
+   "country": "CA",
+   "remote": false,
+   "role": "design-director",
+   "rows": 6
+  },
+  {
+   "path": "na/CA-design-engineer.json",
+   "region": "NA",
+   "country": "CA",
+   "remote": false,
+   "role": "design-engineer",
+   "rows": 8
+  },
+  {
+   "path": "na/CA-design-manager.json",
+   "region": "NA",
+   "country": "CA",
+   "remote": false,
+   "role": "design-manager",
+   "rows": 12
+  },
+  {
+   "path": "na/CA-head-of-design.json",
+   "region": "NA",
+   "country": "CA",
+   "remote": false,
+   "role": "head-of-design",
+   "rows": 1
+  },
+  {
+   "path": "na/CA-product-designer.json",
+   "region": "NA",
+   "country": "CA",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 133
+  },
+  {
+   "path": "na/CA-ux-researcher.json",
+   "region": "NA",
+   "country": "CA",
+   "remote": false,
+   "role": "ux-researcher",
+   "rows": 9
+  },
+  {
+   "path": "na/CA-ux-ui-designer.json",
+   "region": "NA",
+   "country": "CA",
+   "remote": false,
+   "role": "ux-ui-designer",
+   "rows": 62
+  },
+  {
+   "path": "na/EC.json",
+   "region": "NA",
+   "country": "EC",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "na/JP.json",
+   "region": "NA",
+   "country": "JP",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "na/SG.json",
+   "region": "NA",
+   "country": "SG",
+   "remote": false,
+   "role": null,
+   "rows": 5
+  },
+  {
+   "path": "na/US-design-director.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "design-director",
+   "rows": 123
+  },
+  {
+   "path": "na/US-design-engineer.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "design-engineer",
+   "rows": 141
+  },
+  {
+   "path": "na/US-design-manager.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "design-manager",
+   "rows": 57
+  },
+  {
+   "path": "na/US-head-of-design.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "head-of-design",
+   "rows": 32
+  },
+  {
+   "path": "na/US-product-designer-1.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 150
+  },
+  {
+   "path": "na/US-product-designer-2.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 150
+  },
+  {
+   "path": "na/US-product-designer-3.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 150
+  },
+  {
+   "path": "na/US-product-designer-4.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 150
+  },
+  {
+   "path": "na/US-product-designer-5.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 150
+  },
+  {
+   "path": "na/US-product-designer-6.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 150
+  },
+  {
+   "path": "na/US-product-designer-7.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 150
+  },
+  {
+   "path": "na/US-product-designer-8.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 146
+  },
+  {
+   "path": "na/US-ux-researcher.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "ux-researcher",
+   "rows": 107
+  },
+  {
+   "path": "na/US-ux-ui-designer-1.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "ux-ui-designer",
+   "rows": 150
+  },
+  {
+   "path": "na/US-ux-ui-designer-2.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "ux-ui-designer",
+   "rows": 150
+  },
+  {
+   "path": "na/US-ux-ui-designer-3.json",
+   "region": "NA",
+   "country": "US",
+   "remote": false,
+   "role": "ux-ui-designer",
+   "rows": 133
+  },
+  {
+   "path": "na/not-stated.json",
+   "region": "NA",
+   "country": null,
+   "remote": false,
+   "role": null,
+   "rows": 4
+  },
+  {
+   "path": "other/AU.json",
+   "region": "OTHER",
+   "country": "AU",
+   "remote": false,
+   "role": null,
+   "rows": 49
+  },
+  {
+   "path": "other/BD.json",
+   "region": "OTHER",
+   "country": "BD",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "other/BY.json",
+   "region": "OTHER",
+   "country": "BY",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "other/BZ.json",
+   "region": "OTHER",
+   "country": "BZ",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "other/CI.json",
+   "region": "OTHER",
+   "country": "CI",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "other/CN.json",
+   "region": "OTHER",
+   "country": "CN",
+   "remote": false,
+   "role": null,
+   "rows": 34
+  },
+  {
+   "path": "other/GH.json",
+   "region": "OTHER",
+   "country": "GH",
+   "remote": false,
+   "role": null,
+   "rows": 6
+  },
+  {
+   "path": "other/GI.json",
+   "region": "OTHER",
+   "country": "GI",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "other/HK.json",
+   "region": "OTHER",
+   "country": "HK",
+   "remote": false,
+   "role": null,
+   "rows": 28
+  },
+  {
+   "path": "other/ID.json",
+   "region": "OTHER",
+   "country": "ID",
+   "remote": false,
+   "role": null,
+   "rows": 8
+  },
+  {
+   "path": "other/IN-design-director.json",
+   "region": "OTHER",
+   "country": "IN",
+   "remote": false,
+   "role": "design-director",
+   "rows": 8
+  },
+  {
+   "path": "other/IN-design-engineer.json",
+   "region": "OTHER",
+   "country": "IN",
+   "remote": false,
+   "role": "design-engineer",
+   "rows": 14
+  },
+  {
+   "path": "other/IN-design-manager.json",
+   "region": "OTHER",
+   "country": "IN",
+   "remote": false,
+   "role": "design-manager",
+   "rows": 11
+  },
+  {
+   "path": "other/IN-head-of-design.json",
+   "region": "OTHER",
+   "country": "IN",
+   "remote": false,
+   "role": "head-of-design",
+   "rows": 1
+  },
+  {
+   "path": "other/IN-product-designer-1.json",
+   "region": "OTHER",
+   "country": "IN",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 150
+  },
+  {
+   "path": "other/IN-product-designer-2.json",
+   "region": "OTHER",
+   "country": "IN",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 31
+  },
+  {
+   "path": "other/IN-ux-researcher.json",
+   "region": "OTHER",
+   "country": "IN",
+   "remote": false,
+   "role": "ux-researcher",
+   "rows": 15
+  },
+  {
+   "path": "other/IN-ux-ui-designer-1.json",
+   "region": "OTHER",
+   "country": "IN",
+   "remote": false,
+   "role": "ux-ui-designer",
+   "rows": 150
+  },
+  {
+   "path": "other/IN-ux-ui-designer-2.json",
+   "region": "OTHER",
+   "country": "IN",
+   "remote": false,
+   "role": "ux-ui-designer",
+   "rows": 5
+  },
+  {
+   "path": "other/JP.json",
+   "region": "OTHER",
+   "country": "JP",
+   "remote": false,
+   "role": null,
+   "rows": 59
+  },
+  {
+   "path": "other/KE.json",
+   "region": "OTHER",
+   "country": "KE",
+   "remote": false,
+   "role": null,
+   "rows": 9
+  },
+  {
+   "path": "other/KR.json",
+   "region": "OTHER",
+   "country": "KR",
+   "remote": false,
+   "role": null,
+   "rows": 51
+  },
+  {
+   "path": "other/KZ.json",
+   "region": "OTHER",
+   "country": "KZ",
+   "remote": false,
+   "role": null,
+   "rows": 2
+  },
+  {
+   "path": "other/MG.json",
+   "region": "OTHER",
+   "country": "MG",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "other/MU.json",
+   "region": "OTHER",
+   "country": "MU",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "other/MY.json",
+   "region": "OTHER",
+   "country": "MY",
+   "remote": false,
+   "role": null,
+   "rows": 32
+  },
+  {
+   "path": "other/NG.json",
+   "region": "OTHER",
+   "country": "NG",
+   "remote": false,
+   "role": null,
+   "rows": 28
+  },
+  {
+   "path": "other/NZ.json",
+   "region": "OTHER",
+   "country": "NZ",
+   "remote": false,
+   "role": null,
+   "rows": 18
+  },
+  {
+   "path": "other/PH.json",
+   "region": "OTHER",
+   "country": "PH",
+   "remote": false,
+   "role": null,
+   "rows": 36
+  },
+  {
+   "path": "other/PK.json",
+   "region": "OTHER",
+   "country": "PK",
+   "remote": false,
+   "role": null,
+   "rows": 7
+  },
+  {
+   "path": "other/RU.json",
+   "region": "OTHER",
+   "country": "RU",
+   "remote": false,
+   "role": null,
+   "rows": 1
+  },
+  {
+   "path": "other/SG-design-director.json",
+   "region": "OTHER",
+   "country": "SG",
+   "remote": false,
+   "role": "design-director",
+   "rows": 6
+  },
+  {
+   "path": "other/SG-design-engineer.json",
+   "region": "OTHER",
+   "country": "SG",
+   "remote": false,
+   "role": "design-engineer",
+   "rows": 5
+  },
+  {
+   "path": "other/SG-design-manager.json",
+   "region": "OTHER",
+   "country": "SG",
+   "remote": false,
+   "role": "design-manager",
+   "rows": 7
+  },
+  {
+   "path": "other/SG-product-designer.json",
+   "region": "OTHER",
+   "country": "SG",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 79
+  },
+  {
+   "path": "other/SG-ux-researcher.json",
+   "region": "OTHER",
+   "country": "SG",
+   "remote": false,
+   "role": "ux-researcher",
+   "rows": 12
+  },
+  {
+   "path": "other/SG-ux-ui-designer.json",
+   "region": "OTHER",
+   "country": "SG",
+   "remote": false,
+   "role": "ux-ui-designer",
+   "rows": 57
+  },
+  {
+   "path": "other/TH.json",
+   "region": "OTHER",
+   "country": "TH",
+   "remote": false,
+   "role": null,
+   "rows": 8
+  },
+  {
+   "path": "other/TW.json",
+   "region": "OTHER",
+   "country": "TW",
+   "remote": false,
+   "role": null,
+   "rows": 16
+  },
+  {
+   "path": "other/UG.json",
+   "region": "OTHER",
+   "country": "UG",
+   "remote": false,
+   "role": null,
+   "rows": 6
+  },
+  {
+   "path": "other/VN.json",
+   "region": "OTHER",
+   "country": "VN",
+   "remote": false,
+   "role": null,
+   "rows": 13
+  },
+  {
+   "path": "other/ZA.json",
+   "region": "OTHER",
+   "country": "ZA",
+   "remote": false,
+   "role": null,
+   "rows": 24
+  },
+  {
+   "path": "other/not-stated-design-director.json",
+   "region": "OTHER",
+   "country": null,
+   "remote": false,
+   "role": "design-director",
+   "rows": 27
+  },
+  {
+   "path": "other/not-stated-design-engineer.json",
+   "region": "OTHER",
+   "country": null,
+   "remote": false,
+   "role": "design-engineer",
+   "rows": 12
+  },
+  {
+   "path": "other/not-stated-design-manager.json",
+   "region": "OTHER",
+   "country": null,
+   "remote": false,
+   "role": "design-manager",
+   "rows": 21
+  },
+  {
+   "path": "other/not-stated-head-of-design.json",
+   "region": "OTHER",
+   "country": null,
+   "remote": false,
+   "role": "head-of-design",
+   "rows": 2
+  },
+  {
+   "path": "other/not-stated-product-designer-1.json",
+   "region": "OTHER",
+   "country": null,
+   "remote": false,
+   "role": "product-designer",
+   "rows": 150
+  },
+  {
+   "path": "other/not-stated-product-designer-2.json",
+   "region": "OTHER",
+   "country": null,
+   "remote": false,
+   "role": "product-designer",
+   "rows": 129
+  },
+  {
+   "path": "other/not-stated-ux-researcher.json",
+   "region": "OTHER",
+   "country": null,
+   "remote": false,
+   "role": "ux-researcher",
+   "rows": 23
+  },
+  {
+   "path": "other/not-stated-ux-ui-designer.json",
+   "region": "OTHER",
+   "country": null,
+   "remote": false,
+   "role": "ux-ui-designer",
+   "rows": 108
+  },
+  {
+   "path": "uk/GB-design-director.json",
+   "region": "UK",
+   "country": "GB",
+   "remote": false,
+   "role": "design-director",
+   "rows": 11
+  },
+  {
+   "path": "uk/GB-design-engineer.json",
+   "region": "UK",
+   "country": "GB",
+   "remote": false,
+   "role": "design-engineer",
+   "rows": 27
+  },
+  {
+   "path": "uk/GB-design-manager.json",
+   "region": "UK",
+   "country": "GB",
+   "remote": false,
+   "role": "design-manager",
+   "rows": 8
+  },
+  {
+   "path": "uk/GB-head-of-design.json",
+   "region": "UK",
+   "country": "GB",
+   "remote": false,
+   "role": "head-of-design",
+   "rows": 6
+  },
+  {
+   "path": "uk/GB-product-designer-1.json",
+   "region": "UK",
+   "country": "GB",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 150
+  },
+  {
+   "path": "uk/GB-product-designer-2.json",
+   "region": "UK",
+   "country": "GB",
+   "remote": false,
+   "role": "product-designer",
+   "rows": 47
+  },
+  {
+   "path": "uk/GB-ux-researcher.json",
+   "region": "UK",
+   "country": "GB",
+   "remote": false,
+   "role": "ux-researcher",
+   "rows": 37
+  },
+  {
+   "path": "uk/GB-ux-ui-designer.json",
+   "region": "UK",
+   "country": "GB",
+   "remote": false,
+   "role": "ux-ui-designer",
+   "rows": 87
+  },
+  {
+   "path": "worldwide/remote.json",
+   "region": "WORLDWIDE",
+   "country": null,
+   "remote": true,
+   "role": null,
+   "rows": 84
+  }
+ ]
+}
